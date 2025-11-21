@@ -1,21 +1,21 @@
 import { useState } from 'react'
-import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
+import { assets } from '../constants/assets'
 import { favoritePlaces, recentLocations } from '../constants/data'
 
-interface DropoffSelectProps {
+interface ShopsLocationSelectProps {
     onCancel: () => void
     onApply: (value: string) => void
+    currentLocation: string
 }
 
-export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
-    const [value, setValue] = useState('')
-    const [selectedLocation, setSelectedLocation] = useState<[number, number] | null>(null)
+export function ShopsLocationSelectScreen({ onCancel, onApply, currentLocation }: ShopsLocationSelectProps) {
+    const [value, setValue] = useState(currentLocation)
+    const [selectedCoords, setSelectedCoords] = useState<[number, number] | null>(null)
     const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
 
     const handleMapClick = (lat: number, lng: number) => {
-        setSelectedLocation([lat, lng])
-        // In a real app, you'd reverse geocode these coords to get an address string
+        setSelectedCoords([lat, lng])
         setValue(`Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`)
     }
 
@@ -24,7 +24,7 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const coords: [number, number] = [position.coords.latitude, position.coords.longitude]
-                    setSelectedLocation(coords)
+                    setSelectedCoords(coords)
                     setValue('My current location')
                 },
                 (error) => {
@@ -46,15 +46,10 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
         <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen">
             {/* Header with Search Input and View Toggle */}
             <section className="bg-white px-6 py-4 border-b border-gray-200 z-10">
-                <p className="text-xs font-extrabold uppercase tracking-wider text-[#919191] mb-2">DROP-OFF</p>
+                <p className="text-xs font-extrabold uppercase tracking-wider text-[#919191] mb-2">LOCATION</p>
                 <div className="flex items-center gap-3 rounded-3xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm">
-                    <div className="grid size-7 place-items-center flex-shrink-0">
-                        <svg className="w-5 h-5 text-[#ff3b30]" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                    </div>
+                    <img src={assets.searchIcon} alt="Search" className="h-5 w-5 opacity-60" />
                     <input
-                        type="text"
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
                         placeholder="Type here..."
@@ -65,9 +60,7 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                             }
                         }}
                     />
-                    <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <img src={assets.chevronIcon} alt="" className="h-4 w-4 opacity-60" />
                 </div>
 
                 {/* View Toggle */}
@@ -98,9 +91,9 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                         {/* Use Current Location */}
                         <button
                             onClick={handleUseCurrentLocation}
-                            className="w-full flex items-center gap-3 p-3 mb-4 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition text-left min-h-[52px]"
+                            className="w-full flex items-center gap-3 p-3 mb-4 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition text-left"
                         >
-                            <svg className="w-6 h-6 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
@@ -115,7 +108,7 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                                     <button
                                         key={idx}
                                         onClick={() => handleLocationSelect(place)}
-                                        className="px-4 py-2 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 transition min-h-[44px]"
+                                        className="px-4 py-2 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 transition"
                                     >
                                         {place}
                                     </button>
@@ -126,25 +119,21 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                         {/* Recent Locations List */}
                         <div className="mb-6">
                             <p className="text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-4">RECENT LOCATIONS</p>
-                            <div className="space-y-0">
+                            <div className="space-y-2">
                                 {recentLocations.map((location, idx) => (
-                                    <div key={idx}>
-                                        <button
-                                            onClick={() => handleLocationSelect(location.label)}
-                                            className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition text-left min-h-[52px]"
-                                        >
-                                            <div className="size-[14.4px] rounded-full bg-[#ff3b30] flex-shrink-0"></div>
-                                            <span className="flex-1 text-base font-normal text-text-dark">{location.label}</span>
-                                            {location.favorite && (
-                                                <svg className="w-6 h-6 text-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            )}
-                                        </button>
-                                        {idx < recentLocations.length - 1 && (
-                                            <div className="h-[3.5px] bg-gray-200 mx-3"></div>
+                                    <button
+                                        key={idx}
+                                        onClick={() => handleLocationSelect(location.label)}
+                                        className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition text-left"
+                                    >
+                                        <span className="text-lg">
+                                            {location.favorite ? '⭐' : '📍'}
+                                        </span>
+                                        <span className="flex-1 text-base font-normal text-text-dark">{location.label}</span>
+                                        {location.favorite && (
+                                            <span className="text-yellow-400 text-lg">⭐</span>
                                         )}
-                                    </div>
+                                    </button>
                                 ))}
                             </div>
                         </div>
@@ -154,19 +143,16 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                 {viewMode === 'map' && (
                     <>
                         <RideMap
-                            pickupLocation={[24.8607, 67.0011]}
-                            dropoffLocation={selectedLocation || undefined}
+                            pickupLocation={selectedCoords || [24.8607, 67.0011]}
                             onMapClick={handleMapClick}
                             className="h-full w-full"
                         />
 
-                        {/* Selected Location Pin - Centered on map */}
+                        {/* Pin for selected location */}
                         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
                             <div className="relative">
-                                {/* Pin shadow */}
                                 <div className="absolute inset-0 translate-y-1 bg-black/20 blur-sm rounded-full" />
-                                {/* Pin body - Red for drop-off */}
-                                <div className="relative size-14 rounded-full bg-[#ff3b30] border-4 border-white shadow-lg flex items-center justify-center">
+                                <div className="relative size-14 rounded-full bg-primary border-4 border-white shadow-lg flex items-center justify-center">
                                     <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                                     </svg>
@@ -174,13 +160,13 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                             </div>
                         </div>
 
-                        <p className="absolute top-[60%] left-1/2 -translate-x-1/2 rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-[#ff3b30] shadow-md z-20">
-                            Move pin to set drop-off
+                        <p className="absolute top-[60%] left-1/2 -translate-x-1/2 rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-primary shadow-md z-20">
+                            Move pin to set location
                         </p>
 
-                        {/* Location Button - Green circular button */}
+                        {/* Location Button */}
                         <button
-                            className="absolute bottom-6 right-6 size-[51px] rounded-full bg-[#6cc44a] shadow-lg flex items-center justify-center z-20 hover:bg-[#5ab038] transition active:scale-95"
+                            className="absolute bottom-6 right-6 size-[51px] rounded-full bg-primary shadow-lg flex items-center justify-center z-20 hover:bg-primary-dark transition active:scale-95"
                             aria-label="Use current location"
                             onClick={handleUseCurrentLocation}
                         >
@@ -198,13 +184,13 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                 <div className="flex gap-4">
                     <button
                         onClick={onCancel}
-                        className="flex-1 rounded-3xl border-2 border-gray-300 bg-white px-6 py-4 text-base font-bold text-gray-700 transition hover:bg-gray-50 active:scale-95 min-h-[52px]"
+                        className="flex-1 rounded-3xl border-2 border-gray-300 bg-white px-6 py-4 text-base font-bold text-gray-700 transition hover:bg-gray-50 active:scale-95"
                     >
                         CANCEL
                     </button>
                     <button
-                        onClick={() => onApply(value || 'Custom Drop-off')}
-                        className="flex-1 rounded-3xl bg-primary px-6 py-4 text-base font-bold text-white transition hover:bg-primary-dark shadow-lg active:scale-95 min-h-[52px]"
+                        onClick={() => onApply(value || 'My current location')}
+                        className="flex-1 rounded-3xl bg-primary px-6 py-4 text-base font-bold text-white transition hover:bg-primary-dark shadow-lg active:scale-95"
                     >
                         APPLY
                     </button>
@@ -213,3 +199,4 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
         </div>
     )
 }
+
