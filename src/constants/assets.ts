@@ -1,0 +1,18 @@
+export const assets = {
+    mapBase: 'http://localhost:3845/assets/5d31c8faa041a6e969c6bbd40651e8982d01a578.png',
+    mapOverlay: 'http://localhost:3845/assets/8a086b7209164dfa87816c152f5c82f51f2085ba.png',
+    avatar: 'http://localhost:3845/assets/9f7bed72ad54a59b5b7b5fffbd65db756c18d88d.png',
+    locationButton: 'http://localhost:3845/assets/c37e39d9734488800462d0a1487aec52ca406074.svg',
+    micButton: 'http://localhost:3845/assets/6112c27f2555b701acf3445da7f7c84d8db61139.svg',
+    pointer: 'http://localhost:3845/assets/03f1e49c6c15a695cbaf21c3a15c722f57f520ac.svg',
+    searchIcon: 'http://localhost:3845/assets/1fd71f8b4bda2315210a4701a416238e1f81e3b9.svg',
+    chevronIcon: 'http://localhost:3845/assets/9812786b642ff77a832b4c37ffa6ba76ace0eef9.svg',
+    quickBookArrow: 'http://localhost:3845/assets/38c106f2b4407bfb48987559ca21210ffc070149.svg',
+    motoIcon: 'http://localhost:3845/assets/46f7938fd71f4061f069ceaa23a15bc3df4c774c.svg',
+    deliveryIcon: 'http://localhost:3845/assets/369eb2539194f4d9c42005a30466508b536e8012.svg',
+    shopsIcon: 'http://localhost:3845/assets/1f40ec946d2f619a72220bbef0cb2a2a6b5959f8.svg',
+    rentalsIcon: 'http://localhost:3845/assets/27e75e0884e42329f85b191f8b90c9382d678af9.svg',
+    dragHandle: 'http://localhost:3845/assets/9690e8ee2d064b3d84bdaa2b59760c1c73ca750c.svg',
+    cashIcon: 'http://localhost:3845/assets/00da228646800179d85b0865f538f8ea9a89798a.svg',
+    cardIcon: 'http://localhost:3845/assets/76bb4416816b990b8f864e3a00f7fc835d842c88.svg',
+}

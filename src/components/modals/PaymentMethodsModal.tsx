@@ -1,0 +1,49 @@
+import { assets } from '../../constants/assets'
+import type { PaymentMethod } from '../../types'
+
+interface PaymentMethodsModalProps {
+    selected: PaymentMethod
+    onSelect: (value: PaymentMethod) => void
+    onConfirm: () => void
+    onClose: () => void
+}
+
+export function PaymentMethodsModal({ selected, onSelect, onConfirm, onClose }: PaymentMethodsModalProps) {
+    const options = [
+        { id: 'cash' as const, label: 'Cash', icon: assets.cashIcon },
+        { id: 'digital' as const, label: 'Digital / Transfer', icon: assets.cardIcon },
+    ]
+
+    return (
+        <div className="w-[360px] rounded-[28px] border border-primary bg-white px-6 py-8 text-text-dark shadow-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#919191]">Payment Method</p>
+            <div className="mt-4 space-y-4">
+                {options.map((option) => (
+                    <button
+                        key={option.id}
+                        className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 ${selected === option.id ? 'border-primary bg-primary/10' : 'border-zinc-200'
+                            }`}
+                        onClick={() => onSelect(option.id)}
+                    >
+                        <span
+                            className={`grid size-6 place-items-center rounded-full border ${selected === option.id ? 'border-primary bg-primary' : 'border-zinc-300'
+                                }`}
+                        >
+                            <span className="text-white">{selected === option.id ? '•' : ''}</span>
+                        </span>
+                        <img src={option.icon} alt="" className="h-6 w-6" />
+                        <p className="text-lg font-semibold text-text-dark">{option.label}</p>
+                    </button>
+                ))}
+            </div>
+            <div className="mt-6 flex gap-4">
+                <button className="flex-1 rounded-2xl border border-primary px-4 py-3 text-lg font-extrabold uppercase text-primary" onClick={onClose}>
+                    Cancel
+                </button>
+                <button className="flex-1 rounded-2xl bg-primary px-4 py-3 text-lg font-extrabold uppercase text-white" onClick={onConfirm}>
+                    Confirm
+                </button>
+            </div>
+        </div>
+    )
+}
