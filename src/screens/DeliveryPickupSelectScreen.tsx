@@ -46,11 +46,20 @@ export function DeliveryPickupSelectScreen({ onCancel, onApply, currentLocation 
     // If showing map view
     if (showMap) {
         return (
-            <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen">
+            <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px]">
                 {/* Search Input at Top */}
                 <section className="bg-white px-6 py-4 border-b border-gray-200 z-10">
-                    <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs font-extrabold uppercase tracking-wider text-[#919191]">PICKUP</p>
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="size-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                            <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                                <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+                                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <p className="text-2xl font-extrabold uppercase tracking-wider text-primary">PICKUP</p>
+                    </div>
+                    <div className="flex items-center justify-end mb-2">
                         <button
                             onClick={() => setShowMap(false)}
                             className="text-sm font-semibold text-primary"
@@ -133,11 +142,18 @@ export function DeliveryPickupSelectScreen({ onCancel, onApply, currentLocation 
 
     // List view (default)
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen">
+        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px]">
             {/* Search Input at Top */}
             <section className="bg-white px-6 py-4 border-b border-gray-200 z-10">
-                <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-extrabold uppercase tracking-wider text-[#919191]">PICKUP</p>
+                <div className="flex items-center gap-3 mb-3">
+                    <div className="size-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                            <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+                            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <p className="text-2xl font-extrabold uppercase tracking-wider text-primary flex-1">PICKUP</p>
                     <button
                         onClick={() => setShowMap(true)}
                         className="text-sm font-semibold text-primary"
@@ -180,7 +196,7 @@ export function DeliveryPickupSelectScreen({ onCancel, onApply, currentLocation 
                     </div>
                 </div>
 
-                {/* Recent Locations List */}
+                {/* Recent Locations List - Figma style with clickable stars */}
                 <div className="mb-6">
                     <p className="text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-3">RECENT LOCATIONS</p>
                     <div className="space-y-0">
@@ -188,15 +204,26 @@ export function DeliveryPickupSelectScreen({ onCancel, onApply, currentLocation 
                             <div key={idx}>
                                 <button
                                     onClick={() => handleLocationSelect(location.label)}
-                                    className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition text-left"
+                                    className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition text-left group"
                                 >
-                                    <span className="text-lg">
-                                        {location.favorite ? '⭐' : '📍'}
-                                    </span>
+                                    {/* Red location pin icon */}
+                                    <svg className="w-5 h-5 text-[#ff3b30] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                    </svg>
                                     <span className="flex-1 text-base font-normal text-text-dark">{location.label}</span>
-                                    {location.favorite && (
-                                        <span className="text-yellow-400 text-lg">⭐</span>
-                                    )}
+                                    {/* Clickable star icon */}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            console.log('Toggle favorite for:', location.label)
+                                        }}
+                                        className="flex-shrink-0 p-1 hover:scale-110 active:scale-95 transition-transform"
+                                        aria-label={location.favorite ? 'Remove from favorites' : 'Add to favorites'}
+                                    >
+                                        <svg className={`w-6 h-6 flex-shrink-0 transition-colors ${location.favorite ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} fill={location.favorite ? 'currentColor' : 'none'} viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    </button>
                                 </button>
                                 {idx < recentLocations.length - 1 && (
                                     <div className="h-[1px] bg-gray-200 mx-3"></div>

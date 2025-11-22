@@ -40,10 +40,19 @@ export function RentalsPickupSelectScreen({ onCancel, onApply, currentLocation }
     }
 
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen">
+        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px]">
             {/* Search Input at Top */}
             <section className="bg-white px-6 py-4 border-b border-gray-200 z-10">
-                <p className="text-xs font-extrabold uppercase tracking-wider text-[#919191] mb-2">PICKUP</p>
+                <div className="flex items-center gap-3 mb-3">
+                    <div className="size-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                            <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+                            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <p className="text-2xl font-extrabold uppercase tracking-wider text-primary">PICKUP</p>
+                </div>
                 <div className="flex items-center gap-3 rounded-3xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm">
                     <img src={assets.searchIcon} alt="" className="h-5 w-5 opacity-60" />
                     <input

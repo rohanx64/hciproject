@@ -1,36 +1,36 @@
 import { RideMap } from '../components/RideMap'
 
-interface RentalsConfirmScreenProps {
+interface RentalsStartedScreenProps {
     onNavigate?: (screen: string) => void
-    onRentalStarted: () => void
-    onCancel: () => void
     driverName: string
     driverRating: number
     driverAvatar: string
     pickupLocation: string
     selectedHours: number
     selectedVehicle: string
-    fare: number
+    price: number
     onCallDriver?: () => void
     onChatDriver?: () => void
+    onSOS?: () => void
+    onRentalCompleted?: () => void
 }
 
 const RENTALS_COLOR = '#32991d'
 
-export function RentalsConfirmScreen({
+export function RentalsStartedScreen({
     onNavigate,
-    onRentalStarted,
-    onCancel,
     driverName,
     driverRating,
     driverAvatar,
     pickupLocation,
     selectedHours,
     selectedVehicle,
-    fare,
+    price,
     onCallDriver,
     onChatDriver,
-}: RentalsConfirmScreenProps) {
+    onSOS,
+    onRentalCompleted,
+}: RentalsStartedScreenProps) {
     return (
         <div className="w-full h-full flex flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl relative">
             {/* Map Section */}
@@ -66,8 +66,8 @@ export function RentalsConfirmScreen({
                             className="size-16 rounded-full border-2 object-cover"
                             style={{ borderColor: RENTALS_COLOR }}
                         />
-                        <div className="absolute -bottom-1 -right-1 size-6 rounded-full border-2 border-white flex items-center justify-center" style={{ backgroundColor: RENTALS_COLOR }}>
-                            <span className="text-xs text-white font-bold">✓</span>
+                        <div className="absolute -bottom-1 -right-1 size-6 rounded-full bg-green-500 border-2 border-white flex items-center justify-center">
+                            <div className="size-3 rounded-full bg-white animate-pulse"></div>
                         </div>
                     </div>
                     <div className="flex-1">
@@ -79,7 +79,7 @@ export function RentalsConfirmScreen({
                                 ))}
                             </div>
                         </div>
-                        <p className="text-sm text-gray-500">{selectedVehicle}</p>
+                        <p className="text-sm text-gray-500">Rental in progress</p>
                     </div>
                     <div className="flex gap-2">
                         <button
@@ -118,39 +118,46 @@ export function RentalsConfirmScreen({
                     </div>
                 </div>
 
-                {/* Rental Summary */}
-                <div className="mb-6 rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-4">
-                    <div className="flex items-center gap-3 mb-3">
-                        <span className="text-2xl">🚗</span>
-                        <div className="flex-1">
-                            <div className="flex items-center gap-4 text-sm">
-                                <span className="font-semibold text-text-dark">DURATION <span className="font-normal text-gray-600">{selectedHours} {selectedHours === 1 ? 'Hour' : 'Hours'}</span></span>
-                                <span className="font-semibold text-text-dark">VEHICLE <span className="font-normal text-gray-600">{selectedVehicle}</span></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="pt-3 border-t-2 border-gray-200">
-                        <p className="text-lg font-extrabold" style={{ color: RENTALS_COLOR }}>PRICE PKR {fare}</p>
-                    </div>
+                {/* SOS Button - Above price */}
+                <div className="mb-4 flex justify-end">
+                    <button
+                        onClick={onSOS}
+                        className="px-4 py-3 rounded-full bg-[#ff3b30] flex items-center justify-center gap-2 shadow-lg hover:bg-[#ff2d20] active:scale-95 transition-all duration-200"
+                        aria-label="SOS Emergency"
+                    >
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        <span className="text-base font-extrabold text-white">SOS</span>
+                    </button>
                 </div>
 
-                {/* Action Button */}
-                <button
-                    onClick={onCancel}
-                    className="w-full rounded-3xl bg-[#ff544a] px-6 py-4 text-lg font-extrabold text-white shadow-lg hover:bg-[#ff3d33] active:scale-95 transition-all duration-200"
-                >
-                    Cancel Request
-                </button>
+                {/* Price Display */}
+                <div className="mb-6 text-center">
+                    <p className="text-4xl font-extrabold" style={{ color: RENTALS_COLOR }}>PKR {price}</p>
+                </div>
 
-                {/* Auto-start button for demo */}
-                <button
-                    onClick={onRentalStarted}
-                    className="w-full mt-3 rounded-3xl border-2 px-6 py-4 text-lg font-extrabold hover:opacity-90 active:scale-95 transition-all duration-200"
-                    style={{ borderColor: RENTALS_COLOR, backgroundColor: `${RENTALS_COLOR}10`, color: RENTALS_COLOR }}
-                >
-                    Start Rental (Demo)
-                </button>
+                {/* Complete Rental Button */}
+                <div className="mb-6">
+                    <button
+                        onClick={onRentalCompleted}
+                        className="w-full rounded-full px-6 py-4 flex items-center justify-center gap-3 shadow-lg hover:opacity-90 active:scale-95 transition-all duration-200"
+                        style={{ backgroundColor: RENTALS_COLOR }}
+                    >
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-lg font-extrabold text-white">Complete Rental</span>
+                    </button>
+                </div>
             </section>
+
+            {/* Status Bar at Bottom */}
+            <div className="absolute bottom-0 left-0 right-0 px-6 py-4 z-[999]" style={{ backgroundColor: RENTALS_COLOR }}>
+                <p className="text-center text-lg font-extrabold text-white uppercase tracking-wider">
+                    YOUR RENTAL HAS STARTED
+                </p>
+            </div>
         </div>
     )
 }

@@ -35,7 +35,7 @@ export function DeliveryConfirmedScreen({
     onChatRider,
 }: DeliveryConfirmedScreenProps) {
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen relative">
+        <div className="w-full h-full flex flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl relative">
             {/* Map Section */}
             <section className="relative h-[50%] overflow-hidden">
                 <RideMap

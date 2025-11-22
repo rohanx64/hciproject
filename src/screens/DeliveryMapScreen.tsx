@@ -23,7 +23,7 @@ export function DeliveryMapScreen({
     }
 
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen">
+        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px]">
             {/* Drop-off Input at Top */}
             <section className="bg-white px-6 py-4 border-b border-gray-200 z-10">
                 <div className="flex gap-2 items-center">

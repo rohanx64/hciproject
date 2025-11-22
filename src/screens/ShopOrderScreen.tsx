@@ -48,7 +48,7 @@ export function ShopOrderScreen({
     }
 
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen relative">
+        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px] relative">
             {/* Map Section - Full height, panel overlays */}
             <section className="absolute inset-0 overflow-hidden">
                 <RideMap

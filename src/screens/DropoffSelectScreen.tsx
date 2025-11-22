@@ -43,10 +43,17 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
     }
 
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen">
+        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px]">
             {/* Header with Search Input and View Toggle */}
             <section className="bg-white px-6 py-4 border-b border-gray-200 z-10">
-                <p className="text-xs font-extrabold uppercase tracking-wider text-[#919191] mb-2">DROP-OFF</p>
+                <div className="flex items-center gap-3 mb-3">
+                    <div className="size-12 rounded-full bg-[#ff3b30]/20 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-7 h-7 text-[#ff3b30]" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
+                    </div>
+                    <p className="text-2xl font-extrabold uppercase tracking-wider text-[#ff3b30]">DROP-OFF</p>
+                </div>
                 <div className="flex items-center gap-3 rounded-3xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm">
                     <div className="grid size-7 place-items-center flex-shrink-0">
                         <svg className="w-5 h-5 text-[#ff3b30]" fill="currentColor" viewBox="0 0 20 20">
@@ -131,18 +138,29 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                                     <div key={idx}>
                                         <button
                                             onClick={() => handleLocationSelect(location.label)}
-                                            className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition text-left min-h-[52px]"
+                                            className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition text-left min-h-[52px] group"
                                         >
-                                            <div className="size-[14.4px] rounded-full bg-[#ff3b30] flex-shrink-0"></div>
+                                            {/* Red location pin icon */}
+                                            <svg className="w-5 h-5 text-[#ff3b30] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                            </svg>
                                             <span className="flex-1 text-base font-normal text-text-dark">{location.label}</span>
-                                            {location.favorite && (
-                                                <svg className="w-6 h-6 text-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            {/* Clickable star icon */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    console.log('Toggle favorite for:', location.label)
+                                                }}
+                                                className="flex-shrink-0 p-1 hover:scale-110 active:scale-95 transition-transform"
+                                                aria-label={location.favorite ? 'Remove from favorites' : 'Add to favorites'}
+                                            >
+                                                <svg className={`w-6 h-6 flex-shrink-0 transition-colors ${location.favorite ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} fill={location.favorite ? 'currentColor' : 'none'} viewBox="0 0 20 20">
                                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                                 </svg>
-                                            )}
+                                            </button>
                                         </button>
                                         {idx < recentLocations.length - 1 && (
-                                            <div className="h-[3.5px] bg-gray-200 mx-3"></div>
+                                            <div className="h-[1px] bg-gray-200 mx-3"></div>
                                         )}
                                     </div>
                                 ))}

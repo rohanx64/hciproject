@@ -1,5 +1,11 @@
 import { useState } from 'react'
 import {
+  SplashScreen,
+  LoginScreen,
+  SignupScreen,
+  OTPVerificationScreen,
+  OnboardingScreen,
+  OnboardingTutorialScreen,
   HomeRideScreen,
   DropoffSelectScreen,
   SelectVehicleScreen,
@@ -15,32 +21,69 @@ import {
   DeliverySuccessScreen,
   DeliveryConfirmedScreen,
   DeliveryInProgressScreen,
+  DeliveryCompletedScreen,
   RentalsHomeScreen,
   RentalsPickupSelectScreen,
   RentalsConfirmScreen,
+  RentalsStartedScreen,
+  RentalsCompletedScreen,
   ShopsHomeScreen,
   ShopsLocationSelectScreen,
   ShopOrderScreen,
   ShopOrderConfirmedScreen,
+  ShopOrderInProgressScreen,
+  ShopOrderCompletedScreen,
   SOSScreen,
   MessageScreen,
   CallScreen,
+  HistoryScreen,
+  SettingsScreen,
+  MyAccountScreen,
+  NotificationsSettingsScreen,
+  ChangeSizeSettingsScreen,
+  LanguageSettingsScreen,
+  ChangeThemeSettingsScreen,
+  TermsPrivacyScreen,
+  ContactUsScreen,
+  HelpSupportScreen,
+  CallBykeaScreen,
+  VoiceFeedbackScreen,
+  RideCompletedScreen,
 } from './screens'
-import { QuickBookModal, CancelDialog, FareDialog, PaymentMethodsModal, FareBreakdownModal, RideOffersModal } from './components/modals'
+import { Sidebar } from './components/Sidebar'
+import { QuickBookModal, CancelDialog, FareDialog, PaymentMethodsModal, FareBreakdownModal, RideOffersModal, VoiceActivationModal } from './components/modals'
 import { Overlay } from './components/Overlay'
 import { recentLocations, breakdownItems, deliveryBreakdownItems, shopsBreakdownItems, shops } from './constants/data'
 import type { Screen, PaymentMethod, DeliveryType, PaymentOption } from './types'
 
 function App() {
-  const [screen, setScreen] = useState<Screen>('home')
+  // Check localStorage for authentication state on mount
+  const [screen, setScreen] = useState<Screen>(() => {
+    const savedAuth = localStorage.getItem('isAuthenticated')
+    return savedAuth === 'true' ? 'home' : 'splash'
+  })
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('isAuthenticated') === 'true'
+  })
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [isSignup, setIsSignup] = useState(false)
+
+  // Handle logout
+  const handleLogout = () => {
+    setIsAuthenticated(false)
+    localStorage.removeItem('isAuthenticated')
+    setScreen('login')
+  }
   const [isQuickBookOpen, setQuickBookOpen] = useState(false)
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const [showFareDialog, setShowFareDialog] = useState(false)
+  const [showVoiceActivation, setShowVoiceActivation] = useState(false)
   const [fare, setFare] = useState(900)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash')
   const [showBreakdown, setShowBreakdown] = useState(false)
   const [dropoffLabel, setDropoffLabel] = useState('Where to?')
+  const [ridePickup, setRidePickup] = useState('My current location')
   const [showRideOffers, setShowRideOffers] = useState(false)
 
   // Delivery state
@@ -65,9 +108,20 @@ function App() {
   const [shopsPaymentMethod, setShopsPaymentMethod] = useState<PaymentMethod>('cash')
   const [shopsPurchaseValue, setShopsPurchaseValue] = useState(1500)
 
+  // Sidebar state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  // User data
+  const [userName] = useState('Rohan Riaz')
+  const [userEmail] = useState('rohan@gmail.com')
+  const [userGender] = useState('Male')
+  const [userBirthday] = useState('May 8th 2002')
+  const [userPhone] = useState('+92 23183 3818')
+  const [userAvatar] = useState<string | undefined>(undefined)
+
   // Previous screen for back navigation from SOS/Message/Call
   const [previousScreen, setPreviousScreen] = useState<Screen>('rideStarted')
-  const [currentContact, setCurrentContact] = useState<{ name: string; avatar: string; phone?: string; serviceType?: 'ride' | 'delivery' | 'shop' }>({
+  const [currentContact, setCurrentContact] = useState<{ name: string; avatar: string; phone?: string; serviceType?: 'ride' | 'delivery' | 'shop' | 'rental' }>({
     name: 'Driver',
     avatar: '',
     serviceType: 'ride',
@@ -106,10 +160,161 @@ function App() {
       setScreen('rentalsHome')
     } else if (navLabel === 'Shops') {
       setScreen('shopsHome')
+    } else if (navLabel === 'history') {
+      setIsSidebarOpen(false)
+      setScreen('history')
+    } else if (navLabel === 'settings') {
+      setIsSidebarOpen(false)
+      setScreen('settings')
+    } else if (navLabel === 'myAccount') {
+      setIsSidebarOpen(false)
+      setScreen('myAccount')
+    } else if (navLabel === 'wallet' || navLabel === 'notifications') {
+      setIsSidebarOpen(false)
+      setScreen(navLabel as Screen)
+    } else if (navLabel === 'voiceFeedback') {
+      setIsSidebarOpen(false)
+      setScreen('voiceFeedback')
+    } else if (navLabel === 'home') {
+      setIsSidebarOpen(false)
+      setScreen('home')
+    } else if (navLabel === 'callBykea') {
+      setIsSidebarOpen(false)
+      setScreen('callBykea')
+    } else if (navLabel === 'helpSupport') {
+      setIsSidebarOpen(false)
+      setScreen('helpSupport')
+    } else if (navLabel === 'language') {
+      setIsSidebarOpen(false)
+      setScreen('languageSettings')
+    } else if (navLabel === 'settings') {
+      setIsSidebarOpen(false)
+      setScreen('settings')
+    } else if (navLabel === 'notificationsSettings' || navLabel === 'changeSizeSettings' || navLabel === 'languageSettings' || navLabel === 'changeThemeSettings' || navLabel === 'termsPrivacy' || navLabel === 'contactUs') {
+      setIsSidebarOpen(false)
+      setScreen(navLabel as Screen)
     }
   }
 
+  // Handle opening sidebar from profile button
+  const handleOpenSidebar = () => {
+    setIsSidebarOpen(true)
+  }
+
   const renderScreen = () => {
+    // Authentication screens
+    if (screen === 'splash') {
+      return (
+        <SplashScreen
+          onContinue={() => setScreen('login')}
+        />
+      )
+    }
+
+    if (screen === 'login') {
+      return (
+        <LoginScreen
+          onLogin={(phone) => {
+            setPhoneNumber(phone)
+            setScreen('otpVerification')
+            setIsSignup(false)
+          }}
+          onSwitchToSignup={() => setScreen('signup')}
+          onCallBykea={() => setScreen('callBykea')}
+        />
+      )
+    }
+
+    if (screen === 'signup') {
+      return (
+        <SignupScreen
+          onSignup={(phone) => {
+            setPhoneNumber(phone)
+            setScreen('otpVerification')
+            setIsSignup(true)
+          }}
+          onSwitchToLogin={() => setScreen('login')}
+          onCallBykea={() => setScreen('callBykea')}
+        />
+      )
+    }
+
+    if (screen === 'otpVerification') {
+      return (
+        <OTPVerificationScreen
+          phoneNumber={phoneNumber}
+          isSignup={isSignup}
+          onVerify={(otp) => {
+            // In a real app, verify OTP with backend
+            console.log('OTP verified:', otp)
+            if (isSignup) {
+              setScreen('onboarding')
+            } else {
+              setIsAuthenticated(true)
+              localStorage.setItem('isAuthenticated', 'true')
+              setScreen('home')
+            }
+          }}
+          onBack={() => setScreen(isSignup ? 'signup' : 'login')}
+        />
+      )
+    }
+
+    if (screen === 'onboarding') {
+      return (
+        <OnboardingScreen
+          onComplete={(data) => {
+            console.log('Onboarding completed:', data)
+            // Move to tutorial screen after onboarding
+            setScreen('onboardingTutorial')
+          }}
+        />
+      )
+    }
+
+    if (screen === 'onboardingTutorial') {
+      return (
+        <OnboardingTutorialScreen
+          onComplete={() => {
+            setIsAuthenticated(true)
+            localStorage.setItem('isAuthenticated', 'true')
+            setScreen('home')
+          }}
+        />
+      )
+    }
+
+    // Allow callBykea without authentication
+    if (screen === 'callBykea') {
+      return (
+        <CallBykeaScreen
+          onNavigate={handleNavigate}
+          onBack={() => {
+            if (isAuthenticated) {
+              setIsSidebarOpen(true)
+            } else {
+              setScreen('login')
+            }
+          }}
+        />
+      )
+    }
+
+    // If not authenticated, redirect to login
+    if (!isAuthenticated) {
+      return (
+        <LoginScreen
+          onLogin={(phone) => {
+            setPhoneNumber(phone)
+            setScreen('otpVerification')
+            setIsSignup(false)
+          }}
+          onSwitchToSignup={() => setScreen('signup')}
+          onCallBykea={() => setScreen('callBykea')}
+        />
+      )
+    }
+
     // Ride screens
     if (screen === 'home') {
       return (
@@ -118,6 +323,23 @@ function App() {
           onOpenDropoff={openDropoff}
           dropoffLabel={dropoffLabel}
           onNavigate={handleNavigate}
+          onOpenPickupSelect={() => setScreen('ridePickupSelect')}
+          pickupLocation={ridePickup}
+          onOpenSidebar={handleOpenSidebar}
+          onOpenVoiceActivation={() => setShowVoiceActivation(true)}
+        />
+      )
+    }
+
+    if (screen === 'ridePickupSelect') {
+      return (
+        <DeliveryPickupSelectScreen
+          onCancel={() => setScreen('home')}
+          onApply={(value) => {
+            setRidePickup(value)
+            setScreen('home')
+          }}
+          currentLocation={ridePickup}
         />
       )
     }
@@ -224,6 +446,30 @@ function App() {
             setCurrentContact({ name: mockDriver.name, avatar: mockDriver.avatar, phone: mockDriver.phone, serviceType: 'ride' })
             setScreen('sos')
           }}
+          onRideCompleted={() => setScreen('rideCompleted')}
+        />
+      )
+    }
+
+    if (screen === 'rideCompleted') {
+      return (
+        <RideCompletedScreen
+          onNavigate={handleNavigate}
+          onBack={() => setScreen('home')}
+          driverName={mockDriver.name}
+          driverRating={mockDriver.rating}
+          driverAvatar={mockDriver.avatar}
+          pickupLocation="Karachi University"
+          dropoffLocation={dropoffLabel}
+          distance="5.2 km"
+          time="15 min"
+          price={`RS. ${fare}`}
+          vehicleType="Bike"
+          onAddToQuickBook={(data) => {
+            console.log('Added to Quick Book:', data)
+            // In a real app, this would save to QuickBook routes
+          }}
+          onDone={() => setScreen('home')}
         />
       )
     }
@@ -243,6 +489,8 @@ function App() {
           pickupLocation={deliveryPickup}
           onChangePickup={setDeliveryPickup}
           onOpenPickupSelect={() => setScreen('deliveryPickupSelect')}
+          onOpenSidebar={handleOpenSidebar}
+          onOpenVoiceActivation={() => setShowVoiceActivation(true)}
         />
       )
     }
@@ -371,6 +619,26 @@ function App() {
             setCurrentContact({ name: mockRider.name, avatar: mockRider.avatar, phone: mockRider.phone, serviceType: 'delivery' })
             setScreen('sos')
           }}
+          onDeliveryCompleted={() => setScreen('deliveryCompleted')}
+        />
+      )
+    }
+
+    if (screen === 'deliveryCompleted') {
+      return (
+        <DeliveryCompletedScreen
+          onNavigate={handleNavigate}
+          onBack={() => setScreen('deliveryHome')}
+          riderName={mockRider.name}
+          riderRating={mockRider.rating}
+          riderAvatar={mockRider.avatar}
+          pickupLocation={deliveryPickup}
+          deliveryLocation={deliveryLocation || 'Where to?'}
+          distance="5.2 km"
+          time="15 min"
+          price={`RS. ${deliveryFare}`}
+          vehicleType="Bike"
+          onDone={() => setScreen('deliveryHome')}
         />
       )
     }
@@ -392,6 +660,8 @@ function App() {
           onOpenFareDialog={() => setShowFareDialog(true)}
           onOpenPaymentModal={() => setShowPaymentModal(true)}
           onOpenPickupSelect={() => setScreen('rentalsPickupSelect')}
+          onOpenSidebar={handleOpenSidebar}
+          onOpenVoiceActivation={() => setShowVoiceActivation(true)}
         />
       )
     }
@@ -416,11 +686,73 @@ function App() {
       return (
         <RentalsConfirmScreen
           onNavigate={handleNavigate}
-          onDone={() => setScreen('rentalsHome')}
+          onRentalStarted={() => setScreen('rentalsStarted')}
+          onCancel={() => setScreen('rentalsHome')}
+          driverName={mockDriver.name}
+          driverRating={mockDriver.rating}
+          driverAvatar={mockDriver.avatar}
           pickupLocation={rentalsPickup}
           selectedHours={rentalsHours}
           selectedVehicle={rentalsVehicle}
           fare={rentalsFare}
+          onCallDriver={() => {
+            setPreviousScreen('rentalsConfirm')
+            setCurrentContact({ name: mockDriver.name, avatar: mockDriver.avatar, phone: mockDriver.phone, serviceType: 'rental' })
+            setScreen('call')
+          }}
+          onChatDriver={() => {
+            setPreviousScreen('rentalsConfirm')
+            setCurrentContact({ name: mockDriver.name, avatar: mockDriver.avatar, phone: mockDriver.phone, serviceType: 'rental' })
+            setScreen('message')
+          }}
+        />
+      )
+    }
+
+    if (screen === 'rentalsStarted') {
+      return (
+        <RentalsStartedScreen
+          onNavigate={handleNavigate}
+          driverName={mockDriver.name}
+          driverRating={mockDriver.rating}
+          driverAvatar={mockDriver.avatar}
+          pickupLocation={rentalsPickup}
+          selectedHours={rentalsHours}
+          selectedVehicle={rentalsVehicle}
+          price={rentalsFare}
+          onCallDriver={() => {
+            setPreviousScreen('rentalsStarted')
+            setCurrentContact({ name: mockDriver.name, avatar: mockDriver.avatar, phone: mockDriver.phone, serviceType: 'rental' })
+            setScreen('call')
+          }}
+          onChatDriver={() => {
+            setPreviousScreen('rentalsStarted')
+            setCurrentContact({ name: mockDriver.name, avatar: mockDriver.avatar, phone: mockDriver.phone, serviceType: 'rental' })
+            setScreen('message')
+          }}
+          onSOS={() => {
+            setPreviousScreen('rentalsStarted')
+            setCurrentContact({ name: mockDriver.name, avatar: mockDriver.avatar, phone: mockDriver.phone, serviceType: 'rental' })
+            setScreen('sos')
+          }}
+          onRentalCompleted={() => setScreen('rentalsCompleted')}
+        />
+      )
+    }
+
+    if (screen === 'rentalsCompleted') {
+      return (
+        <RentalsCompletedScreen
+          onNavigate={handleNavigate}
+          onBack={() => setScreen('rentalsHome')}
+          driverName={mockDriver.name}
+          driverRating={mockDriver.rating}
+          driverAvatar={mockDriver.avatar}
+          pickupLocation={rentalsPickup}
+          selectedHours={rentalsHours}
+          selectedVehicle={rentalsVehicle}
+          price={`RS. ${rentalsFare}`}
+          onDone={() => setScreen('rentalsHome')}
         />
       )
     }
@@ -439,6 +771,8 @@ function App() {
           }}
           location={shopsLocation}
           onOpenLocationSelect={() => setScreen('shopsLocationSelect')}
+          onOpenSidebar={handleOpenSidebar}
+          onOpenVoiceActivation={() => setShowVoiceActivation(true)}
         />
       )
     }
@@ -519,16 +853,21 @@ function App() {
     }
 
     if (screen === 'shopOrderInProgress') {
-      // Similar to DeliveryInProgressScreen but for shops
+      if (!selectedShop) {
+        setScreen('shopsHome')
+        return null
+      }
       return (
-        <DeliveryInProgressScreen
+        <ShopOrderInProgressScreen
           onNavigate={handleNavigate}
+          shopName={selectedShop.name}
           riderName={mockRider.name}
           riderRating={mockRider.rating}
           riderAvatar={mockRider.avatar}
-          pickupLocation={shopsLocation}
+          shopLocation={shopsLocation}
           deliveryLocation={shopsLocation}
           price={shopsFare}
+          purchaseValue={shopsPurchaseValue}
           onCallRider={() => {
             setPreviousScreen('shopOrderInProgress')
             setCurrentContact({ name: mockRider.name, avatar: mockRider.avatar, phone: mockRider.phone, serviceType: 'shop' })
@@ -544,6 +883,31 @@ function App() {
             setCurrentContact({ name: mockRider.name, avatar: mockRider.avatar, phone: mockRider.phone, serviceType: 'shop' })
             setScreen('sos')
           }}
+          onOrderCompleted={() => setScreen('shopOrderCompleted')}
+        />
+      )
+    }
+
+    if (screen === 'shopOrderCompleted') {
+      if (!selectedShop) {
+        setScreen('shopsHome')
+        return null
+      }
+      return (
+        <ShopOrderCompletedScreen
+          onNavigate={handleNavigate}
+          onBack={() => setScreen('shopsHome')}
+          shopName={selectedShop.name}
+          riderName={mockRider.name}
+          riderRating={mockRider.rating}
+          riderAvatar={mockRider.avatar}
+          shopLocation={shopsLocation}
+          deliveryLocation={shopsLocation}
+          distance="2 km"
+          time="10 min"
+          price={`RS. ${shopsFare}`}
+          purchaseValue={`RS. ${shopsPurchaseValue}`}
+          onDone={() => setScreen('shopsHome')}
         />
       )
     }
@@ -588,18 +952,160 @@ function App() {
       )
     }
 
+    // History Screen
+    if (screen === 'history') {
+      return (
+        <HistoryScreen
+          onNavigate={handleNavigate}
+          onBack={() => setIsSidebarOpen(true)}
+        />
+      )
+    }
+
+    // Settings Screen
+    if (screen === 'settings') {
+      return (
+        <SettingsScreen
+          onNavigate={handleNavigate}
+          onBack={() => setIsSidebarOpen(true)}
+          userName={userName}
+          userAvatar={userAvatar}
+        />
+      )
+    }
+
+    // My Account Screen
+    if (screen === 'myAccount') {
+      return (
+        <MyAccountScreen
+          onNavigate={handleNavigate}
+          onBack={() => setScreen('settings')}
+          userName={userName}
+          userEmail={userEmail}
+          userGender={userGender}
+          userBirthday={userBirthday}
+          userPhone={userPhone}
+          userAvatar={userAvatar}
+          onUpdateUser={(updates) => {
+            // Update user data (in a real app, this would save to backend)
+            if (updates.name) console.log('Name updated:', updates.name)
+            if (updates.email) console.log('Email updated:', updates.email)
+            if (updates.phone) console.log('Phone updated:', updates.phone)
+            if (updates.gender) console.log('Gender updated:', updates.gender)
+            if (updates.birthday) console.log('Birthday updated:', updates.birthday)
+          }}
+        />
+      )
+    }
+
+    // Settings Sub-screens
+    if (screen === 'notificationsSettings') {
+      return (
+        <NotificationsSettingsScreen
+          onNavigate={handleNavigate}
+          onBack={() => setScreen('settings')}
+        />
+      )
+    }
+
+    if (screen === 'changeSizeSettings') {
+      return (
+        <ChangeSizeSettingsScreen
+          onNavigate={handleNavigate}
+          onBack={() => setScreen('settings')}
+        />
+      )
+    }
+
+    if (screen === 'languageSettings') {
+      return (
+        <LanguageSettingsScreen
+          onNavigate={handleNavigate}
+          onBack={() => {
+            // If coming from sidebar, go to settings. If from settings, go back to settings.
+            setScreen('settings')
+          }}
+        />
+      )
+    }
+
+    if (screen === 'changeThemeSettings') {
+      return (
+        <ChangeThemeSettingsScreen
+          onNavigate={handleNavigate}
+          onBack={() => setScreen('settings')}
+        />
+      )
+    }
+
+    if (screen === 'termsPrivacy') {
+      return (
+        <TermsPrivacyScreen
+          onNavigate={handleNavigate}
+          onBack={() => setScreen('settings')}
+        />
+      )
+    }
+
+    if (screen === 'contactUs') {
+      return (
+        <ContactUsScreen
+          onNavigate={handleNavigate}
+          onBack={() => setScreen('settings')}
+        />
+      )
+    }
+
+    // Sidebar screens
+    if (screen === 'helpSupport') {
+      return (
+        <HelpSupportScreen
+          onNavigate={handleNavigate}
+          onBack={() => setIsSidebarOpen(true)}
+        />
+      )
+    }
+
+    if (screen === 'voiceFeedback') {
+      return (
+        <VoiceFeedbackScreen
+          onNavigate={handleNavigate}
+          onBack={() => {
+            handleNavigate('home')
+          }}
+        />
+      )
+    }
+
     // Default fallback
     return null
   }
 
   return (
-    <main className="min-h-screen bg-zinc-100 py-8 text-text-dark">
-      {renderScreen()}
+    <main className="min-h-screen bg-zinc-100 py-8 text-text-dark flex items-center justify-center">
+      <div className="relative mx-auto w-[440px] max-w-full h-[844px] md:scale-90 overflow-hidden rounded-[40px]">
+        {/* Sidebar - Inside mobile container */}
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          onNavigate={handleNavigate}
+          onLogout={handleLogout}
+          userName={userName}
+          userAvatar={userAvatar}
+        />
+        
+        {/* Screen content - Each screen already has its own container, so we need to adjust */}
+        {renderScreen()}
+      </div>
 
       {isQuickBookOpen && (
         <QuickBookModal
           onConfirm={handleQuickBookConfirm}
           onCancel={() => setShowCancelConfirm(true)}
+          onAddQuickBook={(data) => {
+            // Save quick book route (in a real app, this would save to backend)
+            console.log('Quick book route added:', data)
+          }}
         />
       )}
 
@@ -669,6 +1175,53 @@ function App() {
           onClose={() => {
             setShowRideOffers(false)
             setScreen('selectVehicle')
+          }}
+        />
+      )}
+
+      {showVoiceActivation && (
+        <VoiceActivationModal
+          onClose={() => setShowVoiceActivation(false)}
+          onProceed={(command) => {
+            setShowVoiceActivation(false)
+            // Process voice command
+            if (command.action === 'ride') {
+              if (command.pickup) {
+                setRidePickup(command.pickup)
+              }
+              if (command.dropoff) {
+                setDropoffLabel(command.dropoff)
+                setScreen('selectVehicle')
+              } else {
+                setScreen('dropoff')
+              }
+            } else if (command.action === 'delivery') {
+              if (command.pickup) {
+                setDeliveryPickup(command.pickup)
+              }
+              if (command.dropoff) {
+                setDeliveryLocation(command.dropoff)
+                setScreen('deliveryForm')
+              } else {
+                setScreen('deliveryHome')
+              }
+            } else if (command.action === 'rental') {
+              if (command.pickup) {
+                setRentalsPickup(command.pickup)
+              }
+              if (command.details) {
+                const hoursMatch = command.details.match(/(\d+)\s*hour/i)
+                if (hoursMatch) {
+                  setRentalsHours(parseInt(hoursMatch[1]))
+                }
+              }
+              setScreen('rentalsHome')
+            } else if (command.action === 'shop') {
+              if (command.dropoff) {
+                setShopsLocation(command.dropoff)
+              }
+              setScreen('shopsHome')
+            }
           }}
         />
       )}

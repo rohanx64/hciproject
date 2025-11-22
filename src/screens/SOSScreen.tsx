@@ -7,7 +7,7 @@ interface SOSScreenProps {
     contactName?: string
     contactPhone?: string
     currentLocation?: [number, number]
-    serviceType?: 'ride' | 'delivery' | 'shop'
+    serviceType?: 'ride' | 'delivery' | 'shop' | 'rental'
 }
 
 export function SOSScreen({
@@ -37,7 +37,7 @@ export function SOSScreen({
     const bgColor = serviceType === 'delivery' ? 'bg-[#ff9500]' : 'bg-primary'
 
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen relative">
+        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px] relative">
             {/* Map Section */}
             <section className="relative h-[50%] overflow-hidden">
                 <RideMap

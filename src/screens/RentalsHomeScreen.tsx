@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import L from 'leaflet'
 import { assets } from '../constants/assets'
 import { BottomNav } from '../components/BottomNav'
 import { RideMap } from '../components/RideMap'
@@ -13,6 +14,8 @@ interface RentalsHomeScreenProps {
     onOpenFareDialog?: () => void
     onOpenPaymentModal?: () => void
     onOpenPickupSelect?: () => void
+    onOpenSidebar?: () => void
+    onOpenVoiceActivation?: () => void
 }
 
 export function RentalsHomeScreen({
@@ -23,12 +26,40 @@ export function RentalsHomeScreen({
     onOpenFareDialog,
     onOpenPaymentModal,
     onOpenPickupSelect,
+    onOpenSidebar,
+    onOpenVoiceActivation,
 }: RentalsHomeScreenProps) {
     const [panelHeight, setPanelHeight] = useState(42) // Standardized height for all screens
     const [selectedHours, setSelectedHours] = useState(2)
     const [selectedVehicle, setSelectedVehicle] = useState('Bike')
     const [fare] = useState(900)
     const [paymentMethod] = useState('Cash')
+    const [selectedPickupLocation, setSelectedPickupLocation] = useState<[number, number] | null>(null)
+    const [isMapDragging, setIsMapDragging] = useState(false)
+    const mapRef = useRef<L.Map | null>(null)
+    
+    // Calculate button position in pixels based on panel height percentage
+    const containerHeight = 844
+    const bottomNavHeight = 110
+    const availableHeight = containerHeight - bottomNavHeight
+    const panelHeightPixels = (panelHeight / 100) * availableHeight
+    const buttonBottomPixels = bottomNavHeight + panelHeightPixels + 20 // 20px gap above panel
+
+    const handleMapClick = (lat: number, lng: number) => {
+        setSelectedPickupLocation([lat, lng])
+    }
+
+    const handleMapDragStart = () => {
+        setIsMapDragging(true)
+        setPanelHeight(20) // Collapse to minimum
+    }
+
+    const handleMapDragEnd = () => {
+        setIsMapDragging(false)
+        setTimeout(() => {
+            setPanelHeight(showPickupSelection ? 42 : 68) // Expand back to appropriate height
+        }, 300)
+    }
     
     // Check if pickup has been selected (not default)
     // If pickupLocation is "My current location", it means it's the initial state
@@ -66,59 +97,147 @@ export function RentalsHomeScreen({
     const showPickupSelection = !hasSelectedPickup
 
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen relative">
+        <div className="w-full h-full flex flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl relative">
             {/* Map Section - Full height, panel overlays */}
             <section className="absolute inset-0 overflow-hidden">
                 <RideMap
                     pickupLocation={[24.8607, 67.0011]}
+                    selectedPickupLocation={selectedPickupLocation || undefined}
+                    onMapClick={handleMapClick}
+                    onDragStart={handleMapDragStart}
+                    onDragEnd={handleMapDragEnd}
                     className="h-full w-full"
+                    mapRef={mapRef}
                 />
 
                 {/* White gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-transparent to-transparent pointer-events-none z-10" />
 
-                {/* Profile Avatar - Placeholder */}
+                {/* Profile Avatar - Consistent across all screens */}
                 <button
-                    className="absolute left-[4.26%] top-[7.64%] size-[58px] overflow-hidden rounded-[30px] border-2 border-white shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 z-20"
+                    className="absolute left-[4.26%] top-[7.64%] size-[58px] overflow-hidden rounded-[30px] border-2 border-white shadow-lg z-20 hover:scale-105 active:scale-95 transition-all duration-200"
                     aria-label="Profile"
-                    onClick={() => onNavigate?.('Settings')}
+                    onClick={() => onOpenSidebar?.()}
                 >
                     <div className="h-full w-full bg-gradient-to-br from-[#ffd900] to-[#e6c400] flex items-center justify-center">
                         <span className="text-2xl text-white font-bold">U</span>
                     </div>
                 </button>
 
-                {/* Pickup Location Card - At top */}
+                {/* Location Pointer - Clean and distinct design */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full z-30 pointer-events-none">
+                    <div className="relative">
+                        {/* Pointer body - Clean pin without shadows */}
+                        <svg className="w-10 h-14 text-[#ffd900]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        {/* Center dot for precision */}
+                        <div className="absolute left-1/2 -translate-x-1/2 top-[18px] w-2.5 h-2.5 rounded-full bg-white border-2 border-[#ffd900]"></div>
+                    </div>
+                </div>
+
+                {/* Zoom Controls - Positioned at top right, always visible */}
+                <div className="absolute right-[5.26%] top-[20%] z-30 flex flex-col gap-2">
+                    <button
+                        onClick={() => {
+                            if (mapRef.current) {
+                                mapRef.current.zoomIn()
+                            }
+                        }}
+                        className="size-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
+                        aria-label="Zoom in"
+                    >
+                        <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (mapRef.current) {
+                                mapRef.current.zoomOut()
+                            }
+                        }}
+                        className="size-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
+                        aria-label="Zoom out"
+                    >
+                        <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 12H4" />
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Voice Button - Combined mic + Voice label, aligned with location button */}
+                <button
+                    style={{ bottom: `${buttonBottomPixels}px` }}
+                    onClick={onOpenVoiceActivation}
+                    className="absolute left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary active:scale-95 transition-all duration-200 ease-out"
+                    aria-label="Voice input"
+                >
+                    <svg className="w-5 h-5 text-white animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2a3 3 0 013 3v6a3 3 0 01-6 0V5a3 3 0 013-3z" />
+                        <path d="M19 10v1a7 7 0 01-14 0v-1a1 1 0 012 0v1a5 5 0 0010 0v-1a1 1 0 012 0z" />
+                        <path d="M12 18.5a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 01-3 0v-3a1.5 1.5 0 011.5-1.5z" />
+                    </svg>
+                    <span className="text-base font-extrabold text-white uppercase tracking-wide">Voice</span>
+                </button>
+
+                {/* Location Button - Dynamically positioned above panel */}
+                <button
+                    style={{ bottom: `${buttonBottomPixels}px` }}
+                    className="absolute right-[5.26%] min-w-[51px] min-h-[51px] rounded-full bg-[#6cc44a] shadow-lg flex items-center justify-center z-[600] hover:bg-[#5ab038] active:scale-90 transition-all duration-200 ease-out"
+                    aria-label="Use current location"
+                    onClick={() => {
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition((position) => {
+                                handleMapClick(position.coords.latitude, position.coords.longitude)
+                            })
+                        }
+                    }}
+                >
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+
+                {/* Pickup Location Card - With green target icon (Figma style) */}
                 <button
                     onClick={() => {
                         onOpenPickupSelect?.()
                     }}
-                    className="absolute left-[14.3%] top-[7.74%] w-[347px] min-h-[60px] z-20 active:scale-95 transition-transform duration-200"
+                    className="absolute left-1/2 top-[25.7%] -translate-x-1/2 w-[254px] min-h-[60px] z-20 active:scale-95 transition-transform duration-200"
                 >
                     <div className="rounded-3xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-3 shadow-lg flex items-center gap-3 hover:shadow-xl transition-all duration-200">
                         <div className="grid size-7 place-items-center flex-shrink-0">
-                            <div className="size-5 rounded-full border-2 border-primary bg-[#ffd900]"></div>
+                            {/* Green target/crosshair icon for pickup */}
+                            <svg className="w-5 h-5 text-[#6cc44a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                                <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
+                                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                            </svg>
                         </div>
                         <div className="flex-1 text-left min-w-0">
-                            <p className="text-[14.069px] font-normal uppercase text-[#c8c7cc] mb-1">PICKUP</p>
-                            <p className="text-[19.931px] font-normal text-text-dark truncate">{pickupLocation}</p>
+                            <p className="text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-1">PICKUP</p>
+                            <p className="text-base font-normal text-text-dark truncate">{pickupLocation}</p>
                         </div>
-                        <svg className="w-5 h-5 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                     </div>
                 </button>
 
-                {/* Yellow location pin on map - only when pickup is selected */}
-                {hasSelectedPickup && (
+                {/* Location Selection Indicator - Consistent pin style */}
+                {selectedPickupLocation && (
                     <div className="absolute left-1/2 top-[33.5%] -translate-x-1/2 z-20 pointer-events-none">
                         <div className="relative">
                             {/* Pin shadow */}
                             <div className="absolute inset-0 translate-y-1 bg-black/20 blur-sm rounded-full" />
-                            {/* Pin body - Large yellow pin */}
+                            {/* Pin body - Yellow for rentals */}
                             <div className="relative size-[269px] rounded-full bg-[#ffd900]/20 flex items-center justify-center">
                                 <div className="size-[67px] rounded-full bg-[#ffd900] flex items-center justify-center shadow-lg">
-                                    <div className="size-4 rounded-full bg-white"></div>
+                                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                                    </svg>
                                 </div>
                             </div>
                         </div>
@@ -128,32 +247,32 @@ export function RentalsHomeScreen({
 
             {/* Draggable Bottom Panel - Standardized initial, expands when pickup selected */}
             <DraggablePanel
-                initialHeight={showPickupSelection ? 42 : 68}
+                initialHeight={panelHeight}
                 minHeight={20}
                 maxHeight={85}
                 onHeightChange={setPanelHeight}
-                hideBottomNav={hasSelectedPickup}
+                hideBottomNav={false}
             >
-                <div className="px-6 pb-6">
-                    {/* Rentals Title - Yellow color matching Figma */}
-                    <h1 className="font-display text-[42px] font-normal text-[#ffd900] text-center mb-5 mt-6">
+                <div className="px-6 pb-2">
+                    {/* Rentals Title - Top left */}
+                    <h1 className="font-display text-[32px] font-normal text-[#ffd900] text-left mb-3 mt-2">
                         Rentals
                     </h1>
 
                     {showPickupSelection ? (
                         /* Initial State: Pickup Selection */
                         <>
-                            <p className="text-center text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-4">
+                            <p className="text-left text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-3">
                                 SELECT PICKUP LOCATION
                             </p>
                             
                             {/* Suggested Location Tags */}
-                            <div className="flex flex-wrap gap-2 justify-center">
+                            <div className="flex flex-wrap gap-2">
                                 {favoritePlaces.map((place, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => handleLocationClick(place)}
-                                        className="min-h-[44px] px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 active:scale-95 transition-all duration-200 ease-out"
+                                        className="min-h-[44px] px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 hover:border-[#ffd900] hover:shadow-sm active:scale-95 transition-all duration-200 ease-out"
                                     >
                                         {place}
                                     </button>
@@ -164,13 +283,13 @@ export function RentalsHomeScreen({
                         /* After Pickup Selected: Hours and Vehicle Selection */
                         <>
                             {/* SELECT HOURS Section */}
-                            <div className="mb-6">
-                                <p className="text-center text-[19.931px] font-light text-[#919191] mb-4">SELECT HOURS</p>
+                            <div className="mb-4">
+                                <p className="text-left text-[19.931px] font-light text-[#919191] mb-3">SELECT HOURS</p>
                                 <div className="flex items-center justify-center gap-6">
                                     {/* Minus Button */}
                                     <button
                                         onClick={() => handleHoursChange(-1)}
-                                        className="size-[35px] rounded-full border-2 border-gray-300 bg-white flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
+                                        className="size-[35px] rounded-full border-2 border-gray-300 bg-white flex items-center justify-center hover:bg-gray-50 hover:border-[#ffd900] hover:shadow-sm active:scale-90 transition-all duration-200"
                                         aria-label="Decrease hours"
                                     >
                                         <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,7 +306,7 @@ export function RentalsHomeScreen({
                                     {/* Plus Button */}
                                     <button
                                         onClick={() => handleHoursChange(1)}
-                                        className="size-[35px] rounded-full border-2 border-gray-300 bg-white flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
+                                        className="size-[35px] rounded-full border-2 border-gray-300 bg-white flex items-center justify-center hover:bg-gray-50 hover:border-[#ffd900] hover:shadow-sm active:scale-90 transition-all duration-200"
                                         aria-label="Increase hours"
                                     >
                                         <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -198,11 +317,11 @@ export function RentalsHomeScreen({
                             </div>
 
                             {/* Divider Line */}
-                            <div className="h-[1px] bg-gray-200 mb-6 mx-6"></div>
+                            <div className="h-[1px] bg-gray-200 mb-4 mx-6"></div>
 
                             {/* SELECT VEHICLE Section */}
-                            <div className="mb-6">
-                                <p className="text-center text-[19.931px] font-light text-[#919191] mb-4">SELECT VEHICLE</p>
+                            <div className="mb-4">
+                                <p className="text-left text-[19.931px] font-light text-[#919191] mb-3">SELECT VEHICLE</p>
                                 <div className="flex gap-[13px] overflow-x-auto pb-2 scrollbar-hide justify-center">
                                     {vehicles.map((vehicle) => {
                                         const isActive = selectedVehicle === vehicle.id
@@ -233,10 +352,10 @@ export function RentalsHomeScreen({
                             </div>
 
                             {/* Divider Line */}
-                            <div className="h-[1px] bg-gray-200 mb-6 mx-6"></div>
+                            <div className="h-[1px] bg-gray-200 mb-4 mx-6"></div>
 
                             {/* Fare and Payment Cards - Matching Figma styling */}
-                            <div className="flex gap-3 mb-6">
+                            <div className="flex gap-3 mb-4">
                                 {/* Your Fare - Clickable */}
                                 <button
                                     onClick={() => {
@@ -279,7 +398,7 @@ export function RentalsHomeScreen({
                             </div>
 
                             {/* Action Buttons - Matching Figma exactly */}
-                            <div className="flex gap-3">
+                            <div className="flex gap-3 mb-2">
                                 <button
                                     onClick={() => {
                                         // Cancel - navigate back to previous screen
@@ -301,12 +420,10 @@ export function RentalsHomeScreen({
                 </div>
             </DraggablePanel>
 
-            {/* Bottom Navigation - Hide when panel is expanded */}
-            {!hasSelectedPickup && (
-                <div className="absolute bottom-0 left-0 right-0 z-[1000] bg-white transition-opacity duration-300">
-                    <BottomNav active="Rentals" onNavigate={onNavigate} />
-                </div>
-            )}
+            {/* Bottom Navigation - Always visible */}
+            <div className="absolute bottom-0 left-0 right-0 z-[1000] bg-white">
+                <BottomNav active="Rentals" onNavigate={onNavigate} />
+            </div>
         </div>
     )
 }

@@ -26,6 +26,19 @@
   font-family: theme('fontFamily.body');
   z-index: 0 !important;
   position: relative;
+  cursor: grab !important;
+}
+
+.leaflet-container:active {
+  cursor: grabbing !important;
+}
+
+.leaflet-container .leaflet-interactive {
+  cursor: grab !important;
+}
+
+.leaflet-container.leaflet-dragging .leaflet-interactive {
+  cursor: grabbing !important;
 }
 
 .leaflet-pane {
@@ -34,6 +47,22 @@
 
 .leaflet-map-pane {
   z-index: 0 !important;
+}
+
+/* Custom Animations for Onboarding Tutorial */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out;
 }
 
 .leaflet-tile-pane {

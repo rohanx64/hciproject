@@ -6,7 +6,7 @@ interface CallScreenProps {
     contactName: string
     contactAvatar?: string
     contactPhone?: string
-    serviceType?: 'ride' | 'delivery' | 'shop'
+    serviceType?: 'ride' | 'delivery' | 'shop' | 'rental'
     isIncoming?: boolean
 }
 
@@ -71,7 +71,7 @@ export function CallScreen({
     const gradientColor = serviceType === 'delivery' ? 'from-[#ff9500] to-[#e68600]' : serviceType === 'shop' ? 'from-[#3b82f6] to-[#2563eb]' : 'from-primary to-primary-dark'
 
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen relative">
+        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px] relative">
             {/* Background with gradient */}
             <div className={`absolute inset-0 bg-gradient-to-b ${gradientColor} opacity-95`} />
 

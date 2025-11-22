@@ -5,7 +5,7 @@ interface DeliverySuccessScreenProps {
 
 export function DeliverySuccessScreen({ onDone, onNavigate }: DeliverySuccessScreenProps) {
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen relative">
+        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px] relative">
             {/* Back Button */}
             <button
                 className="absolute left-6 top-6 size-10 rounded-full bg-white shadow-lg flex items-center justify-center z-20 hover:bg-gray-50 active:scale-90 transition-all duration-200"

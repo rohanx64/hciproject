@@ -12,7 +12,7 @@ interface MessageScreenProps {
     onClose: () => void
     contactName: string
     contactAvatar?: string
-    serviceType?: 'ride' | 'delivery' | 'shop'
+    serviceType?: 'ride' | 'delivery' | 'shop' | 'rental'
 }
 
 export function MessageScreen({
@@ -80,7 +80,7 @@ export function MessageScreen({
     const borderColor = serviceType === 'delivery' ? 'border-[#ff9500]' : serviceType === 'shop' ? 'border-[#3b82f6]' : 'border-primary'
 
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen relative">
+        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px] relative">
             {/* Header */}
             <header className={`${bgColor} px-6 py-4 flex items-center justify-between z-20`}>
                 <div className="flex items-center gap-3">

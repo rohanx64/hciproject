@@ -19,6 +19,8 @@ interface ShopOrderConfirmedScreenProps {
     onChatRider?: () => void
 }
 
+const SHOPS_COLOR = '#3b82f6'
+
 export function ShopOrderConfirmedScreen({
     onNavigate,
     onOrderStarted,
@@ -37,7 +39,7 @@ export function ShopOrderConfirmedScreen({
     onChatRider,
 }: ShopOrderConfirmedScreenProps) {
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-screen relative">
+        <div className="w-full h-full flex flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl relative">
             {/* Map Section */}
             <section className="relative h-[50%] overflow-hidden">
                 <RideMap
@@ -74,9 +76,10 @@ export function ShopOrderConfirmedScreen({
                         <img
                             src={riderAvatar}
                             alt={riderName}
-                            className="size-16 rounded-full border-2 border-[#3b82f6] object-cover"
+                            className="size-16 rounded-full border-2 object-cover"
+                            style={{ borderColor: SHOPS_COLOR }}
                         />
-                        <div className="absolute -bottom-1 -right-1 size-6 rounded-full bg-[#3b82f6] border-2 border-white flex items-center justify-center">
+                        <div className="absolute -bottom-1 -right-1 size-6 rounded-full border-2 border-white flex items-center justify-center" style={{ backgroundColor: SHOPS_COLOR }}>
                             <span className="text-xs text-white font-bold">✓</span>
                         </div>
                     </div>
@@ -94,7 +97,8 @@ export function ShopOrderConfirmedScreen({
                     <div className="flex gap-2">
                         <button
                             onClick={onChatRider}
-                            className="size-12 rounded-full bg-[#3b82f6] flex items-center justify-center shadow-lg hover:bg-[#2563eb] active:scale-90 transition-all duration-200"
+                            className="size-12 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 active:scale-90 transition-all duration-200"
+                            style={{ backgroundColor: SHOPS_COLOR }}
                             aria-label="Chat with rider"
                         >
                             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,7 +107,8 @@ export function ShopOrderConfirmedScreen({
                         </button>
                         <button
                             onClick={onCallRider}
-                            className="size-12 rounded-full bg-[#3b82f6] flex items-center justify-center shadow-lg hover:bg-[#2563eb] active:scale-90 transition-all duration-200"
+                            className="size-12 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 active:scale-90 transition-all duration-200"
+                            style={{ backgroundColor: SHOPS_COLOR }}
                             aria-label="Call rider"
                         >
                             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,8 +121,8 @@ export function ShopOrderConfirmedScreen({
                 {/* Route Information */}
                 <div className="mb-6 space-y-4">
                     <div className="flex items-start gap-3">
-                        <div className="grid size-10 place-items-center rounded-full border-2 border-[#3b82f6] mt-1 flex-shrink-0">
-                            <div className="size-3 rounded-full bg-[#3b82f6]"></div>
+                        <div className="grid size-10 place-items-center rounded-full border-2 mt-1 flex-shrink-0" style={{ borderColor: SHOPS_COLOR }}>
+                            <div className="size-3 rounded-full" style={{ backgroundColor: SHOPS_COLOR }}></div>
                         </div>
                         <div className="flex-1">
                             <p className="text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-1">SHOP</p>
@@ -164,7 +169,7 @@ export function ShopOrderConfirmedScreen({
                             <span className="text-sm font-bold text-text-dark">{price} Rs.</span>
                         </div>
                         <div className="pt-2 border-t border-gray-200">
-                            <p className="text-lg font-extrabold text-[#3b82f6]">TOTAL PKR {purchaseValue + price}</p>
+                            <p className="text-lg font-extrabold" style={{ color: SHOPS_COLOR }}>TOTAL PKR {purchaseValue + price}</p>
                         </div>
                     </div>
                 </div>
@@ -180,7 +185,8 @@ export function ShopOrderConfirmedScreen({
                 {/* Auto-start button for demo */}
                 <button
                     onClick={onOrderStarted}
-                    className="w-full mt-3 rounded-3xl border-2 border-[#3b82f6] bg-[#3b82f6]/10 px-6 py-4 text-lg font-extrabold text-[#3b82f6] hover:bg-[#3b82f6]/20 active:scale-95 transition-all duration-200"
+                    className="w-full mt-3 rounded-3xl border-2 px-6 py-4 text-lg font-extrabold hover:opacity-90 active:scale-95 transition-all duration-200"
+                    style={{ borderColor: SHOPS_COLOR, backgroundColor: `${SHOPS_COLOR}10`, color: SHOPS_COLOR }}
                 >
                     Start Order (Demo)
                 </button>
