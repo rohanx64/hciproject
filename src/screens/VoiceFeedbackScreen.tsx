@@ -1,3 +1,4 @@
+import { useVoiceFeedback } from '../contexts/VoiceFeedbackContext'
 import { useState } from 'react'
 
 interface VoiceFeedbackScreenProps {
@@ -6,13 +7,23 @@ interface VoiceFeedbackScreenProps {
     hideBottomNav?: boolean
 }
 
-export function VoiceFeedbackScreen({ onNavigate, onBack, hideBottomNav = true }: VoiceFeedbackScreenProps) {
-    const [voiceFeedbackEnabled, setVoiceFeedbackEnabled] = useState(false)
-    const [speechRate, setSpeechRate] = useState(1.0)
-    const [speechVolume, setSpeechVolume] = useState(1.0)
-    const [announceActions, setAnnounceActions] = useState(true)
-    const [announceNavigation, setAnnounceNavigation] = useState(true)
-    const [announceErrors, setAnnounceErrors] = useState(true)
+export function VoiceFeedbackScreen({ onBack }: VoiceFeedbackScreenProps) {
+    const {
+        voiceFeedbackEnabled,
+        setVoiceFeedbackEnabled,
+        speechRate,
+        setSpeechRate,
+        speechVolume,
+        setSpeechVolume,
+        announceActions,
+        setAnnounceActions,
+        announceNavigation,
+        setAnnounceNavigation,
+        announceErrors,
+        setAnnounceErrors,
+        speak
+    } = useVoiceFeedback()
+
     const [testVoice, setTestVoice] = useState(false)
 
     const ToggleSwitch = ({ enabled, onToggle, label, description }: { enabled: boolean; onToggle: () => void; label: string; description?: string }) => (
@@ -23,15 +34,13 @@ export function VoiceFeedbackScreen({ onNavigate, onBack, hideBottomNav = true }
             </div>
             <button
                 onClick={onToggle}
-                className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-200 ease-in-out flex-shrink-0 ${
-                    enabled ? 'bg-primary' : 'bg-gray-300'
-                }`}
+                className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-200 ease-in-out flex-shrink-0 ${enabled ? 'bg-primary' : 'bg-gray-300'
+                    }`}
                 aria-label={`${label}: ${enabled ? 'enabled' : 'disabled'}`}
             >
                 <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-200 ease-in-out shadow-md ${
-                        enabled ? 'translate-x-7' : 'translate-x-1'
-                    }`}
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform duration-200 ease-in-out shadow-md ${enabled ? 'translate-x-7' : 'translate-x-1'
+                        }`}
                 />
             </button>
         </div>
@@ -39,21 +48,12 @@ export function VoiceFeedbackScreen({ onNavigate, onBack, hideBottomNav = true }
 
     const handleTestVoice = () => {
         setTestVoice(true)
-        // In a real app, this would use Web Speech API to speak
-        if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance('This is a test of voice feedback. The app will now announce your actions.')
-            utterance.rate = speechRate
-            utterance.volume = speechVolume
-            utterance.lang = 'en-US' // Would use selected language
-            speechSynthesis.speak(utterance)
-            
-            utterance.onend = () => {
-                setTestVoice(false)
-            }
-        } else {
-            alert('Voice feedback is not supported in your browser.')
+        speak('This is a test of voice feedback. The app will now announce your actions.', 'high')
+
+        // Reset loading state after a short delay (since we don't have a callback for when speech ends in our context yet)
+        setTimeout(() => {
             setTestVoice(false)
-        }
+        }, 3000)
     }
 
     return (
@@ -81,21 +81,19 @@ export function VoiceFeedbackScreen({ onNavigate, onBack, hideBottomNav = true }
                             <div className="flex-1 pr-6">
                                 <h2 className="text-2xl font-bold text-text-dark mb-2">Enable Voice Feedback</h2>
                                 <p className="text-base text-gray-700 leading-relaxed">
-                                    Hear audio announcements for all your actions in your selected language. 
+                                    Hear audio announcements for all your actions in your selected language.
                                     This feature is designed to assist users with visual impairments.
                                 </p>
                             </div>
                             <button
                                 onClick={() => setVoiceFeedbackEnabled(!voiceFeedbackEnabled)}
-                                className={`relative inline-flex h-10 w-18 items-center rounded-full transition-colors duration-200 ease-in-out flex-shrink-0 ${
-                                    voiceFeedbackEnabled ? 'bg-primary' : 'bg-gray-300'
-                                }`}
+                                className={`relative inline-flex h-10 w-18 items-center rounded-full transition-colors duration-200 ease-in-out flex-shrink-0 ${voiceFeedbackEnabled ? 'bg-primary' : 'bg-gray-300'
+                                    }`}
                                 aria-label={`Voice Feedback: ${voiceFeedbackEnabled ? 'enabled' : 'disabled'}`}
                             >
                                 <span
-                                    className={`inline-block h-8 w-8 transform rounded-full bg-white transition-transform duration-200 ease-in-out shadow-lg ${
-                                        voiceFeedbackEnabled ? 'translate-x-9' : 'translate-x-1'
-                                    }`}
+                                    className={`inline-block h-8 w-8 transform rounded-full bg-white transition-transform duration-200 ease-in-out shadow-lg ${voiceFeedbackEnabled ? 'translate-x-9' : 'translate-x-1'
+                                        }`}
                                 />
                             </button>
                         </div>
@@ -214,7 +212,7 @@ export function VoiceFeedbackScreen({ onNavigate, onBack, hideBottomNav = true }
                     {!voiceFeedbackEnabled && (
                         <div className="bg-gray-50 rounded-xl p-6 border-2 border-gray-200">
                             <p className="text-base text-gray-700 leading-relaxed text-center">
-                                Enable voice feedback to hear audio announcements for all your actions. 
+                                Enable voice feedback to hear audio announcements for all your actions.
                                 This feature helps users with visual impairments navigate the app more easily.
                             </p>
                         </div>

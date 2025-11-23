@@ -1,3 +1,4 @@
+import { useVoiceFeedback } from '../contexts/VoiceFeedbackContext'
 import { useState } from 'react'
 
 interface LoginScreenProps {
@@ -7,6 +8,7 @@ interface LoginScreenProps {
 }
 
 export function LoginScreen({ onLogin, onSwitchToSignup, onCallBykea }: LoginScreenProps) {
+    const { speakError } = useVoiceFeedback()
     const [phoneNumber, setPhoneNumber] = useState('')
     const [showKeypad, setShowKeypad] = useState(false)
 
@@ -23,6 +25,8 @@ export function LoginScreen({ onLogin, onSwitchToSignup, onCallBykea }: LoginScr
     const handleNext = () => {
         if (phoneNumber.length === 10) {
             onLogin(phoneNumber)
+        } else {
+            speakError('Please enter a valid 10-digit phone number')
         }
     }
 
@@ -115,11 +119,10 @@ export function LoginScreen({ onLogin, onSwitchToSignup, onCallBykea }: LoginScr
                 <button
                     onClick={handleNext}
                     disabled={phoneNumber.length !== 10}
-                    className={`w-full rounded-full px-6 py-4 text-center font-semibold text-white transition-all duration-200 mb-4 ${
-                        phoneNumber.length === 10
+                    className={`w-full rounded-full px-6 py-4 text-center font-semibold text-white transition-all duration-200 mb-4 ${phoneNumber.length === 10
                             ? 'bg-primary hover:bg-primary-dark active:scale-95 shadow-lg'
                             : 'bg-gray-300 cursor-not-allowed'
-                    }`}
+                        }`}
                 >
                     Next
                 </button>

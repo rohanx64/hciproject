@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useVoiceFeedback } from '../contexts/VoiceFeedbackContext'
 
 interface OTPVerificationScreenProps {
     phoneNumber: string
@@ -7,7 +8,8 @@ interface OTPVerificationScreenProps {
     isSignup?: boolean
 }
 
-export function OTPVerificationScreen({ phoneNumber, onVerify, onBack, isSignup = false }: OTPVerificationScreenProps) {
+export function OTPVerificationScreen({ phoneNumber: _phoneNumber, onVerify, onBack, isSignup: _isSignup = false }: OTPVerificationScreenProps) {
+    const { speakError } = useVoiceFeedback()
     const [otp, setOtp] = useState(['', '', '', ''])
     const [showKeypad, setShowKeypad] = useState(true)
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
@@ -23,7 +25,7 @@ export function OTPVerificationScreen({ phoneNumber, onVerify, onBack, isSignup 
             const newOtp = [...otp]
             newOtp[emptyIndex] = num
             setOtp(newOtp)
-            
+
             // Auto-focus next input
             if (emptyIndex < 3) {
                 inputRefs.current[emptyIndex + 1]?.focus()
@@ -86,6 +88,8 @@ export function OTPVerificationScreen({ phoneNumber, onVerify, onBack, isSignup 
     const handleVerify = () => {
         if (otp.every(digit => digit !== '')) {
             onVerify(otp.join(''))
+        } else {
+            speakError('Please enter the complete 4-digit code')
         }
     }
 
@@ -133,7 +137,7 @@ export function OTPVerificationScreen({ phoneNumber, onVerify, onBack, isSignup 
                     {otp.map((digit, index) => (
                         <input
                             key={index}
-                            ref={(el) => (inputRefs.current[index] = el)}
+                            ref={(el) => { inputRefs.current[index] = el }}
                             type="text"
                             inputMode="numeric"
                             maxLength={1}
@@ -150,11 +154,10 @@ export function OTPVerificationScreen({ phoneNumber, onVerify, onBack, isSignup 
                 <button
                     onClick={handleVerify}
                     disabled={!otp.every(digit => digit !== '')}
-                    className={`w-full rounded-full px-6 py-4 text-center font-semibold text-white transition-all duration-200 mb-4 ${
-                        otp.every(digit => digit !== '')
+                    className={`w-full rounded-full px-6 py-4 text-center font-semibold text-white transition-all duration-200 mb-4 ${otp.every(digit => digit !== '')
                             ? 'bg-primary hover:bg-primary-dark active:scale-95 shadow-lg'
                             : 'bg-gray-300 cursor-not-allowed'
-                    }`}
+                        }`}
                 >
                     Verify Now
                 </button>
@@ -205,4 +208,3 @@ export function OTPVerificationScreen({ phoneNumber, onVerify, onBack, isSignup 
         </div>
     )
 }
-

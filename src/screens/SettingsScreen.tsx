@@ -12,12 +12,13 @@ const settingsOptions = [
     { id: 'notifications', label: 'Notifications' },
     { id: 'changeSize', label: 'Change Size' },
     { id: 'language', label: 'Language' },
+    { id: 'voiceFeedback', label: 'Voice Feedback' },
     { id: 'changeTheme', label: 'Change Theme' },
     { id: 'terms', label: 'Terms & Privacy Policy' },
     { id: 'contact', label: 'Contact us' },
 ]
 
-export function SettingsScreen({ onNavigate, onBack, userName = 'Rohan Riaz', userAvatar, hideBottomNav = true }: SettingsScreenProps) {
+export function SettingsScreen({ onNavigate, userName = 'Rohan Riaz', userAvatar, hideBottomNav = true }: SettingsScreenProps) {
     return (
         <div className="w-full h-full flex flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl relative">
             {/* Header */}
@@ -72,6 +73,8 @@ export function SettingsScreen({ onNavigate, onBack, userName = 'Rohan Riaz', us
                                     onNavigate?.('changeSizeSettings')
                                 } else if (option.id === 'language') {
                                     onNavigate?.('languageSettings')
+                                } else if (option.id === 'voiceFeedback') {
+                                    onNavigate?.('voiceFeedback')
                                 } else if (option.id === 'changeTheme') {
                                     onNavigate?.('changeThemeSettings')
                                 } else if (option.id === 'terms') {

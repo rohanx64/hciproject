@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
 import { DraggablePanel } from '../components/DraggablePanel'
+import { useVoiceFeedback } from '../contexts/VoiceFeedbackContext'
 
 interface SelectVehicleProps {
     onCancel: () => void
@@ -28,6 +29,7 @@ export function SelectVehicleScreen({
     onOpenPickupSelect,
     onOpenDropoffSelect
 }: SelectVehicleProps) {
+    const { speakAction } = useVoiceFeedback()
     const [panelHeight, setPanelHeight] = useState(58)
     const [vehicle, setVehicle] = useState('Bike')
     const [showCancelDialog, setShowCancelDialog] = useState(false)
@@ -46,6 +48,7 @@ export function SelectVehicleScreen({
     useEffect(() => {
         const timer = setTimeout(() => {
             onOpenFareDialog()
+            speakAction(`Your estimated fare is ${fare} rupees`)
         }, 300)
         return () => clearTimeout(timer)
     }, [])
@@ -57,17 +60,20 @@ export function SelectVehicleScreen({
 
     const handleVehicleSelect = (vehicleId: string) => {
         setVehicle(vehicleId)
+        speakAction(`${vehicleId} selected`)
         // Collapse panel after selection
         setPanelHeight(58)
     }
 
     const handleCancelClick = () => {
         setShowCancelDialog(true)
+        speakAction('Do you want to cancel?')
     }
 
     const handleConfirmCancel = () => {
         setShowCancelDialog(false)
         onCancel()
+        speakAction('Cancelled')
     }
 
 
@@ -151,7 +157,7 @@ export function SelectVehicleScreen({
                                     return (
                                         <button
                                             key={v.id}
-                                            onClick={() => setVehicle(v.id)}
+                                            onClick={() => handleVehicleSelect(v.id)}
                                             className={`flex min-w-[70px] flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-all duration-200 active:scale-95 ${active
                                                 ? 'border-primary bg-primary/10 shadow-md scale-105'
                                                 : 'border-gray-200 bg-white hover:border-primary/40 hover:scale-102'

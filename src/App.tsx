@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   SplashScreen,
   LoginScreen,
@@ -56,12 +56,33 @@ import { Overlay } from './components/Overlay'
 import { recentLocations, breakdownItems, deliveryBreakdownItems, shopsBreakdownItems, shops } from './constants/data'
 import type { Screen, PaymentMethod, DeliveryType, PaymentOption } from './types'
 
+import { useVoiceFeedback } from './contexts/VoiceFeedbackContext'
+
 function App() {
-  // Check localStorage for authentication state on mount
+  const { setVoiceFeedbackEnabled, speakAction, speakNavigation } = useVoiceFeedback()
+
   const [screen, setScreen] = useState<Screen>(() => {
     const savedAuth = localStorage.getItem('isAuthenticated')
     return savedAuth === 'true' ? 'home' : 'splash'
   })
+
+  // Announce screen changes
+  useEffect(() => {
+    // Convert camelCase to readable text
+    const readableScreen = screen.replace(/([A-Z])/g, ' $1').trim()
+    speakNavigation(`Navigated to ${readableScreen}`)
+
+    // Add specific instructions for certain screens
+    if (screen === 'dropoff') {
+      speakNavigation('Please enter your dropoff location')
+    } else if (screen === 'ridePickupSelect' || screen === 'deliveryPickupSelect') {
+      speakNavigation('Please confirm your pickup location')
+    } else if (screen === 'selectVehicle') {
+      speakNavigation('Please select a vehicle for your ride')
+    } else if (screen === 'deliveryForm') {
+      speakNavigation('Please fill in the delivery details')
+    }
+  }, [screen, speakNavigation])
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('isAuthenticated') === 'true'
   })
@@ -70,6 +91,7 @@ function App() {
 
   // Handle logout
   const handleLogout = () => {
+    speakAction('Logged out')
     setIsAuthenticated(false)
     localStorage.removeItem('isAuthenticated')
     setScreen('login')
@@ -144,6 +166,7 @@ function App() {
   const openDropoff = () => setScreen('dropoff')
 
   const handleQuickBookConfirm = () => {
+    speakAction('Quick book confirmed')
     setQuickBookOpen(false)
     setShowFareDialog(true)
   }
@@ -265,6 +288,7 @@ function App() {
         <OnboardingScreen
           onComplete={(data) => {
             console.log('Onboarding completed:', data)
+            setVoiceFeedbackEnabled(data.voiceFeedback)
             // Move to tutorial screen after onboarding
             setScreen('onboardingTutorial')
           }}
