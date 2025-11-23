@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
 import { DraggablePanel } from '../components/DraggablePanel'
@@ -11,6 +11,9 @@ interface SelectVehicleProps {
     onOpenPaymentModal: () => void
     fare: number
     paymentMethod: 'cash' | 'digital'
+    pickupLocation?: string
+    onOpenPickupSelect?: () => void
+    onOpenDropoffSelect?: () => void
 }
 
 export function SelectVehicleScreen({
@@ -20,21 +23,56 @@ export function SelectVehicleScreen({
     onOpenFareDialog,
     onOpenPaymentModal,
     fare,
-    paymentMethod
+    paymentMethod,
+    pickupLocation = 'My current location',
+    onOpenPickupSelect,
+    onOpenDropoffSelect
 }: SelectVehicleProps) {
-    const [panelHeight, setPanelHeight] = useState(68) // Auto-adjusted to show all content
+    const [panelHeight, setPanelHeight] = useState(58)
     const [vehicle, setVehicle] = useState('Bike')
+    const [showCancelDialog, setShowCancelDialog] = useState(false)
+    const [isExpanded, setIsExpanded] = useState(false)
 
+    // Vehicle data with estimated fares
     const vehicles = [
-        { id: 'Bike', icon: '🏍️', label: 'Bike' },
-        { id: 'Car', icon: '🚗', label: 'Car' },
-        { id: 'Auto', icon: '🛺', label: 'Auto' },
-        { id: 'Plus', icon: '🚙', label: 'Plus' },
-        { id: 'AC', icon: '🚕', label: 'AC' },
+        { id: 'Bike', icon: '🏍️', label: 'Bike', fare: 250 },
+        { id: 'Car', icon: '🚗', label: 'Car', fare: 450 },
+        { id: 'Auto', icon: '🛺', label: 'Auto', fare: 350 },
+        { id: 'Plus', icon: '🚙', label: 'Plus', fare: 550 },
+        { id: 'AC', icon: '🚕', label: 'AC', fare: 650 },
     ]
 
+    // Auto-open fare dialog when screen loads
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onOpenFareDialog()
+        }, 300)
+        return () => clearTimeout(timer)
+    }, [])
+
+    // Detect when panel is expanded (height > 75%)
+    useEffect(() => {
+        setIsExpanded(panelHeight > 75)
+    }, [panelHeight])
+
+    const handleVehicleSelect = (vehicleId: string) => {
+        setVehicle(vehicleId)
+        // Collapse panel after selection
+        setPanelHeight(58)
+    }
+
+    const handleCancelClick = () => {
+        setShowCancelDialog(true)
+    }
+
+    const handleConfirmCancel = () => {
+        setShowCancelDialog(false)
+        onCancel()
+    }
+
+
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px] relative">
+        <div className="relative flex w-full flex-col overflow-hidden bg-white h-screen">
             {/* Map Section - Full height, panel overlays */}
             <section className="absolute inset-0 overflow-hidden">
                 <RideMap
@@ -50,7 +88,7 @@ export function SelectVehicleScreen({
                 <button
                     className="absolute left-[6.13%] top-[6.38%] size-[52px] rounded-full border-2 border-white bg-white shadow-lg flex items-center justify-center z-20 hover:bg-gray-50 active:scale-90 transition-all duration-200"
                     aria-label="Back"
-                    onClick={onCancel}
+                    onClick={handleCancelClick}
                 >
                     <svg className="w-6 h-6 text-text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -58,21 +96,27 @@ export function SelectVehicleScreen({
                 </button>
 
                 {/* Pickup Location Card */}
-                <div className="absolute left-[14.3%] top-[7.74%] right-[14.3%] z-20">
-                    <div className="rounded-3xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-3 shadow-lg flex items-center gap-3">
+                <button
+                    onClick={onOpenPickupSelect}
+                    className="absolute left-[calc(6.13%+52px+16px)] right-4 top-[6.38%] z-20 text-left hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200"
+                >
+                    <div className="rounded-3xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-2 shadow-lg flex items-center gap-3 hover:border-primary hover:shadow-xl transition-all duration-200">
                         <div className="grid size-7 place-items-center">
                             <div className="size-5 rounded-full border-2 border-primary bg-primary"></div>
                         </div>
                         <div className="flex-1 text-left">
                             <p className="text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-1">PICKUP</p>
-                            <p className="text-base font-normal text-text-dark truncate">My current location</p>
+                            <p className="text-base font-normal text-text-dark truncate">{pickupLocation}</p>
                         </div>
                     </div>
-                </div>
+                </button>
 
                 {/* Drop-off Location Card */}
-                <div className="absolute left-[14.3%] top-[16%] right-[14.3%] z-20">
-                    <div className="rounded-3xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-3 shadow-lg flex items-center gap-3">
+                <button
+                    onClick={onOpenDropoffSelect}
+                    className="absolute left-[calc(6.13%+52px+16px)] right-4 top-[calc(6.38%+52px+8px)] z-20 text-left hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200"
+                >
+                    <div className="rounded-3xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-2 shadow-lg flex items-center gap-3 hover:border-primary hover:shadow-xl transition-all duration-200">
                         <div className="grid size-7 place-items-center">
                             <div className="size-5 rounded-full border-2 border-[#ff3b30] bg-[#ff3b30]"></div>
                         </div>
@@ -81,59 +125,103 @@ export function SelectVehicleScreen({
                             <p className="text-base font-normal text-text-dark truncate">{dropoffLabel}</p>
                         </div>
                     </div>
-                </div>
+                </button>
             </section>
 
-            {/* Draggable Bottom Panel - Auto-adjusted to show all content */}
+            {/* Draggable Bottom Panel */}
             <DraggablePanel
-                initialHeight={68}
-                minHeight={50}
+                initialHeight={58}
+                minHeight={55}
                 maxHeight={85}
                 onHeightChange={setPanelHeight}
                 hideBottomNav={true}
             >
                 <div className="px-6 pb-6">
-                    {/* Ride Title */}
-                    <h1 className="font-display text-[42px] font-normal text-primary text-center mb-5 mt-6">
-                        Ride
-                    </h1>
-
                     {/* SELECT VEHICLE Section */}
-                    <div className="mb-6">
+                    <div className="mb-6 mt-6">
                         <p className="text-center text-[19.931px] font-light text-[#919191] mb-4">
                             SELECT VEHICLE
                         </p>
-                        <div className="flex gap-3 justify-center overflow-x-auto pb-2 scrollbar-hide">
-                            {vehicles.map((v) => {
-                                const active = vehicle === v.id
-                                return (
-                                    <button
-                                        key={v.id}
-                                        onClick={() => setVehicle(v.id)}
-                                        className={`flex min-w-[70px] flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-all duration-200 active:scale-95 ${
-                                            active
+
+                        {/* Horizontal view (collapsed) */}
+                        {!isExpanded && (
+                            <div className="flex gap-3 justify-center overflow-x-auto pb-2 scrollbar-hide">
+                                {vehicles.map((v) => {
+                                    const active = vehicle === v.id
+                                    return (
+                                        <button
+                                            key={v.id}
+                                            onClick={() => setVehicle(v.id)}
+                                            className={`flex min-w-[70px] flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-all duration-200 active:scale-95 ${active
                                                 ? 'border-primary bg-primary/10 shadow-md scale-105'
                                                 : 'border-gray-200 bg-white hover:border-primary/40 hover:scale-102'
-                                        }`}
-                                    >
-                                        <div className={`grid size-14 place-items-center rounded-xl transition-all duration-200 ${
-                                            active ? 'bg-primary/20 scale-110' : 'bg-gray-50'
-                                        }`}>
-                                            <span className={`text-3xl transition-all duration-200 ${
-                                                active ? 'opacity-100 scale-110' : 'opacity-70'
-                                            }`}>
-                                                {v.icon}
+                                                }`}
+                                        >
+                                            <div className={`grid size-14 place-items-center rounded-xl transition-all duration-200 ${active ? 'bg-primary/20 scale-110' : 'bg-gray-50'
+                                                }`}>
+                                                <span className={`text-3xl transition-all duration-200 ${active ? 'opacity-100 scale-110' : 'opacity-70'
+                                                    }`}>
+                                                    {v.icon}
+                                                </span>
+                                            </div>
+                                            <span className={`text-xs font-semibold transition-colors duration-200 ${active ? 'text-primary' : 'text-gray-500'
+                                                }`}>
+                                                {v.label}
                                             </span>
-                                        </div>
-                                        <span className={`text-xs font-semibold transition-colors duration-200 ${
-                                            active ? 'text-primary' : 'text-gray-500'
-                                        }`}>
-                                            {v.label}
-                                        </span>
-                                    </button>
-                                )
-                            })}
-                        </div>
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        )}
+
+                        {/* Vertical view (expanded) with fares */}
+                        {isExpanded && (
+                            <div className="space-y-3 max-h-[320px] overflow-y-auto">
+                                {vehicles.map((v) => {
+                                    const active = vehicle === v.id
+                                    return (
+                                        <button
+                                            key={v.id}
+                                            onClick={() => handleVehicleSelect(v.id)}
+                                            className={`w-full flex items-center gap-4 rounded-2xl border-2 p-4 transition-all duration-200 active:scale-98 ${active
+                                                ? 'border-primary bg-primary/10 shadow-md'
+                                                : 'border-gray-200 bg-white hover:border-primary/40'
+                                                }`}
+                                        >
+                                            <div className={`grid size-16 place-items-center rounded-xl transition-all duration-200 ${active ? 'bg-primary/20' : 'bg-gray-50'
+                                                }`}>
+                                                <span className="text-4xl">
+                                                    {v.icon}
+                                                </span>
+                                            </div>
+                                            <div className="flex-1 text-left">
+                                                <p className={`text-lg font-bold ${active ? 'text-primary' : 'text-gray-700'
+                                                    }`}>
+                                                    {v.label}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    Estimated arrival: 5 min
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className={`text-xl font-extrabold ${active ? 'text-primary' : 'text-gray-700'
+                                                    }`}>
+                                                    PKR {v.fare}
+                                                </p>
+                                                <p className="text-xs text-gray-500">Est. fare</p>
+                                            </div>
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        )}
+
+                        {/* Pull up hint when collapsed */}
+                        {!isExpanded && (
+                            <p className="text-center text-xs text-gray-400 mt-3">
+                                Pull up to see all vehicles with fares
+                            </p>
+                        )}
                     </div>
 
                     {/* YOUR FARE Card - Clickable */}
@@ -179,7 +267,7 @@ export function SelectVehicleScreen({
                     {/* Action Buttons */}
                     <div className="flex gap-3">
                         <button
-                            onClick={onCancel}
+                            onClick={handleCancelClick}
                             className="flex-1 rounded-[7px] border-[1.172px] border-[#ff4141] bg-[#ff544a] px-6 py-4 text-[19.931px] font-extrabold text-white transition-all duration-200 hover:bg-[#ff3d33] hover:shadow-lg hover:scale-102 active:scale-98 min-h-[52px]"
                         >
                             CANCEL
@@ -193,6 +281,31 @@ export function SelectVehicleScreen({
                     </div>
                 </div>
             </DraggablePanel>
+
+            {/* Cancel Confirmation Dialog */}
+            {showCancelDialog && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
+                    <div className="w-[360px] rounded-[28px] border border-primary bg-white px-6 py-8 text-center text-text-dark shadow-2xl mx-4">
+                        <p className="text-xl font-medium">
+                            Cancelling will <span className="font-extrabold">remove all details you have added</span>, are you sure?
+                        </p>
+                        <div className="mt-6 flex gap-4">
+                            <button
+                                className="flex-1 rounded-2xl bg-[#ff544a] px-4 py-3 text-base font-extrabold uppercase tracking-wide text-white shadow-[3px_3px_0_rgba(245,45,86,0.3)] transition hover:brightness-95 active:scale-95"
+                                onClick={handleConfirmCancel}
+                            >
+                                Yes, Cancel
+                            </button>
+                            <button
+                                className="flex-1 rounded-2xl bg-primary px-4 py-3 text-base font-extrabold uppercase tracking-wide text-white shadow-[3px_3px_0_rgba(50,153,29,0.33)] transition hover:bg-primary-dark active:scale-95"
+                                onClick={() => setShowCancelDialog(false)}
+                            >
+                                No
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

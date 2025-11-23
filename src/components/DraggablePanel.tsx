@@ -32,9 +32,8 @@ export function DraggablePanel({
     // Measure container height
     useEffect(() => {
         const measureContainer = () => {
-            if (panelRef.current?.parentElement) {
-                setContainerHeight(panelRef.current.parentElement.clientHeight)
-            }
+            // Use viewport height for fixed positioning
+            setContainerHeight(window.innerHeight)
         }
         measureContainer()
         window.addEventListener('resize', measureContainer)
@@ -70,13 +69,13 @@ export function DraggablePanel({
         const handleMouseMove = (e: MouseEvent) => {
             if (!isDragging || !panelRef.current) return
 
-            const currentContainerHeight = panelRef.current.parentElement?.clientHeight || containerHeight
+            const currentContainerHeight = containerHeight
             const deltaY = startYRef.current - e.clientY // Inverted: dragging up increases height
-            
+
             // Calculate delta as percentage of available space
             const availableHeight = hideBottomNav ? currentContainerHeight : currentContainerHeight - BOTTOM_NAV_HEIGHT
             const deltaPercent = (deltaY / availableHeight) * 100
-            
+
             const newHeight = Math.max(
                 minHeight,
                 Math.min(maxHeight, startHeightRef.current + deltaPercent)
@@ -88,6 +87,11 @@ export function DraggablePanel({
 
         const handleMouseUp = () => {
             setIsDragging(false)
+            // Snap to nearest state
+            const midpoint = (minHeight + maxHeight) / 2
+            const targetHeight = height > midpoint ? maxHeight : minHeight
+            setHeight(targetHeight)
+            onHeightChange?.(targetHeight)
         }
 
         if (isDragging) {
@@ -103,7 +107,7 @@ export function DraggablePanel({
             document.body.style.cursor = ''
             document.body.style.userSelect = ''
         }
-    }, [isDragging, minHeight, maxHeight, onHeightChange, hideBottomNav, containerHeight])
+    }, [isDragging, minHeight, maxHeight, onHeightChange, hideBottomNav, containerHeight, height])
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true)
@@ -120,13 +124,13 @@ export function DraggablePanel({
     const handleTouchMove = (e: React.TouchEvent) => {
         if (!isDragging || !panelRef.current) return
 
-        const currentContainerHeight = panelRef.current.parentElement?.clientHeight || containerHeight
+        const currentContainerHeight = containerHeight
         const deltaY = startYRef.current - e.touches[0].clientY
-        
+
         // Calculate delta as percentage of available space
         const availableHeight = hideBottomNav ? currentContainerHeight : currentContainerHeight - BOTTOM_NAV_HEIGHT
         const deltaPercent = (deltaY / availableHeight) * 100
-        
+
         const newHeight = Math.max(
             minHeight,
             Math.min(maxHeight, startHeightRef.current + deltaPercent)
@@ -138,6 +142,11 @@ export function DraggablePanel({
 
     const handleTouchEnd = () => {
         setIsDragging(false)
+        // Snap to nearest state
+        const midpoint = (minHeight + maxHeight) / 2
+        const targetHeight = height > midpoint ? maxHeight : minHeight
+        setHeight(targetHeight)
+        onHeightChange?.(targetHeight)
     }
 
     // Calculate actual pixel values for styling
@@ -149,7 +158,7 @@ export function DraggablePanel({
     return (
         <div
             ref={panelRef}
-            className="absolute left-0 right-0 bg-white rounded-t-[18px] transition-all duration-300 ease-out z-[500]"
+            className="fixed left-0 right-0 bg-white rounded-t-[18px] transition-all duration-300 ease-out z-[400]"
             style={{
                 height: getStyleHeight(),
                 bottom: hideBottomNav ? '0' : `${BOTTOM_NAV_HEIGHT}px`,

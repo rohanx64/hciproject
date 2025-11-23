@@ -323,7 +323,10 @@ function App() {
           onOpenDropoff={openDropoff}
           dropoffLabel={dropoffLabel}
           onNavigate={handleNavigate}
-          onOpenPickupSelect={() => setScreen('ridePickupSelect')}
+          onOpenPickupSelect={() => {
+            setPreviousScreen('home')
+            setScreen('ridePickupSelect')
+          }}
           pickupLocation={ridePickup}
           onOpenSidebar={handleOpenSidebar}
           onOpenVoiceActivation={() => setShowVoiceActivation(true)}
@@ -334,10 +337,10 @@ function App() {
     if (screen === 'ridePickupSelect') {
       return (
         <DeliveryPickupSelectScreen
-          onCancel={() => setScreen('home')}
+          onCancel={() => setScreen(previousScreen)}
           onApply={(value) => {
             setRidePickup(value)
-            setScreen('home')
+            setScreen(previousScreen)
           }}
           currentLocation={ridePickup}
         />
@@ -368,6 +371,12 @@ function App() {
           onOpenPaymentModal={() => setShowPaymentModal(true)}
           fare={fare}
           paymentMethod={paymentMethod}
+          pickupLocation={ridePickup}
+          onOpenPickupSelect={() => {
+            setPreviousScreen('selectVehicle')
+            setScreen('ridePickupSelect')
+          }}
+          onOpenDropoffSelect={() => setScreen('dropoff')}
         />
       )
     }
@@ -1093,7 +1102,7 @@ function App() {
           userName={userName}
           userAvatar={userAvatar}
         />
-        
+
         {/* Screen content - Each screen already has its own container, so we need to adjust */}
         {renderScreen()}
       </div>
@@ -1157,7 +1166,7 @@ function App() {
               if (screen === 'shopOrder') {
                 // Stay on shop order screen
               } else {
-              setScreen('selectVehicle')
+                setScreen('selectVehicle')
               }
             }}
             onClose={() => setShowBreakdown(false)}

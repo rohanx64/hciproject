@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { assets } from '../constants/assets'
-import { BottomNav } from '../components/BottomNav'
 
 interface SearchingRidesProps {
     dropoffLabel: string
@@ -106,7 +105,6 @@ export function SearchingRidesScreen({ dropoffLabel, onRidesFound }: SearchingRi
                 </div>
             </section>
 
-            <BottomNav active="Ride" />
         </div>
     )
 }

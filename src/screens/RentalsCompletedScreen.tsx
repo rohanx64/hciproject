@@ -161,7 +161,7 @@ export function RentalsCompletedScreen({
             </main>
 
             {/* Bottom Navigation */}
-            <div className="absolute bottom-0 left-0 right-0 z-[1000] bg-white">
+            <div className="fixed bottom-0 left-0 right-0 z-[1000] bg-white max-w-full">
                 <BottomNav active="Rentals" onNavigate={onNavigate} />
             </div>
         </div>

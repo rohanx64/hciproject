@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import L from 'leaflet'
 import { assets } from '../constants/assets'
 import { favoritePlaces, recentLocations } from '../constants/data'
@@ -33,9 +33,17 @@ export function DeliveryHomeScreen({
     const [selectedDropoffLocation, setSelectedDropoffLocation] = useState<[number, number] | null>(null)
     const [isMapDragging, setIsMapDragging] = useState(false)
     const mapRef = useRef<L.Map | null>(null)
-    
+
     // Calculate button position in pixels based on panel height percentage
-    const containerHeight = 844
+    // Use window.innerHeight to match DraggablePanel
+    const [containerHeight, setContainerHeight] = useState(window.innerHeight)
+
+    useEffect(() => {
+        const handleResize = () => setContainerHeight(window.innerHeight)
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
+
     const bottomNavHeight = 110
     const availableHeight = containerHeight - bottomNavHeight
     const panelHeightPixels = (panelHeight / 100) * availableHeight
@@ -101,7 +109,7 @@ export function DeliveryHomeScreen({
                     <div className="relative">
                         {/* Pointer body - Clean pin without shadows */}
                         <svg className="w-10 h-14 text-[#ff9500]" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                         </svg>
                         {/* Center dot for precision */}
                         <div className="absolute left-1/2 -translate-x-1/2 top-[18px] w-2.5 h-2.5 rounded-full bg-white border-2 border-[#ff9500]"></div>
@@ -142,7 +150,7 @@ export function DeliveryHomeScreen({
                 <button
                     style={{ bottom: `${buttonBottomPixels}px` }}
                     onClick={onOpenVoiceActivation}
-                    className="absolute left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary active:scale-95 transition-all duration-200 ease-out"
+                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary active:scale-95 transition-all duration-200 ease-out"
                     aria-label="Voice input"
                 >
                     <svg className="w-5 h-5 text-white animate-pulse" fill="currentColor" viewBox="0 0 24 24">
@@ -156,7 +164,7 @@ export function DeliveryHomeScreen({
                 {/* Location Button - Dynamically positioned above panel */}
                 <button
                     style={{ bottom: `${buttonBottomPixels}px` }}
-                    className="absolute right-[5.26%] min-w-[51px] min-h-[51px] rounded-full bg-[#6cc44a] shadow-lg flex items-center justify-center z-[600] hover:bg-[#5ab038] active:scale-90 transition-all duration-200 ease-out"
+                    className="fixed right-[5.26%] min-w-[51px] min-h-[51px] rounded-full bg-[#6cc44a] shadow-lg flex items-center justify-center z-[600] hover:bg-[#5ab038] active:scale-90 transition-all duration-200 ease-out"
                     aria-label="Use current location"
                     onClick={() => {
                         if (navigator.geolocation) {
@@ -183,9 +191,9 @@ export function DeliveryHomeScreen({
                         <div className="grid size-7 place-items-center flex-shrink-0">
                             {/* Green target/crosshair icon for pickup */}
                             <svg className="w-5 h-5 text-[#6cc44a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
-                                <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-                                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+                                <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none" />
+                                <circle cx="12" cy="12" r="2" fill="currentColor" />
                             </svg>
                         </div>
                         <div className="flex-1 text-left min-w-0">
@@ -220,9 +228,10 @@ export function DeliveryHomeScreen({
             {/* Draggable Bottom Panel */}
             <DraggablePanel
                 initialHeight={panelHeight}
-                minHeight={20}
+                minHeight={42}
                 maxHeight={85}
                 onHeightChange={setPanelHeight}
+                hideBottomNav={false}
             >
                 <div className="px-6 pb-2">
                     {/* Delivery Title - Top left */}
@@ -238,7 +247,7 @@ export function DeliveryHomeScreen({
                         <div className="grid size-7 place-items-center flex-shrink-0">
                             {/* Red location pin icon */}
                             <svg className="w-5 h-5 text-[#ff3b30]" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                             </svg>
                         </div>
                         <div className="flex-1 text-left min-w-0">
@@ -278,7 +287,7 @@ export function DeliveryHomeScreen({
                                         >
                                             {/* Red location pin icon */}
                                             <svg className="w-5 h-5 text-[#ff3b30] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                                             </svg>
                                             <span className="flex-1 text-base font-normal text-text-dark">{location.label}</span>
                                             {/* Clickable star icon */}
@@ -308,7 +317,7 @@ export function DeliveryHomeScreen({
             </DraggablePanel>
 
             {/* Bottom Navigation - Always visible at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 z-[1000] bg-white">
+            <div className="fixed bottom-0 left-0 right-0 z-[1000] bg-white max-w-full">
                 <BottomNav active="Delivery" onNavigate={onNavigate} />
             </div>
         </div>

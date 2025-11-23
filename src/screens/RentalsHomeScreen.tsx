@@ -37,9 +37,17 @@ export function RentalsHomeScreen({
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<[number, number] | null>(null)
     const [isMapDragging, setIsMapDragging] = useState(false)
     const mapRef = useRef<L.Map | null>(null)
-    
+
     // Calculate button position in pixels based on panel height percentage
-    const containerHeight = 844
+    // Use window.innerHeight to match DraggablePanel
+    const [containerHeight, setContainerHeight] = useState(window.innerHeight)
+
+    useEffect(() => {
+        const handleResize = () => setContainerHeight(window.innerHeight)
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
+
     const bottomNavHeight = 110
     const availableHeight = containerHeight - bottomNavHeight
     const panelHeightPixels = (panelHeight / 100) * availableHeight
@@ -60,12 +68,12 @@ export function RentalsHomeScreen({
             setPanelHeight(showPickupSelection ? 42 : 68) // Expand back to appropriate height
         }, 300)
     }
-    
+
     // Check if pickup has been selected (not default)
     // If pickupLocation is "My current location", it means it's the initial state
     // Any other value means user has selected a location via the picker
     const hasSelectedPickup = pickupLocation !== 'My current location' && pickupLocation !== '' && pickupLocation !== 'Where to?' && pickupLocation !== undefined
-    
+
     // Update panel height when pickup is selected - expand smoothly
     useEffect(() => {
         if (hasSelectedPickup) {
@@ -129,7 +137,7 @@ export function RentalsHomeScreen({
                     <div className="relative">
                         {/* Pointer body - Clean pin without shadows */}
                         <svg className="w-10 h-14 text-[#ffd900]" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                         </svg>
                         {/* Center dot for precision */}
                         <div className="absolute left-1/2 -translate-x-1/2 top-[18px] w-2.5 h-2.5 rounded-full bg-white border-2 border-[#ffd900]"></div>
@@ -170,7 +178,7 @@ export function RentalsHomeScreen({
                 <button
                     style={{ bottom: `${buttonBottomPixels}px` }}
                     onClick={onOpenVoiceActivation}
-                    className="absolute left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary active:scale-95 transition-all duration-200 ease-out"
+                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary active:scale-95 transition-all duration-200 ease-out"
                     aria-label="Voice input"
                 >
                     <svg className="w-5 h-5 text-white animate-pulse" fill="currentColor" viewBox="0 0 24 24">
@@ -184,7 +192,7 @@ export function RentalsHomeScreen({
                 {/* Location Button - Dynamically positioned above panel */}
                 <button
                     style={{ bottom: `${buttonBottomPixels}px` }}
-                    className="absolute right-[5.26%] min-w-[51px] min-h-[51px] rounded-full bg-[#6cc44a] shadow-lg flex items-center justify-center z-[600] hover:bg-[#5ab038] active:scale-90 transition-all duration-200 ease-out"
+                    className="fixed right-[5.26%] min-w-[51px] min-h-[51px] rounded-full bg-[#6cc44a] shadow-lg flex items-center justify-center z-[600] hover:bg-[#5ab038] active:scale-90 transition-all duration-200 ease-out"
                     aria-label="Use current location"
                     onClick={() => {
                         if (navigator.geolocation) {
@@ -211,9 +219,9 @@ export function RentalsHomeScreen({
                         <div className="grid size-7 place-items-center flex-shrink-0">
                             {/* Green target/crosshair icon for pickup */}
                             <svg className="w-5 h-5 text-[#6cc44a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
-                                <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none"/>
-                                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+                                <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none" />
+                                <circle cx="12" cy="12" r="2" fill="currentColor" />
                             </svg>
                         </div>
                         <div className="flex-1 text-left min-w-0">
@@ -248,7 +256,7 @@ export function RentalsHomeScreen({
             {/* Draggable Bottom Panel - Standardized initial, expands when pickup selected */}
             <DraggablePanel
                 initialHeight={panelHeight}
-                minHeight={20}
+                minHeight={42}
                 maxHeight={85}
                 onHeightChange={setPanelHeight}
                 hideBottomNav={false}
@@ -265,7 +273,7 @@ export function RentalsHomeScreen({
                             <p className="text-left text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-3">
                                 SELECT PICKUP LOCATION
                             </p>
-                            
+
                             {/* Suggested Location Tags */}
                             <div className="flex flex-wrap gap-2">
                                 {favoritePlaces.map((place, idx) => (
@@ -329,15 +337,13 @@ export function RentalsHomeScreen({
                                             <button
                                                 key={vehicle.id}
                                                 onClick={() => setSelectedVehicle(vehicle.id)}
-                                                className={`flex min-w-[74.5px] h-[72.7px] flex-col items-center justify-center rounded-2xl border-2 transition-all duration-200 ${
-                                                    isActive
-                                                        ? 'border-[#c8f0c0] bg-[#c8f0c0]/30 shadow-md scale-105'
-                                                        : 'border-[#c8f0c0] bg-white hover:bg-green-50 hover:scale-102 active:scale-98'
-                                                }`}
+                                                className={`flex min-w-[74.5px] h-[72.7px] flex-col items-center justify-center rounded-2xl border-2 transition-all duration-200 ${isActive
+                                                    ? 'border-[#c8f0c0] bg-[#c8f0c0]/30 shadow-md scale-105'
+                                                    : 'border-[#c8f0c0] bg-white hover:bg-green-50 hover:scale-102 active:scale-98'
+                                                    }`}
                                             >
-                                                <div className={`grid size-16 place-items-center rounded-xl transition-all duration-200 ${
-                                                    isActive ? 'scale-110' : ''
-                                                }`}>
+                                                <div className={`grid size-16 place-items-center rounded-xl transition-all duration-200 ${isActive ? 'scale-110' : ''
+                                                    }`}>
                                                     <span className={`text-4xl ${isActive ? 'opacity-100' : 'opacity-70'}`}>
                                                         {vehicle.icon}
                                                     </span>
@@ -421,7 +427,7 @@ export function RentalsHomeScreen({
             </DraggablePanel>
 
             {/* Bottom Navigation - Always visible */}
-            <div className="absolute bottom-0 left-0 right-0 z-[1000] bg-white">
+            <div className="fixed bottom-0 left-0 right-0 z-[1000] bg-white max-w-full">
                 <BottomNav active="Rentals" onNavigate={onNavigate} />
             </div>
         </div>

@@ -81,17 +81,15 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                 <div className="flex justify-center mt-4">
                     <button
                         onClick={() => setViewMode('list')}
-                        className={`px-4 py-2 rounded-l-full text-sm font-semibold transition-all duration-200 ${
-                            viewMode === 'list' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
-                        }`}
+                        className={`px-4 py-2 rounded-l-full text-sm font-semibold transition-all duration-200 ${viewMode === 'list' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
+                            }`}
                     >
                         List View
                     </button>
                     <button
                         onClick={() => setViewMode('map')}
-                        className={`px-4 py-2 rounded-r-full text-sm font-semibold transition-all duration-200 ${
-                            viewMode === 'map' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
-                        }`}
+                        className={`px-4 py-2 rounded-r-full text-sm font-semibold transition-all duration-200 ${viewMode === 'map' ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700'
+                            }`}
                     >
                         Map View
                     </button>
@@ -142,7 +140,7 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                                         >
                                             {/* Red location pin icon */}
                                             <svg className="w-5 h-5 text-[#ff3b30] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                                             </svg>
                                             <span className="flex-1 text-base font-normal text-text-dark">{location.label}</span>
                                             {/* Clickable star icon */}
