@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useTheme, type ThemeOption } from '../contexts/ThemeContext'
 
 interface ChangeThemeSettingsScreenProps {
     onNavigate?: (screen: string) => void
@@ -21,24 +22,41 @@ const colorTestPatterns = [
 ]
 
 export function ChangeThemeSettingsScreen({ onNavigate, onBack, hideBottomNav = true }: ChangeThemeSettingsScreenProps) {
-    const [selectedTheme, setSelectedTheme] = useState('light')
+    const { theme, setTheme, resolvedTheme, customTheme, updateCustomTheme } = useTheme()
+    const [selectedTheme, setSelectedTheme] = useState<ThemeOption>(theme)
     const [showColorCalibration, setShowColorCalibration] = useState(false)
-    const [hueShift, setHueShift] = useState(0)
-    const [saturation, setSaturation] = useState(100)
-    const [brightness, setBrightness] = useState(100)
+    const [hueShift, setHueShift] = useState(customTheme.hueShift)
+    const [saturation, setSaturation] = useState(customTheme.saturation)
+    const [brightness, setBrightness] = useState(customTheme.brightness)
     const [selectedTest, setSelectedTest] = useState<string | null>(null)
+
+    useEffect(() => {
+        setSelectedTheme(theme)
+    }, [theme])
+
+    useEffect(() => {
+        setHueShift(customTheme.hueShift)
+        setSaturation(customTheme.saturation)
+        setBrightness(customTheme.brightness)
+    }, [customTheme])
 
     const handleCustomThemeClick = () => {
         setSelectedTheme('custom')
+        setHueShift(customTheme.hueShift)
+        setSaturation(customTheme.saturation)
+        setBrightness(customTheme.brightness)
         setShowColorCalibration(true)
     }
 
     const applyColorFilter = () => {
-        // Apply CSS filter to simulate/adjust colors
-        const filter = `hue-rotate(${hueShift}deg) saturate(${saturation}%) brightness(${brightness}%)`
-        document.documentElement.style.setProperty('--color-filter', filter)
-        // In a real app, this would save to user preferences
-        console.log('Color filter applied:', { hueShift, saturation, brightness })
+        updateCustomTheme({
+            hueShift,
+            saturation,
+            brightness,
+        })
+        setTheme('custom')
+        setSelectedTheme('custom')
+        setShowColorCalibration(false)
     }
 
     return (
@@ -59,6 +77,21 @@ export function ChangeThemeSettingsScreen({ onNavigate, onBack, hideBottomNav = 
 
             {/* Content */}
             <main className="flex-1 overflow-y-auto bg-white px-6 py-4">
+                <div className="mb-4 rounded-2xl border-2 border-gray-200 bg-white p-4 shadow-card">
+                    <p className="text-sm text-gray-600">
+                        Active mode:{' '}
+                        <span className="font-semibold text-text-dark capitalize">
+                            {selectedTheme === 'auto'
+                                ? `${resolvedTheme.charAt(0).toUpperCase() + resolvedTheme.slice(1)} (Auto)`
+                                : selectedTheme === 'custom'
+                                    ? 'Custom Palette'
+                                    : selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)}
+                        </span>
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                        Dark mode gives you deep charcoal surfaces with mint accents for perfect contrast at night.
+                    </p>
+                </div>
                 <div className="space-y-3">
                     {themeOptions.map((option) => (
                         <button
@@ -67,7 +100,8 @@ export function ChangeThemeSettingsScreen({ onNavigate, onBack, hideBottomNav = 
                                 if (option.id === 'custom') {
                                     handleCustomThemeClick()
                                 } else {
-                                    setSelectedTheme(option.id)
+                                    setSelectedTheme(option.id as ThemeOption)
+                                    setTheme(option.id as ThemeOption)
                                     setShowColorCalibration(false)
                                 }
                             }}
@@ -203,7 +237,12 @@ export function ChangeThemeSettingsScreen({ onNavigate, onBack, hideBottomNav = 
                             {/* Preview */}
                             <div className="mb-6 p-4 bg-gray-50 rounded-xl">
                                 <p className="text-sm font-semibold text-text-dark mb-3">Preview</p>
-                                <div className="grid grid-cols-4 gap-2">
+                                <div
+                                    className="grid grid-cols-4 gap-2 rounded-lg overflow-hidden p-2 bg-white/90"
+                                    style={{
+                                        filter: `hue-rotate(${hueShift}deg) saturate(${saturation}%) brightness(${brightness}%)`,
+                                    }}
+                                >
                                     <div className="aspect-square rounded-lg bg-red-500"></div>
                                     <div className="aspect-square rounded-lg bg-green-500"></div>
                                     <div className="aspect-square rounded-lg bg-blue-500"></div>

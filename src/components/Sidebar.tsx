@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 interface SidebarProps {
     isOpen: boolean
     onClose: () => void
@@ -46,7 +44,7 @@ export function Sidebar({ isOpen, onClose, onNavigate, onLogout, userName = 'Roh
             <div
                 className={`absolute left-0 top-0 h-full w-[280px] bg-white shadow-2xl z-[2001] rounded-l-[40px] transition-transform duration-300 ease-out ${
                     isOpen ? 'translate-x-0' : '-translate-x-full pointer-events-none'
-                }`}
+                } flex flex-col`}
             >
                 {/* Header with Profile */}
                 <div className="bg-primary px-6 pt-16 pb-8">
@@ -67,7 +65,7 @@ export function Sidebar({ isOpen, onClose, onNavigate, onLogout, userName = 'Roh
                 </div>
 
                 {/* Menu Items */}
-                <nav className="flex flex-col py-4">
+                <nav className="flex-1 flex flex-col py-4 overflow-y-auto pr-2">
                     {menuItems.map((item) => (
                         <button
                             key={item.id}

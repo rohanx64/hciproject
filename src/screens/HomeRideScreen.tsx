@@ -18,7 +18,7 @@ interface HomeRideProps {
 }
 
 export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, onNavigate, onOpenPickupSelect, pickupLocation = 'My current location', onOpenSidebar, onOpenVoiceActivation }: HomeRideProps) {
-    const [panelHeight, setPanelHeight] = useState(42) // Standardized height for all screens
+    const [panelHeight, setPanelHeight] = useState(36) // Slightly slimmer default panel
     const [selectedDropoffLocation, setSelectedDropoffLocation] = useState<[number, number] | null>(null)
     const [isMapDragging, setIsMapDragging] = useState(false)
     const mapRef = useRef<L.Map | null>(null)
@@ -36,7 +36,7 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
     const bottomNavHeight = 110
     const availableHeight = containerHeight - bottomNavHeight
     const panelHeightPixels = (panelHeight / 100) * availableHeight
-    const buttonBottomPixels = bottomNavHeight + panelHeightPixels + 20 // 20px gap above panel
+    const buttonBottomPixels = bottomNavHeight + panelHeightPixels + 6 // Tighter gap to feel grounded near the panel
 
     const handleLocationClick = (location: string) => {
         // Location will be set when dropoff screen is opened
@@ -61,7 +61,7 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
     const handleMapDragEnd = () => {
         setIsMapDragging(false)
         setTimeout(() => {
-            setPanelHeight(42) // Expand back to initial
+            setPanelHeight(36) // Expand back to initial
         }, 300)
     }
 
@@ -163,7 +163,7 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
                 </div>
 
                 {/* Location Pointer - Clean and distinct design */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full z-30 pointer-events-none">
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[120%] z-30 pointer-events-none">
                     <div className="relative">
                         {/* Pointer body - Clean pin without shadows */}
                         <svg className="w-10 h-14 text-primary" fill="currentColor" viewBox="0 0 24 24">
@@ -211,7 +211,7 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
                 {/* Location Button - Dynamically positioned above panel */}
                 <button
                     style={{ bottom: `${buttonBottomPixels}px` }}
-                    className="fixed right-[5.26%] min-w-[51px] min-h-[51px] rounded-full bg-[#6cc44a] shadow-lg flex items-center justify-center z-[600] hover:bg-[#5ab038] active:scale-90 transition-all duration-200 ease-out"
+                    className="fixed right-[5.26%] px-4 py-3 rounded-full bg-white/95 border-2 border-primary text-primary font-semibold shadow-lg flex items-center gap-2 z-[600] hover:bg-primary hover:text-white hover:shadow-xl active:scale-95 transition-all duration-200 ease-out"
                     aria-label="Use current location"
                     onClick={() => {
                         if (navigator.geolocation) {
@@ -221,18 +221,20 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
                         }
                     }}
                 >
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="6" strokeWidth="2" />
+                        <path strokeWidth="2" d="M12 6V3M12 21v-3M6 12H3M21 12h-3" strokeLinecap="round" />
+                        <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
                     </svg>
+                    <span className="text-sm font-extrabold uppercase tracking-wide">Locate</span>
                 </button>
             </section>
 
             {/* Draggable Bottom Panel */}
             <DraggablePanel
                 initialHeight={panelHeight}
-                minHeight={42}
-                maxHeight={85}
+                minHeight={32}
+                maxHeight={82}
                 onHeightChange={setPanelHeight}
                 hideBottomNav={false}
             >

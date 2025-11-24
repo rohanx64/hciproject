@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Overlay } from '../components/Overlay'
+import { useTheme, type ThemeOption } from '../contexts/ThemeContext'
+import { useTextSize } from '../contexts/TextSizeContext'
+import type { TextSizeOption } from '../contexts/TextSizeContext'
 
 interface OnboardingScreenProps {
     onComplete: (data: {
@@ -29,11 +32,11 @@ const themes = [
     { id: 'custom', label: 'Custom Color Palette', description: 'Adjust colors for accessibility', icon: '🎨' },
 ]
 
-const fontSizes = [
+const fontSizes: { id: TextSizeOption; label: string; size: string }[] = [
     { id: 'small', label: 'Small', size: 'text-sm' },
     { id: 'medium', label: 'Medium', size: 'text-base' },
     { id: 'large', label: 'Large', size: 'text-lg' },
-    { id: 'extra-large', label: 'Extra Large', size: 'text-xl' },
+    { id: 'extraLarge', label: 'Extra Large', size: 'text-xl' },
 ]
 
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
@@ -41,14 +44,25 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [selectedLanguage, setSelectedLanguage] = useState('english')
-    const [selectedTheme, setSelectedTheme] = useState('light')
-    const [selectedFontSize, setSelectedFontSize] = useState('medium')
+    const { theme, setTheme, customTheme, updateCustomTheme } = useTheme()
+    const [selectedTheme, setSelectedTheme] = useState<ThemeOption>(theme)
     const [voiceFeedback, setVoiceFeedback] = useState(false)
     const [showColorCalibration, setShowColorCalibration] = useState(false)
-    const [hueShift, setHueShift] = useState(0)
-    const [saturation, setSaturation] = useState(100)
-    const [brightness, setBrightness] = useState(100)
+    const [hueShift, setHueShift] = useState(customTheme.hueShift)
+    const [saturation, setSaturation] = useState(customTheme.saturation)
+    const [brightness, setBrightness] = useState(customTheme.brightness)
     const [colorBlindnessFilter, setColorBlindnessFilter] = useState('none')
+    const { selectedSize: selectedFontSize, setSelectedSize: setTextSize } = useTextSize()
+
+    useEffect(() => {
+        setSelectedTheme(theme)
+    }, [theme])
+
+    useEffect(() => {
+        setHueShift(customTheme.hueShift)
+        setSaturation(customTheme.saturation)
+        setBrightness(customTheme.brightness)
+    }, [customTheme])
 
     const handleNext = () => {
         if (step < 5) {
@@ -216,36 +230,41 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
                         <div className="mb-6">
                             <h2 className="text-lg font-semibold text-text-dark mb-3">Theme</h2>
                             <div className="space-y-3">
-                                {themes.map((theme) => (
+                                {themes.map((themeOption) => (
                                     <button
-                                        key={theme.id}
+                                        key={themeOption.id}
                                         onClick={() => {
-                                            setSelectedTheme(theme.id)
-                                            if (theme.id === 'custom') {
+                                            const option = themeOption.id as ThemeOption
+                                            setSelectedTheme(option)
+                                            if (option === 'custom') {
+                                                setHueShift(customTheme.hueShift)
+                                                setSaturation(customTheme.saturation)
+                                                setBrightness(customTheme.brightness)
                                                 setShowColorCalibration(true)
                                             } else {
+                                                setTheme(option)
                                                 setShowColorCalibration(false)
                                             }
                                         }}
                                         className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
-                                            selectedTheme === theme.id
+                                            selectedTheme === themeOption.id
                                                 ? 'border-primary bg-green-50'
                                                 : 'border-gray-200 bg-white hover:border-gray-300'
                                         }`}
                                     >
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-4">
-                                                <span className="text-3xl">{theme.icon}</span>
+                                                <span className="text-3xl">{themeOption.icon}</span>
                                                 <div className="flex flex-col">
                                                     <span className={`text-base font-semibold ${
-                                                        selectedTheme === theme.id ? 'text-primary' : 'text-text-dark'
+                                                        selectedTheme === themeOption.id ? 'text-primary' : 'text-text-dark'
                                                     }`}>
-                                                        {theme.label}
+                                                        {themeOption.label}
                                                     </span>
-                                                    <span className="text-sm text-gray-500">{theme.description}</span>
+                                                    <span className="text-sm text-gray-500">{themeOption.description}</span>
                                                 </div>
                                             </div>
-                                            {selectedTheme === theme.id && (
+                                            {selectedTheme === themeOption.id && (
                                                 <div className="size-6 rounded-full bg-primary flex items-center justify-center">
                                                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -265,7 +284,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
                                 {fontSizes.map((size) => (
                                     <button
                                         key={size.id}
-                                        onClick={() => setSelectedFontSize(size.id)}
+                                        onClick={() => setTextSize(size.id)}
                                         className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
                                             selectedFontSize === size.id
                                                 ? 'border-primary bg-green-50'
@@ -433,6 +452,20 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
                             />
                         </div>
 
+                        <div className="mb-4 p-4 bg-gray-50 rounded-xl">
+                            <p className="text-sm font-semibold text-text-dark mb-3">Preview</p>
+                            <div
+                                className="grid grid-cols-4 gap-2 rounded-lg overflow-hidden p-2 bg-white/90"
+                                style={{
+                                    filter: `hue-rotate(${hueShift}deg) saturate(${saturation}%) brightness(${brightness}%)`,
+                                }}
+                            >
+                                <div className="aspect-square rounded-lg bg-red-500"></div>
+                                <div className="aspect-square rounded-lg bg-green-500"></div>
+                                <div className="aspect-square rounded-lg bg-blue-500"></div>
+                                <div className="aspect-square rounded-lg bg-yellow-500"></div>
+                            </div>
+                        </div>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => {
@@ -447,11 +480,13 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
                             </button>
                             <button
                                 onClick={() => {
-                                    // Apply color styles
-                                    document.documentElement.style.setProperty('--custom-hue', `${hueShift}deg`)
-                                    document.documentElement.style.setProperty('--custom-saturation', `${saturation}%`)
-                                    document.documentElement.style.setProperty('--custom-brightness', `${brightness}%`)
-                                    document.documentElement.style.setProperty('--color-blindness-filter', colorBlindnessFilter)
+                                    updateCustomTheme({
+                                        hueShift,
+                                        saturation,
+                                        brightness,
+                                    })
+                                    setTheme('custom')
+                                    setSelectedTheme('custom')
                                     setShowColorCalibration(false)
                                 }}
                                 className="flex-1 py-3 rounded-full bg-primary text-sm font-semibold text-white hover:bg-primary-dark"
