@@ -70,14 +70,7 @@ export function MessageScreen({
         return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     }
 
-    const serviceColors = {
-        ride: 'primary',
-        delivery: '[#ff9500]',
-        shop: '[#3b82f6]',
-    }
-
     const bgColor = serviceType === 'delivery' ? 'bg-[#ff9500]' : serviceType === 'shop' ? 'bg-[#3b82f6]' : 'bg-primary'
-    const borderColor = serviceType === 'delivery' ? 'border-[#ff9500]' : serviceType === 'shop' ? 'border-[#3b82f6]' : 'border-primary'
 
     return (
         <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px] relative">
@@ -126,15 +119,13 @@ export function MessageScreen({
                             key={message.id}
                             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                            <div className={`max-w-[75%] rounded-3xl px-4 py-3 ${
-                                message.sender === 'user'
+                            <div className={`max-w-[75%] rounded-3xl px-4 py-3 ${message.sender === 'user'
                                     ? `${bgColor} text-white`
                                     : 'bg-white text-text-dark shadow-sm'
-                            }`}>
-                                <p className="text-base font-normal">{message.text}</p>
-                                <p className={`text-xs mt-1 ${
-                                    message.sender === 'user' ? 'text-white/70' : 'text-gray-500'
                                 }`}>
+                                <p className="text-base font-normal">{message.text}</p>
+                                <p className={`text-xs mt-1 ${message.sender === 'user' ? 'text-white/70' : 'text-gray-500'
+                                    }`}>
                                     {formatTime(message.timestamp)}
                                 </p>
                             </div>

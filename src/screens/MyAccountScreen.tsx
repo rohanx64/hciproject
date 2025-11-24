@@ -30,7 +30,6 @@ const accountFields = [
 
 export function MyAccountScreen({
     onNavigate,
-    onBack,
     userName = 'Rohan Riaz',
     userEmail = 'rohan@gmail.com',
     userGender = 'Male',
@@ -72,7 +71,7 @@ export function MyAccountScreen({
 
         const updates: any = {}
         updates[fieldId] = formData[fieldId as keyof typeof formData]
-        
+
         onUpdateUser?.(updates)
         setEditingField(null)
     }

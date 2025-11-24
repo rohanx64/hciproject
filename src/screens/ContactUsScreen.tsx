@@ -6,7 +6,7 @@ interface ContactUsScreenProps {
     hideBottomNav?: boolean
 }
 
-export function ContactUsScreen({ onNavigate, onBack, hideBottomNav = true }: ContactUsScreenProps) {
+export function ContactUsScreen({ onBack }: ContactUsScreenProps) {
     const [subject, setSubject] = useState('')
     const [message, setMessage] = useState('')
 

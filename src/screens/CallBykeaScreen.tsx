@@ -6,7 +6,7 @@ interface CallBykeaScreenProps {
     hideBottomNav?: boolean
 }
 
-export function CallBykeaScreen({ onNavigate, onBack, hideBottomNav = true }: CallBykeaScreenProps) {
+export function CallBykeaScreen({ onBack }: CallBykeaScreenProps) {
     const [isCalling, setIsCalling] = useState(false)
 
     const handleCall = () => {
@@ -50,7 +50,7 @@ export function CallBykeaScreen({ onNavigate, onBack, hideBottomNav = true }: Ca
 
                     {/* Description */}
                     <p className="text-base text-gray-600 leading-relaxed">
-                        Speak directly with a Bykea representative to place your order via phone. 
+                        Speak directly with a Bykea representative to place your order via phone.
                         No need to navigate through the app - just call and order!
                     </p>
 

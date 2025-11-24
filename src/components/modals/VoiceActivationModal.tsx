@@ -32,7 +32,7 @@ const demoCommand: VoiceCommand = {
 export function VoiceActivationModal({ onClose, onProceed }: VoiceActivationModalProps) {
     const [step, setStep] = useState<'initial' | 'recording' | 'processing' | 'confirm'>('initial')
     const [selectedCommand, setSelectedCommand] = useState<VoiceCommand | null>(null)
-    const [isRecording, setIsRecording] = useState(false)
+    const [, setIsRecording] = useState(false)
 
     const handleStartRecording = () => {
         setIsRecording(true)

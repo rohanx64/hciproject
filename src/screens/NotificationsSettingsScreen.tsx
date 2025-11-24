@@ -6,7 +6,7 @@ interface NotificationsSettingsScreenProps {
     hideBottomNav?: boolean
 }
 
-export function NotificationsSettingsScreen({ onNavigate, onBack, hideBottomNav = true }: NotificationsSettingsScreenProps) {
+export function NotificationsSettingsScreen({ onBack }: NotificationsSettingsScreenProps) {
     const [pushNotifications, setPushNotifications] = useState(true)
     const [emailNotifications, setEmailNotifications] = useState(true)
     const [smsNotifications, setSmsNotifications] = useState(false)
@@ -16,14 +16,12 @@ export function NotificationsSettingsScreen({ onNavigate, onBack, hideBottomNav 
     const ToggleSwitch = ({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) => (
         <button
             onClick={onToggle}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out ${
-                enabled ? 'bg-primary' : 'bg-gray-300'
-            }`}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out ${enabled ? 'bg-primary' : 'bg-gray-300'
+                }`}
         >
             <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ease-in-out ${
-                    enabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ease-in-out ${enabled ? 'translate-x-6' : 'translate-x-1'
+                    }`}
             />
         </button>
     )

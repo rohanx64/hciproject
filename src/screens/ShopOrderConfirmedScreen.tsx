@@ -1,4 +1,3 @@
-import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
 
 interface ShopOrderConfirmedScreenProps {
@@ -27,7 +26,6 @@ export function ShopOrderConfirmedScreen({
     onCancel,
     shopName,
     riderName,
-    riderRating,
     riderAvatar,
     shopLocation,
     deliveryLocation,

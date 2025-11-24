@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { useRef } from 'react'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -42,42 +42,44 @@ const dropoffIcon = new L.Icon({
     popupAnchor: [0, -46],
 })
 
-interface MapRecenterProps {
-    center: [number, number]
-}
+// MapRecenter component commented out as it's currently unused
+// interface MapRecenterProps {
+//     center: [number, number]
+// }
 
 // Component to handle map recentering when center changes (only on initial load)
-function MapRecenter({ center }: MapRecenterProps) {
-    const map = useMap()
-    const isInitialMount = useRef(true)
-    const [isUserDragging, setIsUserDragging] = useState(false)
+// function MapRecenter({ center }: MapRecenterProps) {
+//     const map = useMap()
+//     const isInitialMount = useRef(true)
+//     const [isUserDragging, setIsUserDragging] = useState(false)
 
-    useEffect(() => {
-        // Listen to drag events to prevent recentering during user interaction
-        const handleDragStart = () => setIsUserDragging(true)
-        const handleDragEnd = () => {
-            setIsUserDragging(false)
-        }
-        
-        map.on('dragstart', handleDragStart)
-        map.on('dragend', handleDragEnd)
-        
-        return () => {
-            map.off('dragstart', handleDragStart)
-            map.off('dragend', handleDragEnd)
-        }
-    }, [map])
+//     useEffect(() => {
+//         // Listen to drag events to prevent recentering during user interaction
+//         const handleDragStart = () => setIsUserDragging(true)
+//         const handleDragEnd = () => {
+//             setIsUserDragging(false)
+//         }
 
-    useEffect(() => {
-        // Only recenter on initial mount, not on every center change or during user drag
-        if (isInitialMount.current && !isUserDragging) {
-            map.setView(center, map.getZoom())
-            isInitialMount.current = false
-        }
-    }, [center, map, isUserDragging])
+//         map.on('dragstart', handleDragStart)
+//         map.on('dragend', handleDragEnd)
 
-    return null
-}
+//         return () => {
+//             map.off('dragstart', handleDragStart)
+//             map.off('dragend', handleDragEnd)
+//         }
+//     }, [map])
+
+//     useEffect(() => {
+//         // Only recenter on initial mount, not on every center change or during user drag
+//         if (isInitialMount.current && !isUserDragging) {
+//             map.setView(center, map.getZoom())
+//             isInitialMount.current = false
+//         }
+//     }, [center, map, isUserDragging])
+
+//     return null
+// }
+
 
 interface RideMapProps {
     pickupLocation?: [number, number]
@@ -145,15 +147,16 @@ export function RideMap({
                 className="h-full w-full rounded-lg"
                 style={{ zIndex: 0, cursor: 'grab' }}
                 ref={mapRef}
-                whenReady={(map) => {
+                // @ts-expect-error - react-leaflet's whenReady type definition is incorrect, it does accept a parameter
+                whenReady={(map: any) => {
                     const mapInstance = map.target
                     mapRef.current = mapInstance // Expose map instance via ref
                     const container = mapInstance.getContainer()
                     let wasDragging = false
-                    
+
                     // Set initial cursor
                     container.style.cursor = 'grab'
-                    
+
                     // Handle drag start - when user starts dragging the map
                     if (onDragStart) {
                         mapInstance.on('dragstart', () => {
@@ -162,7 +165,7 @@ export function RideMap({
                             container.style.cursor = 'grabbing'
                         })
                     }
-                    
+
                     // Handle drag end - when user stops dragging
                     if (onDragEnd) {
                         mapInstance.on('dragend', () => {
@@ -171,7 +174,7 @@ export function RideMap({
                             container.style.cursor = 'grab'
                         })
                     }
-                    
+
                     // Handle map click (only if it wasn't a drag)
                     if (onMapClick) {
                         mapInstance.on('click', (e: L.LeafletMouseEvent) => {
@@ -184,14 +187,14 @@ export function RideMap({
                             }, 100)
                         })
                     }
-                    
+
                     // Handle touch events for mobile
                     if (onDragStart && onDragEnd) {
                         container.addEventListener('touchstart', () => {
                             wasDragging = false
                             onDragStart()
                         }, { passive: true })
-                        
+
                         container.addEventListener('touchend', () => {
                             setTimeout(() => {
                                 onDragEnd()

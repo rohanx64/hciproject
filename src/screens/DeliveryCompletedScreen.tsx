@@ -27,9 +27,7 @@ export function DeliveryCompletedScreen({
     pickupLocation = 'Karachi University',
     deliveryLocation = 'Habib University',
     distance = '5.2 km',
-    time = '15 min',
     price = 'RS. 180',
-    vehicleType = 'Bike',
     onDone,
 }: DeliveryCompletedScreenProps) {
     const [rating, setRating] = useState(0)
@@ -133,11 +131,10 @@ export function DeliveryCompletedScreen({
                                     aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
                                 >
                                     <svg
-                                        className={`w-10 h-10 transition-colors ${
-                                            star <= (hoveredRating || rating)
+                                        className={`w-10 h-10 transition-colors ${star <= (hoveredRating || rating)
                                                 ? 'text-yellow-400 fill-yellow-400'
                                                 : 'text-gray-300'
-                                        }`}
+                                            }`}
                                         fill={star <= (hoveredRating || rating) ? 'currentColor' : 'none'}
                                         stroke={star <= (hoveredRating || rating) ? 'currentColor' : 'currentColor'}
                                         strokeWidth={star <= (hoveredRating || rating) ? 0 : 1.5}
