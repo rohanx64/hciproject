@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { assets } from '../constants/assets'
 import { BottomNav } from '../components/BottomNav'
 import { RideMap } from '../components/RideMap'
@@ -13,8 +12,6 @@ interface RideExtendedProps {
 }
 
 export function RideExtendedScreen({ dropoffLabel, onEditDropoff, recentLocations, onNavigate }: RideExtendedProps) {
-    const [panelHeight, setPanelHeight] = useState(85)
-
     return (
         <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px] relative">
             {/* Map Section */}
@@ -61,7 +58,6 @@ export function RideExtendedScreen({ dropoffLabel, onEditDropoff, recentLocation
                 initialHeight={85}
                 minHeight={20}
                 maxHeight={85}
-                onHeightChange={setPanelHeight}
             >
                 <div className="px-6">
                     {/* Drag Handle */}

@@ -1,4 +1,3 @@
-import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
 import { AppIcon } from '../components/AppIcon'
 
@@ -19,7 +18,6 @@ interface RideStartedScreenProps {
 export function RideStartedScreen({
     onNavigate,
     driverName,
-    driverRating,
     driverAvatar,
     pickupLocation,
     dropoffLocation,

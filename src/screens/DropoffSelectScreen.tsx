@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
 import { favoritePlaces, recentLocations } from '../constants/data'
 

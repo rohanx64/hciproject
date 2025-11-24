@@ -120,10 +120,10 @@ export function RideMap({
                     }
                     const container = mapInstance.getContainer()
                     let wasDragging = false
-                    
+
                     // Set initial cursor
                     container.style.cursor = 'grab'
-                    
+
                     // Handle drag start - when user starts dragging the map
                     if (onDragStart) {
                         mapInstance.on('dragstart', () => {
@@ -132,7 +132,7 @@ export function RideMap({
                             container.style.cursor = 'grabbing'
                         })
                     }
-                    
+
                     // Handle drag end - when user stops dragging
                     if (onDragEnd) {
                         mapInstance.on('dragend', () => {
@@ -141,7 +141,7 @@ export function RideMap({
                             container.style.cursor = 'grab'
                         })
                     }
-                    
+
                     // Handle map click (only if it wasn't a drag)
                     if (onMapClick) {
                         mapInstance.on('click', (e: L.LeafletMouseEvent) => {
@@ -154,14 +154,14 @@ export function RideMap({
                             }, 100)
                         })
                     }
-                    
+
                     // Handle touch events for mobile
                     if (onDragStart && onDragEnd) {
                         container.addEventListener('touchstart', () => {
                             wasDragging = false
                             onDragStart()
                         }, { passive: true })
-                        
+
                         container.addEventListener('touchend', () => {
                             setTimeout(() => {
                                 onDragEnd()

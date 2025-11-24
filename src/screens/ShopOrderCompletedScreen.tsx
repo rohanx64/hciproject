@@ -22,14 +22,11 @@ const SHOPS_COLOR = '#3b82f6'
 export function ShopOrderCompletedScreen({
     onNavigate,
     onBack,
-    shopName = 'Shop Name',
     riderName = 'Ghulam Shabir',
     riderRating = 5,
     riderAvatar,
     shopLocation = 'Shop Location',
     deliveryLocation = 'Habib University',
-    distance = '5.2 km',
-    time = '15 min',
     price = 'RS. 180',
     purchaseValue = 'RS. 1500',
     onDone,
@@ -135,11 +132,10 @@ export function ShopOrderCompletedScreen({
                                     aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
                                 >
                                     <svg
-                                        className={`w-10 h-10 transition-colors ${
-                                            star <= (hoveredRating || rating)
+                                        className={`w-10 h-10 transition-colors ${star <= (hoveredRating || rating)
                                                 ? 'text-yellow-400 fill-yellow-400'
                                                 : 'text-gray-300'
-                                        }`}
+                                            }`}
                                         fill={star <= (hoveredRating || rating) ? 'currentColor' : 'none'}
                                         stroke={star <= (hoveredRating || rating) ? 'currentColor' : 'currentColor'}
                                         strokeWidth={star <= (hoveredRating || rating) ? 0 : 1.5}

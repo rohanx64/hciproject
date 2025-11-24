@@ -11,7 +11,6 @@ interface CallScreenProps {
 }
 
 export function CallScreen({
-    onNavigate,
     onClose,
     contactName,
     contactAvatar,
@@ -61,11 +60,12 @@ export function CallScreen({
         setCallStatus('active')
     }
 
-    const serviceColors = {
-        ride: 'primary',
-        delivery: '[#ff9500]',
-        shop: '[#3b82f6]',
-    }
+    // Service colors defined but currently unused
+    // const serviceColors = {
+    //     ride: 'primary',
+    //     delivery: '[#ff9500]',
+    //     shop: '[#3b82f6]',
+    // }
 
     const bgColor = serviceType === 'delivery' ? 'bg-[#ff9500]' : serviceType === 'shop' ? 'bg-[#3b82f6]' : 'bg-primary'
     const gradientColor = serviceType === 'delivery' ? 'from-[#ff9500] to-[#e68600]' : serviceType === 'shop' ? 'from-[#3b82f6] to-[#2563eb]' : 'from-primary to-primary-dark'
@@ -112,9 +112,8 @@ export function CallScreen({
                         {/* Mute Button */}
                         <button
                             onClick={() => setIsMuted(!isMuted)}
-                            className={`w-full rounded-2xl px-6 py-4 flex items-center justify-center gap-3 ${
-                                isMuted ? 'bg-white/20' : 'bg-white/10'
-                            } backdrop-blur-sm border-2 border-white/30 text-white hover:bg-white/30 active:scale-95 transition-all duration-200`}
+                            className={`w-full rounded-2xl px-6 py-4 flex items-center justify-center gap-3 ${isMuted ? 'bg-white/20' : 'bg-white/10'
+                                } backdrop-blur-sm border-2 border-white/30 text-white hover:bg-white/30 active:scale-95 transition-all duration-200`}
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 {isMuted ? (
@@ -129,9 +128,8 @@ export function CallScreen({
                         {/* Speaker Button */}
                         <button
                             onClick={() => setIsSpeakerOn(!isSpeakerOn)}
-                            className={`w-full rounded-2xl px-6 py-4 flex items-center justify-center gap-3 ${
-                                isSpeakerOn ? 'bg-white/20' : 'bg-white/10'
-                            } backdrop-blur-sm border-2 border-white/30 text-white hover:bg-white/30 active:scale-95 transition-all duration-200`}
+                            className={`w-full rounded-2xl px-6 py-4 flex items-center justify-center gap-3 ${isSpeakerOn ? 'bg-white/20' : 'bg-white/10'
+                                } backdrop-blur-sm border-2 border-white/30 text-white hover:bg-white/30 active:scale-95 transition-all duration-200`}
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />

@@ -21,11 +21,8 @@ const RENTALS_COLOR = '#32991d'
 export function RentalsStartedScreen({
     onNavigate,
     driverName,
-    driverRating,
     driverAvatar,
     pickupLocation,
-    selectedHours,
-    selectedVehicle,
     price,
     onCallDriver,
     onChatDriver,

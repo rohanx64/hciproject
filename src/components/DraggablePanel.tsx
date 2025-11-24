@@ -56,14 +56,14 @@ export function DraggablePanel({
         return (availableHeight * percent) / 100
     }
 
-    // Calculate percentage from pixel height
-    const getPercentFromPixels = (pixels: number, containerHeight: number): number => {
-        if (hideBottomNav) {
-            return (pixels / containerHeight) * 100
-        }
-        const availableHeight = containerHeight - BOTTOM_NAV_HEIGHT
-        return (pixels / availableHeight) * 100
-    }
+    // Calculate percentage from pixel height (currently unused but kept for future use)
+    // const getPercentFromPixels = (pixels: number, containerHeight: number): number => {
+    //     if (hideBottomNav) {
+    //         return (pixels / containerHeight) * 100
+    //     }
+    //     const availableHeight = containerHeight - BOTTOM_NAV_HEIGHT
+    //     return (pixels / availableHeight) * 100
+    // }
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {

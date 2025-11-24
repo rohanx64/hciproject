@@ -128,7 +128,7 @@ function App() {
   const [selectedShop, setSelectedShop] = useState<{ id: string; name: string; category: string } | null>(null)
   const [shopsFare, setShopsFare] = useState(180)
   const [shopsPaymentMethod, setShopsPaymentMethod] = useState<PaymentMethod>('cash')
-  const [shopsPurchaseValue, _setShopsPurchaseValue] = useState(1500)
+  const [shopsPurchaseValue] = useState(1500)
 
   // Sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)

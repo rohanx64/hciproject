@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import L from 'leaflet'
-import { assets } from '../constants/assets'
 import { shopCategories, shops } from '../constants/data'
 import { BottomNav } from '../components/BottomNav'
 import { RideMap } from '../components/RideMap'
@@ -28,7 +27,6 @@ export function ShopsHomeScreen({
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null) // Start with no category selected
     const [selectedLocation, setSelectedLocation] = useState<[number, number] | null>(null)
-    const [isMapDragging, setIsMapDragging] = useState(false)
     const mapRef = useRef<L.Map | null>(null)
 
     // Calculate button position in pixels based on panel height percentage
@@ -51,12 +49,10 @@ export function ShopsHomeScreen({
     }
 
     const handleMapDragStart = () => {
-        setIsMapDragging(true)
         setPanelHeight(20) // Collapse to minimum
     }
 
     const handleMapDragEnd = () => {
-        setIsMapDragging(false)
         setTimeout(() => {
             setPanelHeight(selectedCategory ? 70 : 36) // Expand back to appropriate height
         }, 300)
@@ -257,7 +253,9 @@ export function ShopsHomeScreen({
                     {/* Search Bar */}
                     <div className="mb-3">
                         <div className="flex items-center gap-3 rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm focus-within:border-[#3b82f6] focus-within:shadow-md transition-all duration-200">
-                            <img src={assets.searchIcon} alt="Search" className="h-5 w-5 opacity-60" />
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
                             <input
                                 type="text"
                                 value={searchQuery}

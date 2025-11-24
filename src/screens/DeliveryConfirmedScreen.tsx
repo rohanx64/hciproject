@@ -1,4 +1,3 @@
-import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
 import { AppIcon } from '../components/AppIcon'
 
@@ -24,7 +23,6 @@ export function DeliveryConfirmedScreen({
     onDeliveryStarted,
     onCancel,
     riderName,
-    riderRating,
     riderAvatar,
     pickupLocation,
     deliveryLocation,

@@ -1,4 +1,3 @@
-import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
 import { AppIcon } from '../components/AppIcon'
 
@@ -28,7 +27,6 @@ export function ShopOrderConfirmedScreen({
     onCancel,
     shopName,
     riderName,
-    riderRating,
     riderAvatar,
     shopLocation,
     deliveryLocation,
