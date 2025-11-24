@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { assets } from '../../constants/assets'
 import { quickBook, recentLocations } from '../../constants/data'
 import { Overlay } from '../Overlay'
+import { AppIcon } from '../AppIcon'
 
 interface QuickBookModalProps {
     onConfirm: () => void
@@ -244,12 +245,12 @@ export function QuickBookModal({ onConfirm, onCancel, onAddQuickBook }: QuickBoo
                                 <div className="flex gap-3">
                                     {/* Location icons */}
                                     <div className="flex flex-col items-center gap-1 pt-1">
-                                        <div className="grid size-5 place-items-center rounded-full bg-yellow-400">
-                                            <span className="text-xs">📍</span>
+                                        <div className="grid size-5 place-items-center rounded-full bg-yellow-400 text-white">
+                                            <AppIcon name="📍" className="text-xs" />
                                         </div>
                                         <div className="h-6 w-0.5 bg-zinc-300" />
-                                        <div className="grid size-5 place-items-center rounded-full bg-pink-500">
-                                            <span className="text-xs text-white">📍</span>
+                                        <div className="grid size-5 place-items-center rounded-full bg-pink-500 text-white">
+                                            <AppIcon name="📍" className="text-xs" />
                                         </div>
                                     </div>
 
@@ -284,19 +285,20 @@ export function QuickBookModal({ onConfirm, onCancel, onAddQuickBook }: QuickBoo
                                         onClick={() => handleDeleteRoute(route.id)}
                                         className="grid size-10 place-items-center rounded-lg bg-[#ff6b6b] text-white transition hover:bg-[#ff5555]"
                                     >
-                                        <span className="text-lg">🗑️</span>
+                                        <AppIcon name="🗑️" className="text-lg" />
                                     </button>
                                     <button
                                         onClick={() => handleEditRoute(route)}
                                         className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-text-dark transition hover:bg-zinc-50"
                                     >
-                                        ✏️ Edit
+                                        <AppIcon name="✏️" className="text-base" />
+                                        Edit
                                     </button>
                                     <button
                                         className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
                                         onClick={onConfirm}
                                     >
-                                        ✓
+                                        <AppIcon name="✓" className="text-lg" />
                                     </button>
                                 </div>
                             </div>

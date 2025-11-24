@@ -1,4 +1,5 @@
 import { RideMap } from '../components/RideMap'
+import { AppIcon } from '../components/AppIcon'
 
 interface RideStartedScreenProps {
     onNavigate?: (screen: string) => void
@@ -70,7 +71,7 @@ export function RideStartedScreen({
                             <h3 className="text-lg font-bold text-text-dark">{driverName}</h3>
                             <div className="flex items-center gap-1">
                                 {[...Array(5)].map((_, i) => (
-                                    <span key={i} className="text-yellow-400 text-sm">★</span>
+                                    <AppIcon key={i} name="★" className="text-yellow-400 text-sm" />
                                 ))}
                             </div>
                         </div>

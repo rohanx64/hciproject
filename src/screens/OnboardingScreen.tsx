@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Overlay } from '../components/Overlay'
+import { AppIcon } from '../components/AppIcon'
 import { useTheme, type ThemeOption } from '../contexts/ThemeContext'
 import { useTextSize } from '../contexts/TextSizeContext'
 import type { TextSizeOption } from '../contexts/TextSizeContext'
@@ -194,7 +195,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
-                                            <span className="text-3xl">{lang.flag}</span>
+                                            <AppIcon name={lang.flag} className="text-2xl text-primary" />
                                             <div className="flex flex-col">
                                                 <span className={`text-base font-semibold ${
                                                     selectedLanguage === lang.id ? 'text-primary' : 'text-text-dark'
@@ -254,7 +255,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
                                     >
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-4">
-                                                <span className="text-3xl">{themeOption.icon}</span>
+                                                <AppIcon name={themeOption.icon} className="text-2xl text-primary" />
                                                 <div className="flex flex-col">
                                                     <span className={`text-base font-semibold ${
                                                         selectedTheme === themeOption.id ? 'text-primary' : 'text-text-dark'

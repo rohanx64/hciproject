@@ -4,6 +4,7 @@ import { shopCategories, shops } from '../constants/data'
 import { BottomNav } from '../components/BottomNav'
 import { RideMap } from '../components/RideMap'
 import { DraggablePanel } from '../components/DraggablePanel'
+import { AppIcon } from '../components/AppIcon'
 
 interface ShopsHomeScreenProps {
     onNavigate?: (screen: string) => void
@@ -281,7 +282,7 @@ export function ShopsHomeScreen({
                                             }`}
                                     >
                                         <div
-                                            className={`size-16 rounded-2xl flex items-center justify-center text-3xl transition-all duration-200 shadow-sm ${isActive
+                                            className={`size-16 rounded-2xl flex items-center justify-center transition-all duration-200 shadow-sm ${isActive
                                                 ? 'shadow-lg border-2 ring-2 ring-offset-2'
                                                 : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow-md'
                                                 }`}
@@ -290,8 +291,8 @@ export function ShopsHomeScreen({
                                                 borderColor: isActive ? category.color : undefined,
                                                 '--tw-ring-color': isActive ? `${category.color}40` : undefined,
                                             } as React.CSSProperties}
-                                        >
-                                            {category.icon}
+                                            >
+                                                <AppIcon name={category.icon} className="text-2xl text-text-dark" />
                                         </div>
                                         <span
                                             className={`text-xs font-semibold transition-colors duration-200 ${isActive ? 'text-text-dark font-bold' : 'text-gray-600'
@@ -323,7 +324,7 @@ export function ShopsHomeScreen({
                                                     backgroundColor: category ? `${category.color}20` : '#f3f4f6',
                                                 }}
                                             >
-                                                {shop.icon}
+                                                <AppIcon name={shop.icon} className="text-2xl text-[#3b82f6]" />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-base font-semibold text-text-dark truncate group-hover:text-[#3b82f6] transition-colors duration-200">{shop.name}</p>

@@ -1,3 +1,5 @@
+import { AppIcon } from '../AppIcon'
+
 interface FareDialogProps {
     fare: number
     onChangeFare: (value: number) => void
@@ -42,7 +44,7 @@ export function FareDialog({ fare, onChangeFare, onConfirm, onViewBreakdown, rec
                 onClick={onViewBreakdown}
             >
                 Fare Breakdown
-                <span className="text-2xl">›</span>
+                <AppIcon name="›" className="text-2xl" />
             </button>
         </div>
     )

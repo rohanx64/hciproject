@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { AppIcon } from './AppIcon'
 
 // Fix for default marker icons in Leaflet
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
@@ -41,45 +42,6 @@ const dropoffIcon = new L.Icon({
     iconAnchor: [16, 46],
     popupAnchor: [0, -46],
 })
-
-// MapRecenter component commented out as it's currently unused
-// interface MapRecenterProps {
-//     center: [number, number]
-// }
-
-// Component to handle map recentering when center changes (only on initial load)
-// function MapRecenter({ center }: MapRecenterProps) {
-//     const map = useMap()
-//     const isInitialMount = useRef(true)
-//     const [isUserDragging, setIsUserDragging] = useState(false)
-
-//     useEffect(() => {
-//         // Listen to drag events to prevent recentering during user interaction
-//         const handleDragStart = () => setIsUserDragging(true)
-//         const handleDragEnd = () => {
-//             setIsUserDragging(false)
-//         }
-
-//         map.on('dragstart', handleDragStart)
-//         map.on('dragend', handleDragEnd)
-
-//         return () => {
-//             map.off('dragstart', handleDragStart)
-//             map.off('dragend', handleDragEnd)
-//         }
-//     }, [map])
-
-//     useEffect(() => {
-//         // Only recenter on initial mount, not on every center change or during user drag
-//         if (isInitialMount.current && !isUserDragging) {
-//             map.setView(center, map.getZoom())
-//             isInitialMount.current = false
-//         }
-//     }, [center, map, isUserDragging])
-
-//     return null
-// }
-
 
 interface RideMapProps {
     pickupLocation?: [number, number]
@@ -146,11 +108,16 @@ export function RideMap({
                 zoomControl={false}
                 className="h-full w-full rounded-lg"
                 style={{ zIndex: 0, cursor: 'grab' }}
-                ref={mapRef}
-                // @ts-expect-error - react-leaflet's whenReady type definition is incorrect, it does accept a parameter
-                whenReady={(map: any) => {
-                    const mapInstance = map.target
-                    mapRef.current = mapInstance // Expose map instance via ref
+                ref={(instance) => {
+                    if (instance) {
+                        mapRef.current = instance
+                    }
+                }}
+                whenReady={() => {
+                    const mapInstance = mapRef.current
+                    if (!mapInstance) {
+                        return
+                    }
                     const container = mapInstance.getContainer()
                     let wasDragging = false
 
@@ -213,7 +180,10 @@ export function RideMap({
                     <Marker position={pickupLocation} icon={pickupIcon}>
                         <Popup className="custom-popup">
                             <div className="text-center">
-                                <p className="font-semibold text-primary">📍 Pickup Location</p>
+                                <p className="font-semibold text-primary flex items-center justify-center gap-1">
+                                    <AppIcon name="📍" className="text-base" />
+                                    Pickup Location
+                                </p>
                                 <p className="text-xs text-gray-600 mt-1">Your current location</p>
                             </div>
                         </Popup>
@@ -225,7 +195,10 @@ export function RideMap({
                     <Marker position={dropoffLocation} icon={dropoffIcon}>
                         <Popup className="custom-popup">
                             <div className="text-center">
-                                <p className="font-semibold text-accent">💖 Drop-off Location</p>
+                                <p className="font-semibold text-accent flex items-center justify-center gap-1">
+                                    <AppIcon name="💖" className="text-base" />
+                                    Drop-off Location
+                                </p>
                                 <p className="text-xs text-gray-600 mt-1">Your destination</p>
                             </div>
                         </Popup>
@@ -237,7 +210,10 @@ export function RideMap({
                     <Marker position={selectedPickupLocation} icon={selectedPickupIcon}>
                         <Popup className="custom-popup">
                             <div className="text-center">
-                                <p className="font-semibold text-primary">📍 Selected Pickup</p>
+                                <p className="font-semibold text-primary flex items-center justify-center gap-1">
+                                    <AppIcon name="📍" className="text-base" />
+                                    Selected Pickup
+                                </p>
                             </div>
                         </Popup>
                     </Marker>
@@ -248,7 +224,10 @@ export function RideMap({
                     <Marker position={selectedDropoffLocation} icon={selectedDropoffIcon}>
                         <Popup className="custom-popup">
                             <div className="text-center">
-                                <p className="font-semibold text-red-500">📍 Selected Drop-off</p>
+                                <p className="font-semibold text-red-500 flex items-center justify-center gap-1">
+                                    <AppIcon name="📍" className="text-base" />
+                                    Selected Drop-off
+                                </p>
                             </div>
                         </Popup>
                     </Marker>

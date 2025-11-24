@@ -1,4 +1,5 @@
 import type { BreakdownItem } from '../../types'
+import { AppIcon } from '../AppIcon'
 
 interface FareBreakdownProps {
     fare: number
@@ -24,7 +25,7 @@ export function FareBreakdownModal({ fare, items, onConfirm, onClose }: FareBrea
             <div className="mt-6">
                 <div className="flex items-center justify-between text-sm font-semibold uppercase tracking-[0.25em] text-[#919191] mb-4">
                     <span>FARE BREAKDOWN</span>
-                    <span className="text-xl">⌄</span>
+                    <AppIcon name="⌄" className="text-xl text-[#919191]" />
                 </div>
                 <div className="space-y-3">
                     {items.map((item) => (

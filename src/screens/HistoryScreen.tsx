@@ -1,4 +1,5 @@
 import { BottomNav } from '../components/BottomNav'
+import { AppIcon } from '../components/AppIcon'
 
 interface HistoryEntry {
     id: string
@@ -109,7 +110,7 @@ export function HistoryScreen({ onNavigate, hideBottomNav = true }: HistoryScree
                             {/* Price and Status */}
                             <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-gray-500">💰</span>
+                                    <AppIcon name="💰" className="text-gray-500 text-lg" />
                                     <span className="text-base font-normal text-text-dark">{entry.price}</span>
                                 </div>
                                 {entry.status === 'pending' ? (

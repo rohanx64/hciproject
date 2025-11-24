@@ -1,3 +1,5 @@
+import { AppIcon } from './AppIcon'
+
 interface SidebarProps {
     isOpen: boolean
     onClose: () => void
@@ -76,7 +78,7 @@ export function Sidebar({ isOpen, onClose, onNavigate, onLogout, userName = 'Roh
                                     : 'text-text-dark hover:bg-gray-50'
                             }`}
                         >
-                            <span className="text-2xl">{item.icon}</span>
+                            <AppIcon name={item.icon} className="text-2xl text-primary" />
                             <span className="text-base font-normal">{item.label}</span>
                         </button>
                     ))}

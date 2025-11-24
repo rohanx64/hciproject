@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
 import { DraggablePanel } from '../components/DraggablePanel'
+import { AppIcon } from '../components/AppIcon'
 import { useVoiceFeedback } from '../contexts/VoiceFeedbackContext'
 
 interface SelectVehicleProps {
@@ -165,10 +166,10 @@ export function SelectVehicleScreen({
                                         >
                                             <div className={`grid size-14 place-items-center rounded-xl transition-all duration-200 ${active ? 'bg-primary/20 scale-110' : 'bg-gray-50'
                                                 }`}>
-                                                <span className={`text-3xl transition-all duration-200 ${active ? 'opacity-100 scale-110' : 'opacity-70'
-                                                    }`}>
-                                                    {v.icon}
-                                                </span>
+                                                <AppIcon
+                                                    name={v.icon}
+                                                    className={`text-3xl transition-all duration-200 ${active ? 'text-primary scale-110' : 'text-gray-500'}`}
+                                                />
                                             </div>
                                             <span className={`text-xs font-semibold transition-colors duration-200 ${active ? 'text-primary' : 'text-gray-500'
                                                 }`}>
@@ -196,9 +197,7 @@ export function SelectVehicleScreen({
                                         >
                                             <div className={`grid size-16 place-items-center rounded-xl transition-all duration-200 ${active ? 'bg-primary/20' : 'bg-gray-50'
                                                 }`}>
-                                                <span className="text-4xl">
-                                                    {v.icon}
-                                                </span>
+                                                <AppIcon name={v.icon} className="text-3xl text-primary" />
                                             </div>
                                             <div className="flex-1 text-left">
                                                 <p className={`text-lg font-bold ${active ? 'text-primary' : 'text-gray-700'
@@ -257,7 +256,7 @@ export function SelectVehicleScreen({
                         <div className="flex items-center gap-3">
                             <div className="grid size-10 place-items-center rounded-full bg-primary/10">
                                 <span className="text-2xl">
-                                    {paymentMethod === 'cash' ? '💵' : '💳'}
+                                    <AppIcon name={paymentMethod === 'cash' ? '💵' : '💳'} className="text-2xl text-primary" />
                                 </span>
                             </div>
                             <div className="flex-1 text-left">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTheme, type ThemeOption } from '../contexts/ThemeContext'
+import { AppIcon } from '../components/AppIcon'
 
 interface ChangeThemeSettingsScreenProps {
     onNavigate?: (screen: string) => void
@@ -112,7 +113,7 @@ export function ChangeThemeSettingsScreen({ onBack }: ChangeThemeSettingsScreenP
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    <span className="text-3xl">{option.icon}</span>
+                                    <AppIcon name={option.icon} className="text-2xl text-primary" />
                                     <div className="flex flex-col">
                                         <span className={`text-base font-semibold ${selectedTheme === option.id ? 'text-primary' : 'text-text-dark'
                                             }`}>

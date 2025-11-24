@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { AppIcon } from '../components/AppIcon'
 
 interface OnboardingTutorialScreenProps {
     onComplete: () => void
@@ -295,7 +296,7 @@ export function OnboardingTutorialScreen({ onComplete }: OnboardingTutorialScree
                     }`}
                 >
                     <div className="mb-4">
-                        <span className="text-5xl">{slide.icon}</span>
+                        <AppIcon name={slide.icon} className="text-5xl text-white drop-shadow-lg" />
                     </div>
                     <h1 className="text-3xl font-bold text-white mb-3">{slide.title}</h1>
                     <p className="text-lg text-white/90 max-w-sm mx-auto">{slide.description}</p>

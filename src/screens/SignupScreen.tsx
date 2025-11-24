@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AppIcon } from '../components/AppIcon'
 
 interface SignupScreenProps {
     onSignup: (phoneNumber: string) => void
@@ -77,7 +78,7 @@ export function SignupScreen({ onSignup, onSwitchToLogin, onCallBykea }: SignupS
                     <div className="flex items-center gap-3 rounded-2xl border-2 border-gray-200 bg-white px-4 py-4 shadow-sm focus-within:border-primary focus-within:shadow-md transition-all">
                         {/* Country Code */}
                         <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="text-2xl">🇵🇰</span>
+                            <AppIcon name="🇵🇰" className="text-2xl text-primary" />
                             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
@@ -127,9 +128,10 @@ export function SignupScreen({ onSignup, onSwitchToLogin, onCallBykea }: SignupS
                 {/* Call Bykea Button */}
                 <button
                     onClick={onCallBykea}
-                    className="w-full rounded-full px-6 py-4 text-center font-semibold text-primary border-2 border-primary bg-white hover:bg-primary hover:text-white transition-all duration-200 active:scale-95 mb-4"
+                    className="w-full rounded-full px-6 py-4 text-center font-semibold text-primary border-2 border-primary bg-white hover:bg-primary hover:text-white transition-all duration-200 active:scale-95 mb-4 flex items-center justify-center gap-2"
                 >
-                    📞 Call Bykea
+                    <AppIcon name="📞" className="text-xl" />
+                    Call Bykea
                 </button>
 
                 {/* Numeric Keypad */}
