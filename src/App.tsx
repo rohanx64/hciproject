@@ -143,6 +143,7 @@ function App() {
 
   // Previous screen for back navigation from SOS/Message/Call
   const [previousScreen, setPreviousScreen] = useState<Screen>('rideStarted')
+  const [pickupSuccessScreen, setPickupSuccessScreen] = useState<Screen | null>(null)
   const [currentContact, setCurrentContact] = useState<{ name: string; avatar: string; phone?: string; serviceType?: 'ride' | 'delivery' | 'shop' | 'rental' }>({
     name: 'Driver',
     avatar: '',
@@ -349,6 +350,7 @@ function App() {
           onNavigate={handleNavigate}
           onOpenPickupSelect={() => {
             setPreviousScreen('home')
+            setPickupSuccessScreen('dropoff')
             setScreen('ridePickupSelect')
           }}
           pickupLocation={ridePickup}
@@ -361,10 +363,15 @@ function App() {
     if (screen === 'ridePickupSelect') {
       return (
         <DeliveryPickupSelectScreen
-          onCancel={() => setScreen(previousScreen)}
+          onCancel={() => {
+            setPickupSuccessScreen(null)
+            setScreen(previousScreen)
+          }}
           onApply={(value) => {
             setRidePickup(value)
-            setScreen(previousScreen)
+            const targetScreen = pickupSuccessScreen ?? previousScreen
+            setScreen(targetScreen)
+            setPickupSuccessScreen(null)
           }}
           currentLocation={ridePickup}
         />
@@ -398,6 +405,7 @@ function App() {
           pickupLocation={ridePickup}
           onOpenPickupSelect={() => {
             setPreviousScreen('selectVehicle')
+            setPickupSuccessScreen('selectVehicle')
             setScreen('ridePickupSelect')
           }}
           onOpenDropoffSelect={() => setScreen('dropoff')}

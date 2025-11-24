@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -25,9 +25,9 @@ const pickupIcon = new L.Icon({
             <circle cx="16" cy="15" r="6" fill="#fff"/>
         </svg>
     `),
-    iconSize: [32, 46],
-    iconAnchor: [16, 46],
-    popupAnchor: [0, -46],
+    iconSize: [40, 58],
+    iconAnchor: [20, 58],
+    popupAnchor: [0, -58],
 })
 
 // Custom pink marker icon for dropoff location
@@ -38,9 +38,9 @@ const dropoffIcon = new L.Icon({
             <circle cx="16" cy="15" r="6" fill="#fff"/>
         </svg>
     `),
-    iconSize: [32, 46],
-    iconAnchor: [16, 46],
-    popupAnchor: [0, -46],
+    iconSize: [40, 58],
+    iconAnchor: [20, 58],
+    popupAnchor: [0, -58],
 })
 
 interface RideMapProps {
@@ -54,6 +54,7 @@ interface RideMapProps {
     onDragEnd?: () => void
     mapRef?: React.MutableRefObject<L.Map | null> // Ref to expose map instance
     showDefaultPickupMarker?: boolean // Option to hide default pickup marker
+    zoomLevel?: number
 }
 
 // Custom marker icon for selected pickup location (green)
@@ -65,9 +66,9 @@ const selectedPickupIcon = new L.Icon({
             <circle cx="20" cy="18" r="4" fill="#6cc44a"/>
         </svg>
     `),
-    iconSize: [40, 56],
-    iconAnchor: [20, 56],
-    popupAnchor: [0, -56],
+    iconSize: [48, 68],
+    iconAnchor: [24, 68],
+    popupAnchor: [0, -68],
 })
 
 // Custom marker icon for selected dropoff location (red)
@@ -79,9 +80,9 @@ const selectedDropoffIcon = new L.Icon({
             <circle cx="20" cy="18" r="4" fill="#ff3b30"/>
         </svg>
     `),
-    iconSize: [40, 56],
-    iconAnchor: [20, 56],
-    popupAnchor: [0, -56],
+    iconSize: [48, 68],
+    iconAnchor: [24, 68],
+    popupAnchor: [0, -68],
 })
 
 export function RideMap({
@@ -95,78 +96,103 @@ export function RideMap({
     onDragEnd,
     mapRef: externalMapRef,
     showDefaultPickupMarker = false, // Hide default pickup marker by default
+    zoomLevel = 16,
 }: RideMapProps) {
     const internalMapRef = useRef<L.Map | null>(null)
     const mapRef = externalMapRef || internalMapRef
+    const interactionActiveRef = useRef(false)
+    const [mapReady, setMapReady] = useState(false)
+
+    // Set up event listeners when map is ready and callbacks change
+    useEffect(() => {
+        const mapInstance = mapRef.current
+        if (!mapInstance || !mapReady) return
+
+        const container = mapInstance.getContainer()
+        let wasDragging = false
+
+        const startInteraction = () => {
+            if (!interactionActiveRef.current) {
+                interactionActiveRef.current = true
+                onDragStart?.()
+            }
+            container.style.cursor = 'grabbing'
+            wasDragging = true
+        }
+
+        const endInteraction = () => {
+            if (interactionActiveRef.current) {
+                interactionActiveRef.current = false
+                onDragEnd?.()
+            }
+            container.style.cursor = 'grab'
+            wasDragging = false
+        }
+
+        const handleClick = (e: L.LeafletMouseEvent) => {
+            // Small delay to check if drag just ended
+            setTimeout(() => {
+                if (!wasDragging) {
+                    onMapClick?.(e.latlng.lat, e.latlng.lng)
+                }
+                wasDragging = false
+            }, 100)
+        }
+
+        const handleTouchStart = () => {
+            startInteraction()
+        }
+
+        const handleTouchEnd = () => {
+            setTimeout(() => {
+                endInteraction()
+            }, 150)
+        }
+
+        // Set initial cursor
+        container.style.cursor = 'grab'
+
+        // Add event listeners
+        mapInstance.on('dragstart', startInteraction)
+        mapInstance.on('movestart', startInteraction)
+        mapInstance.on('dragend', endInteraction)
+        mapInstance.on('moveend', endInteraction)
+
+        if (onMapClick) {
+            mapInstance.on('click', handleClick)
+        }
+
+        container.addEventListener('touchstart', handleTouchStart, { passive: true })
+        container.addEventListener('touchend', handleTouchEnd, { passive: true })
+
+        // Cleanup function
+        return () => {
+            mapInstance.off('dragstart', startInteraction)
+            mapInstance.off('movestart', startInteraction)
+            mapInstance.off('dragend', endInteraction)
+            mapInstance.off('moveend', endInteraction)
+            if (onMapClick) {
+                mapInstance.off('click', handleClick)
+            }
+            container.removeEventListener('touchstart', handleTouchStart)
+            container.removeEventListener('touchend', handleTouchEnd)
+        }
+    }, [mapReady, onDragStart, onDragEnd, onMapClick])
 
     return (
         <div className={`relative ${className}`} style={{ zIndex: 0, cursor: 'grab' }}>
             <MapContainer
                 center={pickupLocation}
-                zoom={13}
+                zoom={zoomLevel}
                 scrollWheelZoom={false}
                 zoomControl={false}
                 className="h-full w-full rounded-lg"
                 style={{ zIndex: 0, cursor: 'grab' }}
                 ref={(instance) => {
-                    if (instance) {
+                    if (instance && !mapRef.current) {
                         mapRef.current = instance
-                    }
-                }}
-                whenReady={() => {
-                    const mapInstance = mapRef.current
-                    if (!mapInstance) {
-                        return
-                    }
-                    const container = mapInstance.getContainer()
-                    let wasDragging = false
-
-                    // Set initial cursor
-                    container.style.cursor = 'grab'
-
-                    // Handle drag start - when user starts dragging the map
-                    if (onDragStart) {
-                        mapInstance.on('dragstart', () => {
-                            wasDragging = true
-                            onDragStart()
-                            container.style.cursor = 'grabbing'
-                        })
-                    }
-
-                    // Handle drag end - when user stops dragging
-                    if (onDragEnd) {
-                        mapInstance.on('dragend', () => {
-                            wasDragging = false
-                            onDragEnd()
-                            container.style.cursor = 'grab'
-                        })
-                    }
-
-                    // Handle map click (only if it wasn't a drag)
-                    if (onMapClick) {
-                        mapInstance.on('click', (e: L.LeafletMouseEvent) => {
-                            // Small delay to check if drag just ended
-                            setTimeout(() => {
-                                if (!wasDragging) {
-                                    onMapClick(e.latlng.lat, e.latlng.lng)
-                                }
-                                wasDragging = false
-                            }, 100)
-                        })
-                    }
-
-                    // Handle touch events for mobile
-                    if (onDragStart && onDragEnd) {
-                        container.addEventListener('touchstart', () => {
-                            wasDragging = false
-                            onDragStart()
-                        }, { passive: true })
-
-                        container.addEventListener('touchend', () => {
-                            setTimeout(() => {
-                                onDragEnd()
-                            }, 150)
-                        }, { passive: true })
+                        // Trigger useEffect by setting mapReady
+                        setTimeout(() => setMapReady(true), 100)
                     }
                 }}
             >

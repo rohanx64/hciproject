@@ -6,6 +6,10 @@ import { RideMap } from '../components/RideMap'
 import { DraggablePanel } from '../components/DraggablePanel'
 import { AppIcon } from '../components/AppIcon'
 
+const PANEL_BASE_MIN_HEIGHT = 30
+const PANEL_DRAG_MIN_HEIGHT = 12
+const PANEL_RESTORE_DELAY = 220
+
 interface ShopsHomeScreenProps {
     onNavigate?: (screen: string) => void
     onSelectShop: (shopId: string) => void
@@ -24,6 +28,8 @@ export function ShopsHomeScreen({
     onOpenVoiceActivation,
 }: ShopsHomeScreenProps) {
     const [panelHeight, setPanelHeight] = useState(36) // Slimmer default panel
+    const [panelMinHeight, setPanelMinHeight] = useState(PANEL_BASE_MIN_HEIGHT)
+    const panelHeightBeforeDragRef = useRef<number | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null) // Start with no category selected
     const [selectedLocation, setSelectedLocation] = useState<[number, number] | null>(null)
@@ -49,13 +55,20 @@ export function ShopsHomeScreen({
     }
 
     const handleMapDragStart = () => {
-        setPanelHeight(20) // Collapse to minimum
+        if (panelHeightBeforeDragRef.current === null) {
+            panelHeightBeforeDragRef.current = panelHeight
+        }
+        setPanelMinHeight(PANEL_DRAG_MIN_HEIGHT)
+        setPanelHeight(PANEL_DRAG_MIN_HEIGHT)
     }
 
     const handleMapDragEnd = () => {
         setTimeout(() => {
-            setPanelHeight(selectedCategory ? 70 : 36) // Expand back to appropriate height
-        }, 300)
+            const fallback = Math.max(panelHeightBeforeDragRef.current ?? (selectedCategory ? 70 : 36), PANEL_BASE_MIN_HEIGHT)
+            panelHeightBeforeDragRef.current = null
+            setPanelMinHeight(PANEL_BASE_MIN_HEIGHT)
+            setPanelHeight(fallback)
+        }, PANEL_RESTORE_DELAY)
     }
 
     // Filter shops based on category and search
@@ -68,13 +81,12 @@ export function ShopsHomeScreen({
 
     // Auto-expand panel when category is selected
     useEffect(() => {
-        if (selectedCategory) {
-            // Smoothly expand to show shops
-            setTimeout(() => setPanelHeight(70), 300)
-        } else {
-            // Reset to initial height when category is deselected
-            setPanelHeight(36)
-        }
+        const timeout = setTimeout(() => {
+            panelHeightBeforeDragRef.current = null
+            setPanelMinHeight(PANEL_BASE_MIN_HEIGHT)
+            setPanelHeight(selectedCategory ? 70 : 36)
+        }, 300)
+        return () => clearTimeout(timeout)
     }, [selectedCategory])
 
     const handleCategorySelect = (categoryId: string) => {
@@ -117,7 +129,10 @@ export function ShopsHomeScreen({
 
                 {/* Location Pointer - Clean and distinct design */}
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[120%] z-30 pointer-events-none">
-                    <div className="relative">
+                    <div
+                        className="relative"
+                        style={{ transform: 'scale(var(--app-scale, 1))', transformOrigin: 'center bottom' }}
+                    >
                         {/* Pointer body - Clean pin without shadows */}
                         <svg className="w-10 h-14 text-[#3b82f6]" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
@@ -239,7 +254,7 @@ export function ShopsHomeScreen({
             {/* Draggable Bottom Panel - Standardized initial, expands when category selected */}
             <DraggablePanel
                 initialHeight={panelHeight}
-                minHeight={32}
+                minHeight={panelMinHeight}
                 maxHeight={82}
                 onHeightChange={setPanelHeight}
                 hideBottomNav={false}

@@ -5,6 +5,10 @@ import { BottomNav } from '../components/BottomNav'
 import { RideMap } from '../components/RideMap'
 import { DraggablePanel } from '../components/DraggablePanel'
 
+const PANEL_BASE_MIN_HEIGHT = 30
+const PANEL_DRAG_MIN_HEIGHT = 12
+const PANEL_RESTORE_DELAY = 220
+
 interface HomeRideProps {
     onOpenQuickBook: () => void
     onOpenDropoff: () => void
@@ -16,9 +20,20 @@ interface HomeRideProps {
     onOpenVoiceActivation?: () => void
 }
 
-export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, onNavigate, onOpenPickupSelect, pickupLocation = 'My current location', onOpenSidebar, onOpenVoiceActivation }: HomeRideProps) {
+export function HomeRideScreen({
+    onOpenQuickBook,
+    onOpenDropoff,
+    dropoffLabel,
+    onNavigate,
+    onOpenPickupSelect,
+    pickupLocation = 'My current location',
+    onOpenSidebar,
+    onOpenVoiceActivation,
+}: HomeRideProps) {
     const [panelHeight, setPanelHeight] = useState(36) // Slightly slimmer default panel
+    const [panelMinHeight, setPanelMinHeight] = useState(PANEL_BASE_MIN_HEIGHT)
     const mapRef = useRef<L.Map | null>(null)
+    const panelHeightBeforeDragRef = useRef<number | null>(null)
 
     // Calculate button position in pixels based on panel height percentage
     // Use window.innerHeight to match DraggablePanel
@@ -34,6 +49,7 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
     const availableHeight = containerHeight - bottomNavHeight
     const panelHeightPixels = (panelHeight / 100) * availableHeight
     const buttonBottomPixels = bottomNavHeight + panelHeightPixels + 6 // Tighter gap to feel grounded near the panel
+    const dropoffCardStyle = { minHeight: 'calc(58px * var(--app-scale, 1))' }
 
     const handleLocationClick = () => {
         // Location will be set when dropoff screen is opened
@@ -51,13 +67,20 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
     }
 
     const handleMapDragStart = () => {
-        setPanelHeight(20) // Collapse to minimum
+        if (panelHeightBeforeDragRef.current === null) {
+            panelHeightBeforeDragRef.current = panelHeight
+        }
+        setPanelMinHeight(PANEL_DRAG_MIN_HEIGHT)
+        setPanelHeight(PANEL_DRAG_MIN_HEIGHT)
     }
 
     const handleMapDragEnd = () => {
         setTimeout(() => {
-            setPanelHeight(36) // Expand back to initial
-        }, 300)
+            const fallback = Math.max(panelHeightBeforeDragRef.current ?? 36, PANEL_BASE_MIN_HEIGHT)
+            panelHeightBeforeDragRef.current = null
+            setPanelMinHeight(PANEL_BASE_MIN_HEIGHT)
+            setPanelHeight(fallback)
+        }, PANEL_RESTORE_DELAY)
     }
 
     return (
@@ -159,7 +182,10 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
 
                 {/* Location Pointer - Clean and distinct design */}
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[120%] z-30 pointer-events-none">
-                    <div className="relative">
+                    <div
+                        className="relative"
+                        style={{ transform: 'scale(var(--app-scale, 1))', transformOrigin: 'center bottom' }}
+                    >
                         {/* Pointer body - Clean pin without shadows */}
                         <svg className="w-10 h-14 text-primary" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
@@ -212,7 +238,7 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
             {/* Draggable Bottom Panel */}
             <DraggablePanel
                 initialHeight={panelHeight}
-                minHeight={32}
+                minHeight={panelMinHeight}
                 maxHeight={82}
                 onHeightChange={setPanelHeight}
                 hideBottomNav={false}
@@ -226,7 +252,8 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
                     {/* Drop-off Input Card - With red pin icon (Figma style) */}
                     <button
                         onClick={onOpenDropoff}
-                        className="w-full min-h-[68px] rounded-3xl border-2 border-[#c8f0c0] bg-white p-4 shadow-sm mb-3 flex items-center gap-3 hover:bg-green-50 hover:border-primary hover:shadow-md active:scale-[0.98] transition-all duration-200 ease-out group"
+                        className="w-full rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm mb-3 flex items-center gap-3 hover:bg-green-50 hover:border-primary hover:shadow-md active:scale-[0.98] transition-all duration-200 ease-out group"
+                        style={dropoffCardStyle}
                     >
                         <div className="grid size-7 place-items-center flex-shrink-0">
                             {/* Red location pin icon */}
