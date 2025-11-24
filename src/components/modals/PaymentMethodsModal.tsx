@@ -1,4 +1,3 @@
-import { assets } from '../../constants/assets'
 import type { PaymentMethod } from '../../types'
 
 interface PaymentMethodsModalProps {
@@ -10,8 +9,8 @@ interface PaymentMethodsModalProps {
 
 export function PaymentMethodsModal({ selected, onSelect, onConfirm, onClose }: PaymentMethodsModalProps) {
     const options = [
-        { id: 'cash' as const, label: 'Cash', icon: assets.cashIcon },
-        { id: 'digital' as const, label: 'Digital / Transfer', icon: assets.cardIcon },
+        { id: 'cash' as const, label: 'Cash', icon: '💵' },
+        { id: 'digital' as const, label: 'Digital / Transfer', icon: '💳' },
     ]
 
     return (
@@ -31,7 +30,7 @@ export function PaymentMethodsModal({ selected, onSelect, onConfirm, onClose }: 
                         >
                             <span className="text-white">{selected === option.id ? '•' : ''}</span>
                         </span>
-                        <img src={option.icon} alt="" className="h-6 w-6" />
+                        <span className="text-2xl">{option.icon}</span>
                         <p className="text-lg font-semibold text-text-dark">{option.label}</p>
                     </button>
                 ))}

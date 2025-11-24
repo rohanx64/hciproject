@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { assets } from '../constants/assets'
-import { BottomNav } from '../components/BottomNav'
 
 interface SearchingRidesProps {
     dropoffLabel: string
@@ -27,7 +26,7 @@ export function SearchingRidesScreen({ dropoffLabel, onRidesFound }: SearchingRi
     }, [onRidesFound])
 
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90">
+        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px]">
             <section className="relative h-[560px] overflow-hidden">
                 <img src={assets.mapBase} alt="Map" className="absolute inset-0 h-full w-full object-cover" />
                 <img src={assets.mapOverlay} alt="" className="absolute inset-0 h-full w-full object-cover opacity-95" />
@@ -106,7 +105,6 @@ export function SearchingRidesScreen({ dropoffLabel, onRidesFound }: SearchingRi
                 </div>
             </section>
 
-            <BottomNav active="Ride" />
         </div>
     )
 }
