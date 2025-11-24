@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import L from 'leaflet'
-import { assets } from '../constants/assets'
 import { favoritePlaces, recentLocations } from '../constants/data'
 import { BottomNav } from '../components/BottomNav'
 import { RideMap } from '../components/RideMap'
@@ -19,8 +18,6 @@ interface HomeRideProps {
 
 export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, onNavigate, onOpenPickupSelect, pickupLocation = 'My current location', onOpenSidebar, onOpenVoiceActivation }: HomeRideProps) {
     const [panelHeight, setPanelHeight] = useState(36) // Slightly slimmer default panel
-    const [selectedDropoffLocation, setSelectedDropoffLocation] = useState<[number, number] | null>(null)
-    const [isMapDragging, setIsMapDragging] = useState(false)
     const mapRef = useRef<L.Map | null>(null)
 
     // Calculate button position in pixels based on panel height percentage
@@ -38,7 +35,7 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
     const panelHeightPixels = (panelHeight / 100) * availableHeight
     const buttonBottomPixels = bottomNavHeight + panelHeightPixels + 6 // Tighter gap to feel grounded near the panel
 
-    const handleLocationClick = (location: string) => {
+    const handleLocationClick = () => {
         // Location will be set when dropoff screen is opened
         onOpenDropoff()
     }
@@ -54,12 +51,10 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
     }
 
     const handleMapDragStart = () => {
-        setIsMapDragging(true)
         setPanelHeight(20) // Collapse to minimum
     }
 
     const handleMapDragEnd = () => {
-        setIsMapDragging(false)
         setTimeout(() => {
             setPanelHeight(36) // Expand back to initial
         }, 300)
@@ -71,7 +66,7 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
             <section className="absolute inset-0 overflow-hidden">
                 <RideMap
                     pickupLocation={[24.8607, 67.0011]}
-                    selectedDropoffLocation={selectedDropoffLocation || undefined}
+                    selectedDropoffLocation={undefined}
                     onMapClick={handleMapClick}
                     onDragStart={handleMapDragStart}
                     onDragEnd={handleMapDragEnd}
@@ -174,23 +169,7 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
                     </div>
                 </div>
 
-                {/* Location Selection Indicator - Consistent pin style */}
-                {selectedDropoffLocation && (
-                    <div className="absolute left-1/2 top-[33.5%] -translate-x-1/2 z-20 pointer-events-none">
-                        <div className="relative">
-                            {/* Pin shadow */}
-                            <div className="absolute inset-0 translate-y-1 bg-black/20 blur-sm rounded-full" />
-                            {/* Pin body - Green for ride */}
-                            <div className="relative size-[269px] rounded-full bg-primary/20 flex items-center justify-center">
-                                <div className="size-[67px] rounded-full bg-primary flex items-center justify-center shadow-lg">
-                                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                {/* Location Selection Indicator - Hidden as selectedDropoffLocation is removed */}
 
 
                 {/* Voice Button - Combined mic + Voice label, aligned with location button */}
@@ -271,7 +250,7 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
                         {favoritePlaces.map((place, idx) => (
                             <button
                                 key={idx}
-                                onClick={() => handleLocationClick(place)}
+                                onClick={() => handleLocationClick()}
                                 className="min-h-[44px] px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 active:scale-95 transition-all duration-200 ease-out"
                             >
                                 {place}
@@ -287,7 +266,7 @@ export function HomeRideScreen({ onOpenQuickBook, onOpenDropoff, dropoffLabel, o
                                 {recentLocations.map((location, idx) => (
                                     <div key={idx}>
                                         <button
-                                            onClick={() => handleLocationClick(location.label)}
+                                            onClick={() => handleLocationClick()}
                                             className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition text-left min-h-[52px] group"
                                         >
                                             {/* Red location pin icon */}

@@ -4,7 +4,7 @@ interface HelpSupportScreenProps {
     hideBottomNav?: boolean
 }
 
-export function HelpSupportScreen({ onNavigate, onBack, hideBottomNav = true }: HelpSupportScreenProps) {
+export function HelpSupportScreen({ onNavigate }: HelpSupportScreenProps) {
     return (
         <div className="w-full h-full flex flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl relative">
             {/* Header */}

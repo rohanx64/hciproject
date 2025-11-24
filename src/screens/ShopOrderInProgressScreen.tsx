@@ -22,7 +22,6 @@ export function ShopOrderInProgressScreen({
     onNavigate,
     shopName,
     riderName,
-    riderRating,
     riderAvatar,
     shopLocation,
     deliveryLocation,

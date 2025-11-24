@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import L from 'leaflet'
-import { assets } from '../constants/assets'
 import { BottomNav } from '../components/BottomNav'
 import { RideMap } from '../components/RideMap'
 import { DraggablePanel } from '../components/DraggablePanel'
@@ -35,7 +34,6 @@ export function RentalsHomeScreen({
     const [fare] = useState(900)
     const [paymentMethod] = useState('Cash')
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<[number, number] | null>(null)
-    const [isMapDragging, setIsMapDragging] = useState(false)
     const mapRef = useRef<L.Map | null>(null)
 
     // Calculate button position in pixels based on panel height percentage
@@ -58,12 +56,10 @@ export function RentalsHomeScreen({
     }
 
     const handleMapDragStart = () => {
-        setIsMapDragging(true)
         setPanelHeight(20) // Collapse to minimum
     }
 
     const handleMapDragEnd = () => {
-        setIsMapDragging(false)
         setTimeout(() => {
             setPanelHeight(showPickupSelection ? 36 : 68) // Expand back to appropriate height
         }, 300)

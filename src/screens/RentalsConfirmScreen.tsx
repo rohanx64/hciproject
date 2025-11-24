@@ -22,7 +22,6 @@ export function RentalsConfirmScreen({
     onRentalStarted,
     onCancel,
     driverName,
-    driverRating,
     driverAvatar,
     pickupLocation,
     selectedHours,

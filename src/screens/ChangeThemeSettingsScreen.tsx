@@ -21,7 +21,7 @@ const colorTestPatterns = [
     { id: 'tritanopia', label: 'Blue-Yellow (Tritanopia)', description: 'Test for blue color blindness' },
 ]
 
-export function ChangeThemeSettingsScreen({ onNavigate, onBack, hideBottomNav = true }: ChangeThemeSettingsScreenProps) {
+export function ChangeThemeSettingsScreen({ onBack }: ChangeThemeSettingsScreenProps) {
     const { theme, setTheme, resolvedTheme, customTheme, updateCustomTheme } = useTheme()
     const [selectedTheme, setSelectedTheme] = useState<ThemeOption>(theme)
     const [showColorCalibration, setShowColorCalibration] = useState(false)
@@ -105,19 +105,17 @@ export function ChangeThemeSettingsScreen({ onNavigate, onBack, hideBottomNav = 
                                     setShowColorCalibration(false)
                                 }
                             }}
-                            className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
-                                selectedTheme === option.id
+                            className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${selectedTheme === option.id
                                     ? 'border-primary bg-green-50'
                                     : 'border-gray-200 bg-white hover:border-gray-300'
-                            }`}
+                                }`}
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <span className="text-3xl">{option.icon}</span>
                                     <div className="flex flex-col">
-                                        <span className={`text-base font-semibold ${
-                                            selectedTheme === option.id ? 'text-primary' : 'text-text-dark'
-                                        }`}>
+                                        <span className={`text-base font-semibold ${selectedTheme === option.id ? 'text-primary' : 'text-text-dark'
+                                            }`}>
                                             {option.label}
                                         </span>
                                         <span className="text-sm text-gray-500">{option.description}</span>
@@ -163,11 +161,10 @@ export function ChangeThemeSettingsScreen({ onNavigate, onBack, hideBottomNav = 
                                         <button
                                             key={test.id}
                                             onClick={() => setSelectedTest(test.id)}
-                                            className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
-                                                selectedTest === test.id
+                                            className={`w-full p-3 rounded-xl border-2 text-left transition-all ${selectedTest === test.id
                                                     ? 'border-primary bg-green-50'
                                                     : 'border-gray-200 hover:border-gray-300'
-                                            }`}
+                                                }`}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className="flex gap-1">

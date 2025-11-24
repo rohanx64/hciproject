@@ -15,7 +15,7 @@ const sizeOptions: { id: TextSizeOption; label: string; description: string }[] 
     { id: 'custom', label: 'Custom', description: 'Adjust text size to your preference' },
 ]
 
-export function ChangeSizeSettingsScreen({ onNavigate, onBack, hideBottomNav = true }: ChangeSizeSettingsScreenProps) {
+export function ChangeSizeSettingsScreen({ onBack }: ChangeSizeSettingsScreenProps) {
     const { selectedSize, customSize, setSelectedSize, setCustomSize } = useTextSize()
 
     return (
@@ -41,17 +41,15 @@ export function ChangeSizeSettingsScreen({ onNavigate, onBack, hideBottomNav = t
                         <div key={option.id}>
                             <button
                                 onClick={() => setSelectedSize(option.id)}
-                                className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
-                                    selectedSize === option.id
+                                className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${selectedSize === option.id
                                         ? 'border-primary bg-green-50'
                                         : 'border-gray-200 bg-white hover:border-gray-300'
-                                }`}
+                                    }`}
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex flex-col">
-                                        <span className={`text-base font-semibold ${
-                                            selectedSize === option.id ? 'text-primary' : 'text-text-dark'
-                                        }`}>
+                                        <span className={`text-base font-semibold ${selectedSize === option.id ? 'text-primary' : 'text-text-dark'
+                                            }`}>
                                             {option.label}
                                         </span>
                                         <span className="text-sm text-gray-500 mt-1">{option.description}</span>
@@ -65,7 +63,7 @@ export function ChangeSizeSettingsScreen({ onNavigate, onBack, hideBottomNav = t
                                     )}
                                 </div>
                             </button>
-                            
+
                             {/* Custom Size Slider - Only show when custom is selected */}
                             {option.id === 'custom' && selectedSize === 'custom' && (
                                 <div className="mt-4 p-4 bg-gray-50 rounded-2xl border-2 border-primary">

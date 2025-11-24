@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
 import { DraggablePanel } from '../components/DraggablePanel'
-import { BottomNav } from '../components/BottomNav'
 import type { PaymentOption } from '../types'
 
 interface DeliveryFormScreenProps {
@@ -41,9 +40,7 @@ export function DeliveryFormScreen({
     onCancel,
     onApply,
     onOpenMap,
-    onNavigate,
 }: DeliveryFormScreenProps) {
-    const [panelHeight, setPanelHeight] = useState(70) // Auto-adjusted to show all essential content
     const [formData, setFormData] = useState<DeliveryFormData>({
         pickupName: 'John Doe',
         pickupMobile: '03001245236',
@@ -120,7 +117,6 @@ export function DeliveryFormScreen({
                 initialHeight={70}
                 minHeight={50}
                 maxHeight={85}
-                onHeightChange={setPanelHeight}
                 hideBottomNav={true}
             >
                 <div className="px-6 pb-6">
@@ -142,7 +138,7 @@ export function DeliveryFormScreen({
                                 placeholder="Enter pickup address"
                                 className="flex-1 rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-3 text-base font-normal text-text-dark focus:border-[#ff9500] focus:outline-none"
                             />
-                            <button 
+                            <button
                                 onClick={onOpenMap}
                                 className="px-4 py-3 rounded-2xl border-2 border-[#c8f0c0] bg-white hover:bg-green-50 transition active:scale-95"
                             >
@@ -187,7 +183,7 @@ export function DeliveryFormScreen({
                                 placeholder="Enter delivery address"
                                 className="flex-1 rounded-2xl border-2 border-red-300 bg-white px-4 py-3 text-base font-normal text-text-dark focus:border-red-500 focus:outline-none"
                             />
-                            <button 
+                            <button
                                 onClick={onOpenMap}
                                 className="px-4 py-3 rounded-2xl border-2 border-red-300 bg-white hover:bg-red-50 transition active:scale-95"
                             >
@@ -263,8 +259,8 @@ export function DeliveryFormScreen({
                             <button
                                 onClick={() => onChangePayment('half-pay')}
                                 className={`flex-1 rounded-2xl px-4 py-3 text-sm font-bold transition active:scale-95 ${paymentOption === 'half-pay'
-                                        ? 'bg-[#ff9500] text-white shadow-lg'
-                                        : 'bg-white text-[#ff9500] border-2 border-[#ff9500] hover:bg-orange-50'
+                                    ? 'bg-[#ff9500] text-white shadow-lg'
+                                    : 'bg-white text-[#ff9500] border-2 border-[#ff9500] hover:bg-orange-50'
                                     }`}
                             >
                                 I will pay
@@ -272,8 +268,8 @@ export function DeliveryFormScreen({
                             <button
                                 onClick={() => onChangePayment('receiver-will-pay')}
                                 className={`flex-1 rounded-2xl px-4 py-3 text-sm font-bold transition active:scale-95 ${paymentOption === 'receiver-will-pay'
-                                        ? 'bg-[#ff9500] text-white shadow-lg'
-                                        : 'bg-white text-[#ff9500] border-2 border-[#ff9500] hover:bg-orange-50'
+                                    ? 'bg-[#ff9500] text-white shadow-lg'
+                                    : 'bg-white text-[#ff9500] border-2 border-[#ff9500] hover:bg-orange-50'
                                     }`}
                             >
                                 Receiver will pay

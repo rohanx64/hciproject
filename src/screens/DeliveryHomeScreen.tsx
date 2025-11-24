@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import L from 'leaflet'
-import { assets } from '../constants/assets'
 import { favoritePlaces, recentLocations } from '../constants/data'
 import { BottomNav } from '../components/BottomNav'
 import { RideMap } from '../components/RideMap'
@@ -31,7 +30,6 @@ export function DeliveryHomeScreen({
     const [panelHeight, setPanelHeight] = useState(36) // Slimmer default panel
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<[number, number] | null>(null)
     const [selectedDropoffLocation, setSelectedDropoffLocation] = useState<[number, number] | null>(null)
-    const [isMapDragging, setIsMapDragging] = useState(false)
     const mapRef = useRef<L.Map | null>(null)
 
     // Calculate button position in pixels based on panel height percentage
@@ -64,12 +62,10 @@ export function DeliveryHomeScreen({
     }
 
     const handleMapDragStart = () => {
-        setIsMapDragging(true)
         setPanelHeight(20) // Collapse to minimum
     }
 
     const handleMapDragEnd = () => {
-        setIsMapDragging(false)
         setTimeout(() => {
             setPanelHeight(36) // Expand back to initial
         }, 300)

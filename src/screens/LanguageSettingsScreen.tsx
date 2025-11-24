@@ -16,7 +16,7 @@ const languageOptions = [
     { id: 'siraiki', label: 'سرائیکی', code: 'SK', flag: '🇵🇰' },
 ]
 
-export function LanguageSettingsScreen({ onNavigate, onBack, hideBottomNav = true }: LanguageSettingsScreenProps) {
+export function LanguageSettingsScreen({ onBack }: LanguageSettingsScreenProps) {
     const [selectedLanguage, setSelectedLanguage] = useState('english')
 
     return (
@@ -42,19 +42,17 @@ export function LanguageSettingsScreen({ onNavigate, onBack, hideBottomNav = tru
                         <button
                             key={option.id}
                             onClick={() => setSelectedLanguage(option.id)}
-                            className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
-                                selectedLanguage === option.id
+                            className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${selectedLanguage === option.id
                                     ? 'border-primary bg-green-50'
                                     : 'border-gray-200 bg-white hover:border-gray-300'
-                            }`}
+                                }`}
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <span className="text-3xl">{option.flag}</span>
                                     <div className="flex flex-col">
-                                        <span className={`text-base font-semibold ${
-                                            selectedLanguage === option.id ? 'text-primary' : 'text-text-dark'
-                                        }`}>
+                                        <span className={`text-base font-semibold ${selectedLanguage === option.id ? 'text-primary' : 'text-text-dark'
+                                            }`}>
                                             {option.label}
                                         </span>
                                         <span className="text-sm text-gray-500">{option.code}</span>

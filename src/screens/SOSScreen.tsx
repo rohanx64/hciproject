@@ -14,9 +14,7 @@ export function SOSScreen({
     onNavigate,
     onClose,
     contactName = 'Emergency Services',
-    contactPhone = '112',
     currentLocation = [24.8607, 67.0011],
-    serviceType = 'ride',
 }: SOSScreenProps) {
     const [isCalling, setIsCalling] = useState(false)
 
@@ -27,14 +25,6 @@ export function SOSScreen({
             setIsCalling(false)
         }, 2000)
     }
-
-    const serviceColors = {
-        ride: 'primary',
-        delivery: '[#ff9500]',
-        shop: 'primary',
-    }
-
-    const bgColor = serviceType === 'delivery' ? 'bg-[#ff9500]' : 'bg-primary'
 
     return (
         <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px] relative">

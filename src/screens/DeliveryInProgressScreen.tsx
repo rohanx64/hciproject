@@ -1,4 +1,3 @@
-import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
 
 interface DeliveryInProgressScreenProps {
@@ -18,7 +17,6 @@ interface DeliveryInProgressScreenProps {
 export function DeliveryInProgressScreen({
     onNavigate,
     riderName,
-    riderRating,
     riderAvatar,
     pickupLocation,
     deliveryLocation,
