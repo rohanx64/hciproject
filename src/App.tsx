@@ -57,6 +57,8 @@ import { recentLocations, breakdownItems, deliveryBreakdownItems, shopsBreakdown
 import type { Screen, PaymentMethod, DeliveryType, PaymentOption } from './types'
 
 import { useVoiceFeedback } from './contexts/VoiceFeedbackContext'
+import type { QuickBookRoute } from './components/modals/QuickBookModal'
+import { quickBook } from './constants/data'
 
 function App() {
   const { setVoiceFeedbackEnabled, speakAction, speakNavigation } = useVoiceFeedback()
@@ -97,6 +99,18 @@ function App() {
     setScreen('login')
   }
   const [isQuickBookOpen, setQuickBookOpen] = useState(false)
+  const [quickBookRoutes, setQuickBookRoutes] = useState<QuickBookRoute[]>([
+    {
+      id: '1',
+      pickupLabel: quickBook.pickupLabel,
+      pickupAddress: quickBook.pickupAddress,
+      dropoffLabel: quickBook.dropoffLabel,
+      dropoffAddress: quickBook.dropoffAddress,
+      price: quickBook.price,
+    },
+  ])
+  const [quickBookSelectionMode, setQuickBookSelectionMode] = useState<'pickup' | 'dropoff' | null>(null)
+  const [quickBookTempRoute, setQuickBookTempRoute] = useState<Partial<QuickBookRoute> | null>(null)
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const [showFareDialog, setShowFareDialog] = useState(false)
   const [showVoiceActivation, setShowVoiceActivation] = useState(false)
@@ -166,10 +180,19 @@ function App() {
 
   const openDropoff = () => setScreen('dropoff')
 
-  const handleQuickBookConfirm = () => {
-    speakAction('Quick book confirmed')
+  const handleQuickBookConfirm = (route: QuickBookRoute) => {
+    speakAction('Quick book selected')
     setQuickBookOpen(false)
-    setShowFareDialog(true)
+    setRidePickup(route.pickupAddress)
+    setDropoffLabel(route.dropoffAddress)
+    setScreen('selectVehicle')
+  }
+
+  const handleQuickBookSelectLocation = (type: 'pickup' | 'dropoff', currentRoute: Partial<QuickBookRoute>) => {
+    setQuickBookSelectionMode(type)
+    setQuickBookTempRoute(currentRoute)
+    setQuickBookOpen(false)
+    setScreen(type === 'pickup' ? 'ridePickupSelect' : 'dropoff')
   }
 
   // Handle bottom navigation
@@ -364,10 +387,24 @@ function App() {
       return (
         <DeliveryPickupSelectScreen
           onCancel={() => {
+            if (quickBookSelectionMode) {
+              setQuickBookSelectionMode(null)
+              setQuickBookTempRoute(null)
+              setScreen('home')
+              setQuickBookOpen(true)
+              return
+            }
             setPickupSuccessScreen(null)
             setScreen(previousScreen)
           }}
           onApply={(value) => {
+            if (quickBookSelectionMode === 'pickup' && quickBookTempRoute) {
+              setQuickBookTempRoute({ ...quickBookTempRoute, pickupAddress: value })
+              setQuickBookSelectionMode(null)
+              setScreen('home')
+              setQuickBookOpen(true)
+              return
+            }
             setRidePickup(value)
             const targetScreen = pickupSuccessScreen ?? previousScreen
             setScreen(targetScreen)
@@ -381,8 +418,24 @@ function App() {
     if (screen === 'dropoff') {
       return (
         <DropoffSelectScreen
-          onCancel={() => setScreen('home')}
+          onCancel={() => {
+            if (quickBookSelectionMode) {
+              setQuickBookSelectionMode(null)
+              setQuickBookTempRoute(null)
+              setScreen('home')
+              setQuickBookOpen(true)
+              return
+            }
+            setScreen('home')
+          }}
           onApply={(value) => {
+            if (quickBookSelectionMode === 'dropoff' && quickBookTempRoute) {
+              setQuickBookTempRoute({ ...quickBookTempRoute, dropoffAddress: value })
+              setQuickBookSelectionMode(null)
+              setScreen('home')
+              setQuickBookOpen(true)
+              return
+            }
             if (value.trim()) {
               setDropoffLabel(value.trim())
             }
@@ -1142,11 +1195,14 @@ function App() {
       {isQuickBookOpen && (
         <QuickBookModal
           onConfirm={handleQuickBookConfirm}
-          onCancel={() => setShowCancelConfirm(true)}
-          onAddQuickBook={(data) => {
-            // Save quick book route (in a real app, this would save to backend)
-            console.log('Quick book route added:', data)
+          onCancel={() => {
+            setQuickBookOpen(false)
+            setQuickBookTempRoute(null)
           }}
+          routes={quickBookRoutes}
+          onRoutesChange={setQuickBookRoutes}
+          initialNewRoute={quickBookTempRoute || undefined}
+          onSelectLocation={handleQuickBookSelectLocation}
         />
       )}
 
