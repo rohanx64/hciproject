@@ -41,6 +41,29 @@ export function ChangeThemeSettingsScreen({ onBack }: ChangeThemeSettingsScreenP
         setBrightness(customTheme.brightness)
     }, [customTheme])
 
+    // Apply presets when color test changes
+    useEffect(() => {
+        if (!selectedTest) return
+
+        switch (selectedTest) {
+            case 'protanopia':
+                setHueShift(10)
+                setSaturation(120)
+                setBrightness(100)
+                break
+            case 'deuteranopia':
+                setHueShift(-10)
+                setSaturation(120)
+                setBrightness(100)
+                break
+            case 'tritanopia':
+                setHueShift(0)
+                setSaturation(140)
+                setBrightness(110)
+                break
+        }
+    }, [selectedTest])
+
     const handleCustomThemeClick = () => {
         setSelectedTheme('custom')
         setHueShift(customTheme.hueShift)
@@ -107,8 +130,8 @@ export function ChangeThemeSettingsScreen({ onBack }: ChangeThemeSettingsScreenP
                                 }
                             }}
                             className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${selectedTheme === option.id
-                                    ? 'border-primary bg-green-50'
-                                    : 'border-gray-200 bg-white hover:border-gray-300'
+                                ? 'border-primary bg-green-50'
+                                : 'border-gray-200 bg-white hover:border-gray-300'
                                 }`}
                         >
                             <div className="flex items-center justify-between">
@@ -163,8 +186,8 @@ export function ChangeThemeSettingsScreen({ onBack }: ChangeThemeSettingsScreenP
                                             key={test.id}
                                             onClick={() => setSelectedTest(test.id)}
                                             className={`w-full p-3 rounded-xl border-2 text-left transition-all ${selectedTest === test.id
-                                                    ? 'border-primary bg-green-50'
-                                                    : 'border-gray-200 hover:border-gray-300'
+                                                ? 'border-primary bg-green-50'
+                                                : 'border-gray-200 hover:border-gray-300'
                                                 }`}
                                         >
                                             <div className="flex items-center gap-3">

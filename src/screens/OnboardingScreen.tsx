@@ -65,6 +65,35 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
         setBrightness(customTheme.brightness)
     }, [customTheme])
 
+    // Apply presets when color blindness filter changes
+    useEffect(() => {
+        switch (colorBlindnessFilter) {
+            case 'protanopia':
+                setHueShift(10)
+                setSaturation(120)
+                setBrightness(100)
+                break
+            case 'deuteranopia':
+                setHueShift(-10)
+                setSaturation(120)
+                setBrightness(100)
+                break
+            case 'tritanopia':
+                setHueShift(0)
+                setSaturation(140)
+                setBrightness(110)
+                break
+            case 'none':
+                // Only reset if we are explicitly setting to none, 
+                // but maybe we shouldn't reset if the user just opened the dialog?
+                // For now, let's assume selecting 'none' resets to defaults.
+                setHueShift(0)
+                setSaturation(100)
+                setBrightness(100)
+                break
+        }
+    }, [colorBlindnessFilter])
+
     const handleNext = () => {
         if (step < 5) {
             setStep(step + 1)
@@ -187,19 +216,17 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
                                 <button
                                     key={lang.id}
                                     onClick={() => setSelectedLanguage(lang.id)}
-                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
-                                        selectedLanguage === lang.id
+                                    className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${selectedLanguage === lang.id
                                             ? 'border-primary bg-green-50'
                                             : 'border-gray-200 bg-white hover:border-gray-300'
-                                    }`}
+                                        }`}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
                                             <AppIcon name={lang.flag} className="text-2xl text-primary" />
                                             <div className="flex flex-col">
-                                                <span className={`text-base font-semibold ${
-                                                    selectedLanguage === lang.id ? 'text-primary' : 'text-text-dark'
-                                                }`}>
+                                                <span className={`text-base font-semibold ${selectedLanguage === lang.id ? 'text-primary' : 'text-text-dark'
+                                                    }`}>
                                                     {lang.label}
                                                 </span>
                                                 <span className="text-sm text-gray-500">{lang.code}</span>
@@ -247,19 +274,17 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
                                                 setShowColorCalibration(false)
                                             }
                                         }}
-                                        className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
-                                            selectedTheme === themeOption.id
+                                        className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${selectedTheme === themeOption.id
                                                 ? 'border-primary bg-green-50'
                                                 : 'border-gray-200 bg-white hover:border-gray-300'
-                                        }`}
+                                            }`}
                                     >
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-4">
                                                 <AppIcon name={themeOption.icon} className="text-2xl text-primary" />
                                                 <div className="flex flex-col">
-                                                    <span className={`text-base font-semibold ${
-                                                        selectedTheme === themeOption.id ? 'text-primary' : 'text-text-dark'
-                                                    }`}>
+                                                    <span className={`text-base font-semibold ${selectedTheme === themeOption.id ? 'text-primary' : 'text-text-dark'
+                                                        }`}>
                                                         {themeOption.label}
                                                     </span>
                                                     <span className="text-sm text-gray-500">{themeOption.description}</span>
@@ -286,16 +311,14 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
                                     <button
                                         key={size.id}
                                         onClick={() => setTextSize(size.id)}
-                                        className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
-                                            selectedFontSize === size.id
+                                        className={`w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left ${selectedFontSize === size.id
                                                 ? 'border-primary bg-green-50'
                                                 : 'border-gray-200 bg-white hover:border-gray-300'
-                                        }`}
+                                            }`}
                                     >
                                         <div className="flex items-center justify-between">
-                                            <span className={`${size.size} font-semibold ${
-                                                selectedFontSize === size.id ? 'text-primary' : 'text-text-dark'
-                                            }`}>
+                                            <span className={`${size.size} font-semibold ${selectedFontSize === size.id ? 'text-primary' : 'text-text-dark'
+                                                }`}>
                                                 {size.label} - Sample Text
                                             </span>
                                             {selectedFontSize === size.id && (
@@ -340,16 +363,14 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
                                 </div>
                                 <button
                                     onClick={() => setVoiceFeedback(!voiceFeedback)}
-                                    className={`relative inline-flex h-10 w-18 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                                        voiceFeedback ? 'bg-primary focus:ring-primary' : 'bg-gray-300 focus:ring-gray-400'
-                                    }`}
+                                    className={`relative inline-flex h-10 w-18 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${voiceFeedback ? 'bg-primary focus:ring-primary' : 'bg-gray-300 focus:ring-gray-400'
+                                        }`}
                                     role="switch"
                                     aria-checked={voiceFeedback}
                                 >
                                     <span
-                                        className={`inline-block h-8 w-8 transform rounded-full bg-white shadow-lg transition-transform duration-200 ease-in-out ${
-                                            voiceFeedback ? 'translate-x-9' : 'translate-x-1'
-                                        }`}
+                                        className={`inline-block h-8 w-8 transform rounded-full bg-white shadow-lg transition-transform duration-200 ease-in-out ${voiceFeedback ? 'translate-x-9' : 'translate-x-1'
+                                            }`}
                                     />
                                 </button>
                             </div>
@@ -377,11 +398,10 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
                     <button
                         onClick={handleNext}
                         disabled={!canProceed()}
-                        className={`flex-1 py-4 rounded-full text-base font-semibold text-white transition-all duration-200 ${
-                            canProceed()
+                        className={`flex-1 py-4 rounded-full text-base font-semibold text-white transition-all duration-200 ${canProceed()
                                 ? 'bg-primary hover:bg-primary-dark active:scale-95 shadow-lg'
                                 : 'bg-gray-300 cursor-not-allowed'
-                        }`}
+                            }`}
                     >
                         {step === 5 ? 'Get Started' : 'Next'}
                     </button>
