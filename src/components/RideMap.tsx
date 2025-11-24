@@ -25,9 +25,9 @@ const pickupIcon = new L.Icon({
             <circle cx="16" cy="15" r="6" fill="#fff"/>
         </svg>
     `),
-    iconSize: [32, 46],
-    iconAnchor: [16, 46],
-    popupAnchor: [0, -46],
+    iconSize: [40, 58],
+    iconAnchor: [20, 58],
+    popupAnchor: [0, -58],
 })
 
 // Custom pink marker icon for dropoff location
@@ -38,9 +38,9 @@ const dropoffIcon = new L.Icon({
             <circle cx="16" cy="15" r="6" fill="#fff"/>
         </svg>
     `),
-    iconSize: [32, 46],
-    iconAnchor: [16, 46],
-    popupAnchor: [0, -46],
+    iconSize: [40, 58],
+    iconAnchor: [20, 58],
+    popupAnchor: [0, -58],
 })
 
 interface RideMapProps {
@@ -54,6 +54,7 @@ interface RideMapProps {
     onDragEnd?: () => void
     mapRef?: React.MutableRefObject<L.Map | null> // Ref to expose map instance
     showDefaultPickupMarker?: boolean // Option to hide default pickup marker
+    zoomLevel?: number
 }
 
 // Custom marker icon for selected pickup location (green)
@@ -65,9 +66,9 @@ const selectedPickupIcon = new L.Icon({
             <circle cx="20" cy="18" r="4" fill="#6cc44a"/>
         </svg>
     `),
-    iconSize: [40, 56],
-    iconAnchor: [20, 56],
-    popupAnchor: [0, -56],
+    iconSize: [48, 68],
+    iconAnchor: [24, 68],
+    popupAnchor: [0, -68],
 })
 
 // Custom marker icon for selected dropoff location (red)
@@ -79,9 +80,9 @@ const selectedDropoffIcon = new L.Icon({
             <circle cx="20" cy="18" r="4" fill="#ff3b30"/>
         </svg>
     `),
-    iconSize: [40, 56],
-    iconAnchor: [20, 56],
-    popupAnchor: [0, -56],
+    iconSize: [48, 68],
+    iconAnchor: [24, 68],
+    popupAnchor: [0, -68],
 })
 
 export function RideMap({
@@ -95,15 +96,17 @@ export function RideMap({
     onDragEnd,
     mapRef: externalMapRef,
     showDefaultPickupMarker = false, // Hide default pickup marker by default
+    zoomLevel = 16,
 }: RideMapProps) {
     const internalMapRef = useRef<L.Map | null>(null)
     const mapRef = externalMapRef || internalMapRef
+    const interactionActiveRef = useRef(false)
 
     return (
         <div className={`relative ${className}`} style={{ zIndex: 0, cursor: 'grab' }}>
             <MapContainer
                 center={pickupLocation}
-                zoom={13}
+                zoom={zoomLevel}
                 scrollWheelZoom={false}
                 zoomControl={false}
                 className="h-full w-full rounded-lg"
@@ -121,26 +124,31 @@ export function RideMap({
                     const container = mapInstance.getContainer()
                     let wasDragging = false
 
+                    const startInteraction = () => {
+                        if (!interactionActiveRef.current) {
+                            interactionActiveRef.current = true
+                            onDragStart?.()
+                        }
+                        container.style.cursor = 'grabbing'
+                        wasDragging = true
+                    }
+
+                    const endInteraction = () => {
+                        if (interactionActiveRef.current) {
+                            interactionActiveRef.current = false
+                            onDragEnd?.()
+                        }
+                        container.style.cursor = 'grab'
+                        wasDragging = false
+                    }
+
                     // Set initial cursor
                     container.style.cursor = 'grab'
 
-                    // Handle drag start - when user starts dragging the map
-                    if (onDragStart) {
-                        mapInstance.on('dragstart', () => {
-                            wasDragging = true
-                            onDragStart()
-                            container.style.cursor = 'grabbing'
-                        })
-                    }
-
-                    // Handle drag end - when user stops dragging
-                    if (onDragEnd) {
-                        mapInstance.on('dragend', () => {
-                            wasDragging = false
-                            onDragEnd()
-                            container.style.cursor = 'grab'
-                        })
-                    }
+                    mapInstance.on('dragstart', startInteraction)
+                    mapInstance.on('movestart', startInteraction)
+                    mapInstance.on('dragend', endInteraction)
+                    mapInstance.on('moveend', endInteraction)
 
                     // Handle map click (only if it wasn't a drag)
                     if (onMapClick) {
@@ -156,18 +164,23 @@ export function RideMap({
                     }
 
                     // Handle touch events for mobile
-                    if (onDragStart && onDragEnd) {
-                        container.addEventListener('touchstart', () => {
-                            wasDragging = false
-                            onDragStart()
-                        }, { passive: true })
+                    container.addEventListener(
+                        'touchstart',
+                        () => {
+                            startInteraction()
+                        },
+                        { passive: true },
+                    )
 
-                        container.addEventListener('touchend', () => {
+                    container.addEventListener(
+                        'touchend',
+                        () => {
                             setTimeout(() => {
-                                onDragEnd()
+                                endInteraction()
                             }, 150)
-                        }, { passive: true })
-                    }
+                        },
+                        { passive: true },
+                    )
                 }}
             >
                 <TileLayer

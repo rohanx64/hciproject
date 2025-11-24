@@ -6,6 +6,10 @@ import { DraggablePanel } from '../components/DraggablePanel'
 import { favoritePlaces } from '../constants/data'
 import { AppIcon } from '../components/AppIcon'
 
+const PANEL_BASE_MIN_HEIGHT = 30
+const PANEL_DRAG_MIN_HEIGHT = 12
+const PANEL_RESTORE_DELAY = 220
+
 interface RentalsHomeScreenProps {
     onNavigate?: (screen: string) => void
     onProceedToConfirm: (hours: number, vehicle: string) => void
@@ -30,6 +34,8 @@ export function RentalsHomeScreen({
     onOpenVoiceActivation,
 }: RentalsHomeScreenProps) {
     const [panelHeight, setPanelHeight] = useState(36) // Slimmer default panel
+    const [panelMinHeight, setPanelMinHeight] = useState(PANEL_BASE_MIN_HEIGHT)
+    const panelHeightBeforeDragRef = useRef<number | null>(null)
     const [selectedHours, setSelectedHours] = useState(2)
     const [selectedVehicle, setSelectedVehicle] = useState('Bike')
     const [fare] = useState(900)
@@ -57,13 +63,20 @@ export function RentalsHomeScreen({
     }
 
     const handleMapDragStart = () => {
-        setPanelHeight(20) // Collapse to minimum
+        if (panelHeightBeforeDragRef.current === null) {
+            panelHeightBeforeDragRef.current = panelHeight
+        }
+        setPanelMinHeight(PANEL_DRAG_MIN_HEIGHT)
+        setPanelHeight(PANEL_DRAG_MIN_HEIGHT)
     }
 
     const handleMapDragEnd = () => {
         setTimeout(() => {
-            setPanelHeight(showPickupSelection ? 36 : 68) // Expand back to appropriate height
-        }, 300)
+            const fallback = Math.max(panelHeightBeforeDragRef.current ?? (showPickupSelection ? 36 : 68), PANEL_BASE_MIN_HEIGHT)
+            panelHeightBeforeDragRef.current = null
+            setPanelMinHeight(PANEL_BASE_MIN_HEIGHT)
+            setPanelHeight(fallback)
+        }, PANEL_RESTORE_DELAY)
     }
 
     // Check if pickup has been selected (not default)
@@ -73,11 +86,13 @@ export function RentalsHomeScreen({
 
     // Update panel height when pickup is selected - expand smoothly
     useEffect(() => {
-        if (hasSelectedPickup) {
-            setTimeout(() => setPanelHeight(68), 300)
-        } else {
-            setPanelHeight(36)
-        }
+        const targetHeight = hasSelectedPickup ? 68 : 36
+        const timeout = setTimeout(() => {
+            panelHeightBeforeDragRef.current = null
+            setPanelMinHeight(PANEL_BASE_MIN_HEIGHT)
+            setPanelHeight(targetHeight)
+        }, 300)
+        return () => clearTimeout(timeout)
     }, [hasSelectedPickup])
 
     const vehicles = [
@@ -129,7 +144,10 @@ export function RentalsHomeScreen({
 
                 {/* Location Pointer - Clean and distinct design */}
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[120%] z-30 pointer-events-none">
-                    <div className="relative">
+                    <div
+                        className="relative"
+                        style={{ transform: 'scale(var(--app-scale, 1))', transformOrigin: 'center bottom' }}
+                    >
                         {/* Pointer body - Clean pin without shadows */}
                         <svg className="w-10 h-14 text-[#ffd900]" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
@@ -253,7 +271,7 @@ export function RentalsHomeScreen({
             {/* Draggable Bottom Panel - Standardized initial, expands when pickup selected */}
             <DraggablePanel
                 initialHeight={panelHeight}
-                minHeight={32}
+                minHeight={panelMinHeight}
                 maxHeight={82}
                 onHeightChange={setPanelHeight}
                 hideBottomNav={false}
