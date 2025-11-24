@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -101,6 +101,83 @@ export function RideMap({
     const internalMapRef = useRef<L.Map | null>(null)
     const mapRef = externalMapRef || internalMapRef
     const interactionActiveRef = useRef(false)
+    const [mapReady, setMapReady] = useState(false)
+
+    // Set up event listeners when map is ready and callbacks change
+    useEffect(() => {
+        const mapInstance = mapRef.current
+        if (!mapInstance || !mapReady) return
+
+        const container = mapInstance.getContainer()
+        let wasDragging = false
+
+        const startInteraction = () => {
+            if (!interactionActiveRef.current) {
+                interactionActiveRef.current = true
+                onDragStart?.()
+            }
+            container.style.cursor = 'grabbing'
+            wasDragging = true
+        }
+
+        const endInteraction = () => {
+            if (interactionActiveRef.current) {
+                interactionActiveRef.current = false
+                onDragEnd?.()
+            }
+            container.style.cursor = 'grab'
+            wasDragging = false
+        }
+
+        const handleClick = (e: L.LeafletMouseEvent) => {
+            // Small delay to check if drag just ended
+            setTimeout(() => {
+                if (!wasDragging) {
+                    onMapClick?.(e.latlng.lat, e.latlng.lng)
+                }
+                wasDragging = false
+            }, 100)
+        }
+
+        const handleTouchStart = () => {
+            startInteraction()
+        }
+
+        const handleTouchEnd = () => {
+            setTimeout(() => {
+                endInteraction()
+            }, 150)
+        }
+
+        // Set initial cursor
+        container.style.cursor = 'grab'
+
+        // Add event listeners
+        mapInstance.on('dragstart', startInteraction)
+        mapInstance.on('movestart', startInteraction)
+        mapInstance.on('dragend', endInteraction)
+        mapInstance.on('moveend', endInteraction)
+
+        if (onMapClick) {
+            mapInstance.on('click', handleClick)
+        }
+
+        container.addEventListener('touchstart', handleTouchStart, { passive: true })
+        container.addEventListener('touchend', handleTouchEnd, { passive: true })
+
+        // Cleanup function
+        return () => {
+            mapInstance.off('dragstart', startInteraction)
+            mapInstance.off('movestart', startInteraction)
+            mapInstance.off('dragend', endInteraction)
+            mapInstance.off('moveend', endInteraction)
+            if (onMapClick) {
+                mapInstance.off('click', handleClick)
+            }
+            container.removeEventListener('touchstart', handleTouchStart)
+            container.removeEventListener('touchend', handleTouchEnd)
+        }
+    }, [mapReady, onDragStart, onDragEnd, onMapClick])
 
     return (
         <div className={`relative ${className}`} style={{ zIndex: 0, cursor: 'grab' }}>
@@ -112,75 +189,11 @@ export function RideMap({
                 className="h-full w-full rounded-lg"
                 style={{ zIndex: 0, cursor: 'grab' }}
                 ref={(instance) => {
-                    if (instance) {
+                    if (instance && !mapRef.current) {
                         mapRef.current = instance
+                        // Trigger useEffect by setting mapReady
+                        setTimeout(() => setMapReady(true), 100)
                     }
-                }}
-                whenReady={() => {
-                    const mapInstance = mapRef.current
-                    if (!mapInstance) {
-                        return
-                    }
-                    const container = mapInstance.getContainer()
-                    let wasDragging = false
-
-                    const startInteraction = () => {
-                        if (!interactionActiveRef.current) {
-                            interactionActiveRef.current = true
-                            onDragStart?.()
-                        }
-                        container.style.cursor = 'grabbing'
-                        wasDragging = true
-                    }
-
-                    const endInteraction = () => {
-                        if (interactionActiveRef.current) {
-                            interactionActiveRef.current = false
-                            onDragEnd?.()
-                        }
-                        container.style.cursor = 'grab'
-                        wasDragging = false
-                    }
-
-                    // Set initial cursor
-                    container.style.cursor = 'grab'
-
-                    mapInstance.on('dragstart', startInteraction)
-                    mapInstance.on('movestart', startInteraction)
-                    mapInstance.on('dragend', endInteraction)
-                    mapInstance.on('moveend', endInteraction)
-
-                    // Handle map click (only if it wasn't a drag)
-                    if (onMapClick) {
-                        mapInstance.on('click', (e: L.LeafletMouseEvent) => {
-                            // Small delay to check if drag just ended
-                            setTimeout(() => {
-                                if (!wasDragging) {
-                                    onMapClick(e.latlng.lat, e.latlng.lng)
-                                }
-                                wasDragging = false
-                            }, 100)
-                        })
-                    }
-
-                    // Handle touch events for mobile
-                    container.addEventListener(
-                        'touchstart',
-                        () => {
-                            startInteraction()
-                        },
-                        { passive: true },
-                    )
-
-                    container.addEventListener(
-                        'touchend',
-                        () => {
-                            setTimeout(() => {
-                                endInteraction()
-                            }, 150)
-                        },
-                        { passive: true },
-                    )
                 }}
             >
                 <TileLayer
