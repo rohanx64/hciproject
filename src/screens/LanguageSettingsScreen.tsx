@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AppIcon } from '../components/AppIcon'
 
 interface LanguageSettingsScreenProps {
     onNavigate?: (screen: string) => void
@@ -50,7 +51,7 @@ export function LanguageSettingsScreen({ onNavigate, onBack, hideBottomNav = tru
                         >
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    <span className="text-3xl">{option.flag}</span>
+                                    <AppIcon name={option.flag} className="text-2xl text-primary" />
                                     <div className="flex flex-col">
                                         <span className={`text-base font-semibold ${
                                             selectedLanguage === option.id ? 'text-primary' : 'text-text-dark'

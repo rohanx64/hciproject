@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { assets } from '../constants/assets'
+import { AppIcon } from '../components/AppIcon'
 
 interface SearchingRidesProps {
     dropoffLabel: string
@@ -80,7 +81,7 @@ export function SearchingRidesScreen({ dropoffLabel, onRidesFound }: SearchingRi
                     <div className="space-y-3">
                         <div className="flex items-center gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
                             <div className="grid size-12 place-items-center rounded-full bg-primary/10">
-                                <span className="text-2xl">🔍</span>
+                                <AppIcon name="🔍" className="text-2xl text-primary" />
                             </div>
                             <div className="flex-1">
                                 <p className="font-semibold text-text-dark">Searching nearby drivers</p>
@@ -90,7 +91,7 @@ export function SearchingRidesScreen({ dropoffLabel, onRidesFound }: SearchingRi
 
                         <div className="flex items-center gap-3 rounded-2xl border border-zinc-200 bg-white p-4">
                             <div className="grid size-12 place-items-center rounded-full bg-zinc-100">
-                                <span className="text-2xl">💰</span>
+                                <AppIcon name="💰" className="text-2xl text-green-600" />
                             </div>
                             <div className="flex-1">
                                 <p className="font-semibold text-text-dark">Your fare: 900 Rs.</p>

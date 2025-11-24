@@ -1,4 +1,5 @@
 import type { PaymentMethod } from '../../types'
+import { AppIcon } from '../AppIcon'
 
 interface PaymentMethodsModalProps {
     selected: PaymentMethod
@@ -30,7 +31,7 @@ export function PaymentMethodsModal({ selected, onSelect, onConfirm, onClose }: 
                         >
                             <span className="text-white">{selected === option.id ? '•' : ''}</span>
                         </span>
-                        <span className="text-2xl">{option.icon}</span>
+                        <AppIcon name={option.icon} className="text-2xl text-primary" />
                         <p className="text-lg font-semibold text-text-dark">{option.label}</p>
                     </button>
                 ))}

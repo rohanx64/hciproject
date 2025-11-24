@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AppIcon } from '../components/AppIcon'
 
 interface ContactUsScreenProps {
     onNavigate?: (screen: string) => void
@@ -71,14 +72,14 @@ export function ContactUsScreen({ onNavigate, onBack, hideBottomNav = true }: Co
                         <h3 className="text-base font-semibold text-text-dark mb-3">Other Ways to Reach Us</h3>
                         <div className="space-y-3">
                             <div className="flex items-center gap-3">
-                                <span className="text-2xl">📧</span>
+                                <AppIcon name="📧" className="text-2xl text-primary" />
                                 <div>
                                     <p className="text-sm text-gray-500">Email</p>
                                     <p className="text-base text-text-dark">support@bykea.com</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <span className="text-2xl">📞</span>
+                                <AppIcon name="📞" className="text-2xl text-primary" />
                                 <div>
                                     <p className="text-sm text-gray-500">Phone</p>
                                     <p className="text-base text-text-dark">+92 300 123 4567</p>

@@ -1,4 +1,5 @@
 import { navItems } from '../constants/data'
+import { AppIcon } from './AppIcon'
 
 interface BottomNavProps {
     active: string
@@ -29,9 +30,10 @@ export function BottomNav({ active, onNavigate }: BottomNavProps) {
                         }`}
                     >
                         <span className="grid size-14 place-items-center rounded-2xl bg-transparent">
-                            <span className={`text-3xl ${isActive ? '' : 'opacity-70'}`}>
-                                {item.icon}
-                            </span>
+                            <AppIcon
+                                name={item.icon}
+                                className={`text-3xl ${isActive ? '' : 'opacity-70'}`}
+                            />
                         </span>
                         <span className="text-[11.7px] font-normal">{item.label}</span>
                     </button>

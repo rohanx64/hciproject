@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { assets } from '../../constants/assets'
 import { Overlay } from '../Overlay'
+import { AppIcon } from '../AppIcon'
 
 interface Driver {
     id: string
@@ -70,10 +71,10 @@ export function RideOffersModal({ onSelectRide, onClose }: RideOffersModalProps)
                     </div>
                     <button
                         onClick={onClose}
-                        className="grid size-10 place-items-center rounded-full border border-zinc-200 text-2xl text-[#7d7d7d] transition hover:bg-zinc-100"
+                        className="grid size-10 place-items-center rounded-full border border-zinc-200 text-[#7d7d7d] transition hover:bg-zinc-100"
                         aria-label="Close"
                     >
-                        ×
+                        <AppIcon name="×" className="text-2xl" />
                     </button>
                 </div>
 
@@ -122,7 +123,7 @@ export function RideOffersModal({ onSelectRide, onClose }: RideOffersModalProps)
                                                 <h3 className="text-lg font-bold text-text-dark">{driver.name}</h3>
                                                 <div className="mt-1 flex items-center gap-2">
                                                     <div className="flex items-center gap-1">
-                                                        <span className="text-yellow-500">⭐</span>
+                                                        <AppIcon name="★" className="text-yellow-500" />
                                                         <span className="text-sm font-semibold text-text-dark">{driver.rating}</span>
                                                         <span className="text-xs text-[#7d7d7d]">({driver.reviewCount})</span>
                                                     </div>
@@ -141,11 +142,11 @@ export function RideOffersModal({ onSelectRide, onClose }: RideOffersModalProps)
                                                 <span className="font-medium text-text-dark">{driver.vehicleType}</span>
                                             </div>
                                             <div className="flex items-center gap-1 text-[#7d7d7d]">
-                                                <span>🕐</span>
+                                                <AppIcon name="🕐" className="text-base" />
                                                 <span className="font-medium">{driver.estimatedTime}</span>
                                             </div>
                                             <div className="flex items-center gap-1 text-[#7d7d7d]">
-                                                <span>📍</span>
+                                                <AppIcon name="📍" className="text-base" />
                                                 <span className="text-xs">{driver.distance}</span>
                                             </div>
                                         </div>
@@ -160,7 +161,7 @@ export function RideOffersModal({ onSelectRide, onClose }: RideOffersModalProps)
                                 {/* Selection indicator */}
                                 {isSelected && (
                                     <div className="absolute right-4 top-4 grid size-6 place-items-center rounded-full bg-primary">
-                                        <span className="text-sm text-white">✓</span>
+                                        <AppIcon name="✓" className="text-sm text-white" />
                                     </div>
                                 )}
                             </div>

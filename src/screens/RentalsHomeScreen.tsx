@@ -5,6 +5,7 @@ import { BottomNav } from '../components/BottomNav'
 import { RideMap } from '../components/RideMap'
 import { DraggablePanel } from '../components/DraggablePanel'
 import { favoritePlaces } from '../constants/data'
+import { AppIcon } from '../components/AppIcon'
 
 interface RentalsHomeScreenProps {
     onNavigate?: (screen: string) => void
@@ -344,9 +345,10 @@ export function RentalsHomeScreen({
                                             >
                                                 <div className={`grid size-16 place-items-center rounded-xl transition-all duration-200 ${isActive ? 'scale-110' : ''
                                                     }`}>
-                                                    <span className={`text-4xl ${isActive ? 'opacity-100' : 'opacity-70'}`}>
-                                                        {vehicle.icon}
-                                                    </span>
+                                                    <AppIcon
+                                                        name={vehicle.icon}
+                                                        className={`text-3xl ${isActive ? 'text-primary' : 'text-gray-500'}`}
+                                                    />
                                                 </div>
                                                 {vehicle.id === 'AC' && (
                                                     <p className="text-[14.493px] font-black italic text-primary mt-1" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>AC</p>
@@ -391,8 +393,8 @@ export function RentalsHomeScreen({
                                     }}
                                     className="flex flex-1 items-center gap-3 rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-3 text-left transition-all duration-200 hover:border-primary hover:shadow-md hover:scale-102 active:scale-98 min-h-[82px]"
                                 >
-                                    <div className="grid size-10 place-items-center">
-                                        <span className="text-2xl">💵</span>
+                                    <div className="grid size-10 place-items-center text-primary">
+                                        <AppIcon name="💵" className="text-2xl" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-[14.069px] font-normal uppercase text-[#919191] mb-1">

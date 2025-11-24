@@ -1,4 +1,5 @@
 import { RideMap } from '../components/RideMap'
+import { AppIcon } from '../components/AppIcon'
 
 interface RentalsConfirmScreenProps {
     onNavigate?: (screen: string) => void
@@ -67,7 +68,7 @@ export function RentalsConfirmScreen({
                             style={{ borderColor: RENTALS_COLOR }}
                         />
                         <div className="absolute -bottom-1 -right-1 size-6 rounded-full border-2 border-white flex items-center justify-center" style={{ backgroundColor: RENTALS_COLOR }}>
-                            <span className="text-xs text-white font-bold">✓</span>
+                            <AppIcon name="✓" className="text-xs text-white font-bold" />
                         </div>
                     </div>
                     <div className="flex-1">
@@ -75,7 +76,7 @@ export function RentalsConfirmScreen({
                             <h3 className="text-lg font-bold text-text-dark">{driverName}</h3>
                             <div className="flex items-center gap-1">
                                 {[...Array(5)].map((_, i) => (
-                                    <span key={i} className="text-yellow-400 text-sm">★</span>
+                                    <AppIcon key={i} name="★" className="text-yellow-400 text-sm" />
                                 ))}
                             </div>
                         </div>
@@ -121,7 +122,9 @@ export function RentalsConfirmScreen({
                 {/* Rental Summary */}
                 <div className="mb-6 rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-4">
                     <div className="flex items-center gap-3 mb-3">
-                        <span className="text-2xl">🚗</span>
+                        <span style={{ color: RENTALS_COLOR }}>
+                            <AppIcon name="🚗" className="text-2xl" />
+                        </span>
                         <div className="flex-1">
                             <div className="flex items-center gap-4 text-sm">
                                 <span className="font-semibold text-text-dark">DURATION <span className="font-normal text-gray-600">{selectedHours} {selectedHours === 1 ? 'Hour' : 'Hours'}</span></span>

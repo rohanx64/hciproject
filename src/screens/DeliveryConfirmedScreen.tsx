@@ -1,5 +1,6 @@
 import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
+import { AppIcon } from '../components/AppIcon'
 
 interface DeliveryConfirmedScreenProps {
     onNavigate?: (screen: string) => void
@@ -70,7 +71,7 @@ export function DeliveryConfirmedScreen({
                             className="size-16 rounded-full border-2 border-[#ff9500] object-cover"
                         />
                         <div className="absolute -bottom-1 -right-1 size-6 rounded-full bg-[#ff9500] border-2 border-white flex items-center justify-center">
-                            <span className="text-xs text-white font-bold">✓</span>
+                            <AppIcon name="✓" className="text-xs text-white font-bold" />
                         </div>
                     </div>
                     <div className="flex-1">
@@ -78,7 +79,7 @@ export function DeliveryConfirmedScreen({
                             <h3 className="text-lg font-bold text-text-dark">{riderName}</h3>
                             <div className="flex items-center gap-1">
                                 {[...Array(5)].map((_, i) => (
-                                    <span key={i} className="text-yellow-400 text-sm">★</span>
+                                    <AppIcon key={i} name="★" className="text-yellow-400 text-sm" />
                                 ))}
                             </div>
                         </div>
@@ -139,7 +140,7 @@ export function DeliveryConfirmedScreen({
                 {/* Delivery Summary */}
                 <div className="mb-6 rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-4">
                     <div className="flex items-center gap-3 mb-3">
-                        <span className="text-2xl">📦</span>
+                        <AppIcon name="📦" className="text-2xl text-[#ff9500]" />
                         <div className="flex-1">
                             <div className="flex items-center gap-4 text-sm">
                                 <span className="font-semibold text-text-dark">DISTANCE <span className="font-normal text-gray-600">{distance}</span></span>
