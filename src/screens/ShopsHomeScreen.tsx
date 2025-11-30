@@ -118,12 +118,19 @@ export function ShopsHomeScreen({
 
                 {/* Profile Avatar - Consistent across all screens */}
                 <button
-                    className="absolute left-[4.26%] top-[7.64%] size-[58px] overflow-hidden rounded-[30px] border-2 border-white shadow-lg z-20 hover:scale-105 active:scale-95 transition-all duration-200"
-                    aria-label="Profile"
+                    className="absolute left-[4.26%] top-[7.64%] size-[58px] overflow-hidden rounded-[30px] border-2 border-white shadow-lg z-20 hover:scale-105 active:scale-95 transition-all duration-200 group"
+                    aria-label="Open menu"
                     onClick={() => onOpenSidebar?.()}
+                    title="Tap to open menu"
                 >
-                    <div className="h-full w-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] flex items-center justify-center">
-                        <span className="text-2xl text-white font-bold">U</span>
+                    <div className="h-full w-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] flex items-center justify-center relative">
+                        <span className="text-2xl text-white font-bold">R</span>
+                        {/* Hamburger indicator */}
+                        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
+                            <div className="w-1 h-1 rounded-full bg-white"></div>
+                            <div className="w-1 h-1 rounded-full bg-white"></div>
+                            <div className="w-1 h-1 rounded-full bg-white"></div>
+                        </div>
                     </div>
                 </button>
 
@@ -179,7 +186,7 @@ export function ShopsHomeScreen({
                     className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary active:scale-95 transition-all duration-200 ease-out"
                     aria-label="Voice input"
                 >
-                    <svg className="w-5 h-5 text-white animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-white animate-subtle-pulse" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2a3 3 0 013 3v6a3 3 0 01-6 0V5a3 3 0 013-3z" />
                         <path d="M19 10v1a7 7 0 01-14 0v-1a1 1 0 012 0v1a5 5 0 0010 0v-1a1 1 0 012 0z" />
                         <path d="M12 18.5a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 01-3 0v-3a1.5 1.5 0 011.5-1.5z" />
@@ -261,7 +268,7 @@ export function ShopsHomeScreen({
             >
                 <div className="px-6 pb-2">
                     {/* Shops Title - Top left */}
-                    <h1 className="font-display text-[32px] font-normal text-[#3b82f6] text-left mb-3 mt-2">
+                    <h1 className="font-display text-[32px] font-extrabold text-[#3b82f6] text-left mb-3 mt-2">
                         Shops
                     </h1>
 

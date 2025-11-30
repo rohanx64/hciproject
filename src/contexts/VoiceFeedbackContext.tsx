@@ -26,6 +26,21 @@ export function VoiceFeedbackProvider({ children }: { children: React.ReactNode 
     const [voiceFeedbackEnabled, setVoiceFeedbackEnabled] = useState(() => {
         return localStorage.getItem('voiceFeedbackEnabled') === 'true'
     })
+    
+    // Initialize speech synthesis on mount
+    useEffect(() => {
+        if ('speechSynthesis' in window) {
+            // Wake up the speech synthesis API by getting voices
+            // This helps with browser compatibility issues
+            const voices = window.speechSynthesis.getVoices()
+            if (voices.length === 0) {
+                // Some browsers need an event to load voices
+                window.speechSynthesis.onvoiceschanged = () => {
+                    console.log('Speech synthesis voices loaded')
+                }
+            }
+        }
+    }, [])
     const [speechRate, setSpeechRate] = useState(() => {
         const saved = localStorage.getItem('speechRate')
         return saved ? parseFloat(saved) : 1.0
@@ -73,17 +88,43 @@ export function VoiceFeedbackProvider({ children }: { children: React.ReactNode 
     }, [announceErrors])
 
     const speak = useCallback((text: string, priority: 'high' | 'normal' = 'normal') => {
-        if (!voiceFeedbackEnabled || !('speechSynthesis' in window)) return
-
-        // Cancel current speech if high priority
-        if (priority === 'high') {
-            window.speechSynthesis.cancel()
+        if (!voiceFeedbackEnabled || !('speechSynthesis' in window)) {
+            console.log('Voice feedback disabled or not supported')
+            return
         }
 
-        const utterance = new SpeechSynthesisUtterance(text)
-        utterance.rate = speechRate
-        utterance.volume = speechVolume
-        window.speechSynthesis.speak(utterance)
+        try {
+            // Cancel current speech if high priority
+            if (priority === 'high') {
+                window.speechSynthesis.cancel()
+            }
+
+            // Create utterance with all necessary properties
+            const utterance = new SpeechSynthesisUtterance(text)
+            utterance.rate = speechRate
+            utterance.volume = speechVolume
+            utterance.lang = 'en-US' // Set language
+            
+            // Add error handlers for debugging
+            utterance.onerror = (event) => {
+                console.error('Speech synthesis error:', event)
+            }
+            
+            utterance.onend = () => {
+                console.log('Speech ended')
+            }
+            
+            utterance.onstart = () => {
+                console.log('Speech started')
+            }
+
+            // Use setTimeout to ensure it's triggered properly
+            setTimeout(() => {
+                window.speechSynthesis.speak(utterance)
+            }, 0)
+        } catch (error) {
+            console.error('Error in speech synthesis:', error)
+        }
     }, [voiceFeedbackEnabled, speechRate, speechVolume])
 
     const speakAction = useCallback((text: string) => {

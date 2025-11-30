@@ -50,6 +50,7 @@ import {
   VoiceFeedbackScreen,
   RideCompletedScreen,
 } from './screens'
+import { AnalyticsDashboard } from './screens/Dashboard/AnalyticsDashboard'
 import { Sidebar } from './components/Sidebar'
 import { QuickBookModal, CancelDialog, FareDialog, PaymentMethodsModal, FareBreakdownModal, RideOffersModal, VoiceActivationModal } from './components/modals'
 import { Overlay } from './components/Overlay'
@@ -57,16 +58,50 @@ import { recentLocations, breakdownItems, deliveryBreakdownItems, shopsBreakdown
 import type { Screen, PaymentMethod, DeliveryType, PaymentOption } from './types'
 
 import { useVoiceFeedback } from './contexts/VoiceFeedbackContext'
+import { useAnalytics } from './contexts/AnalyticsContext'
 import type { QuickBookRoute } from './components/modals/QuickBookModal'
 import { quickBook } from './constants/data'
 
 function App() {
   const { setVoiceFeedbackEnabled, speakAction, speakNavigation } = useVoiceFeedback()
+  const { setCurrentScreen: trackScreen } = useAnalytics()
+
+  // Check for dashboard route
+  const [isDashboard, setIsDashboard] = useState(() => {
+    return window.location.pathname === '/dashboard'
+  })
+
+  // Listen for route changes
+  useEffect(() => {
+    const handleRouteChange = () => {
+      setIsDashboard(window.location.pathname === '/dashboard')
+    }
+
+    // Check on mount and listen for popstate (back/forward)
+    window.addEventListener('popstate', handleRouteChange)
+    // Also check periodically in case of programmatic navigation
+    const interval = setInterval(handleRouteChange, 100)
+
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange)
+      clearInterval(interval)
+    }
+  }, [])
+
+  // Render dashboard if on /dashboard route
+  if (isDashboard) {
+    return <AnalyticsDashboard />
+  }
 
   const [screen, setScreen] = useState<Screen>(() => {
     const savedAuth = localStorage.getItem('isAuthenticated')
     return savedAuth === 'true' ? 'home' : 'splash'
   })
+
+  // Track screen changes in analytics
+  useEffect(() => {
+    trackScreen(screen)
+  }, [screen, trackScreen])
 
   // Announce screen changes
   useEffect(() => {
@@ -146,6 +181,7 @@ function App() {
 
   // Sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [screenBeforeSidebar, setScreenBeforeSidebar] = useState<Screen | null>(null)
 
   // User data
   const [userName] = useState('Rohan Riaz')
@@ -208,35 +244,64 @@ function App() {
     } else if (navLabel === 'Shops') {
       setScreen('shopsHome')
     } else if (navLabel === 'history') {
+      // Store screen before navigating if coming from sidebar
+      if (isSidebarOpen) {
+        setScreenBeforeSidebar(screen)
+      }
       setIsSidebarOpen(false)
       setScreen('history')
     } else if (navLabel === 'settings') {
+      // Store screen before navigating if coming from sidebar
+      if (isSidebarOpen) {
+        setScreenBeforeSidebar(screen)
+      }
       setIsSidebarOpen(false)
       setScreen('settings')
     } else if (navLabel === 'myAccount') {
+      // Store screen before navigating if coming from sidebar
+      if (isSidebarOpen) {
+        setScreenBeforeSidebar(screen)
+      }
       setIsSidebarOpen(false)
       setScreen('myAccount')
     } else if (navLabel === 'wallet' || navLabel === 'notifications') {
+      // Store screen before navigating if coming from sidebar
+      if (isSidebarOpen) {
+        setScreenBeforeSidebar(screen)
+      }
       setIsSidebarOpen(false)
       setScreen(navLabel as Screen)
     } else if (navLabel === 'voiceFeedback') {
+      // Store screen before navigating if coming from sidebar
+      if (isSidebarOpen) {
+        setScreenBeforeSidebar(screen)
+      }
       setIsSidebarOpen(false)
       setScreen('voiceFeedback')
     } else if (navLabel === 'home') {
       setIsSidebarOpen(false)
       setScreen('home')
     } else if (navLabel === 'callBykea') {
+      // Store screen before navigating if coming from sidebar
+      if (isSidebarOpen) {
+        setScreenBeforeSidebar(screen)
+      }
       setIsSidebarOpen(false)
       setScreen('callBykea')
     } else if (navLabel === 'helpSupport') {
+      // Store screen before navigating if coming from sidebar
+      if (isSidebarOpen) {
+        setScreenBeforeSidebar(screen)
+      }
       setIsSidebarOpen(false)
       setScreen('helpSupport')
     } else if (navLabel === 'language') {
+      // Store screen before navigating if coming from sidebar
+      if (isSidebarOpen) {
+        setScreenBeforeSidebar(screen)
+      }
       setIsSidebarOpen(false)
       setScreen('languageSettings')
-    } else if (navLabel === 'settings') {
-      setIsSidebarOpen(false)
-      setScreen('settings')
     } else if (navLabel === 'notificationsSettings' || navLabel === 'changeSizeSettings' || navLabel === 'languageSettings' || navLabel === 'changeThemeSettings' || navLabel === 'termsPrivacy' || navLabel === 'contactUs') {
       setIsSidebarOpen(false)
       setScreen(navLabel as Screen)
@@ -245,6 +310,7 @@ function App() {
 
   // Handle opening sidebar from profile button
   const handleOpenSidebar = () => {
+    setScreenBeforeSidebar(screen) // Store current screen before opening sidebar
     setIsSidebarOpen(true)
   }
 
@@ -321,12 +387,22 @@ function App() {
     }
 
     if (screen === 'onboardingTutorial') {
+      // Check if we came from helpSupport
+      const cameFromHelp = screenBeforeSidebar === 'helpSupport'
+      
       return (
         <OnboardingTutorialScreen
           onComplete={() => {
-            setIsAuthenticated(true)
-            localStorage.setItem('isAuthenticated', 'true')
-            setScreen('home')
+            if (cameFromHelp) {
+              // Return to help support
+              setScreen('helpSupport')
+              setScreenBeforeSidebar(null)
+            } else {
+              // Complete onboarding normally
+              setIsAuthenticated(true)
+              localStorage.setItem('isAuthenticated', 'true')
+              setScreen('home')
+            }
           }}
         />
       )
@@ -339,7 +415,9 @@ function App() {
           onNavigate={handleNavigate}
           onBack={() => {
             if (isAuthenticated) {
-              setIsSidebarOpen(true)
+              // Go back to the screen before sidebar was opened, or home if none
+              setScreen(screenBeforeSidebar || 'home')
+              setScreenBeforeSidebar(null)
             } else {
               setScreen('login')
             }
@@ -1051,7 +1129,11 @@ function App() {
       return (
         <HistoryScreen
           onNavigate={handleNavigate}
-          onBack={() => setIsSidebarOpen(true)}
+          onBack={() => {
+            // Go back to the screen before sidebar was opened, or home if none
+            setScreen(screenBeforeSidebar || 'home')
+            setScreenBeforeSidebar(null)
+          }}
         />
       )
     }
@@ -1061,7 +1143,11 @@ function App() {
       return (
         <SettingsScreen
           onNavigate={handleNavigate}
-          onBack={() => setIsSidebarOpen(true)}
+          onBack={() => {
+            // Go back to the screen before sidebar was opened, or home if none
+            setScreen(screenBeforeSidebar || 'home')
+            setScreenBeforeSidebar(null)
+          }}
           userName={userName}
           userAvatar={userAvatar}
         />
@@ -1154,8 +1240,22 @@ function App() {
     if (screen === 'helpSupport') {
       return (
         <HelpSupportScreen
-          onNavigate={handleNavigate}
-          onBack={() => setIsSidebarOpen(true)}
+          onNavigate={(screenName) => {
+            if (screenName === 'onboardingTutorial') {
+              // Store that we're coming from help support
+              setScreenBeforeSidebar('helpSupport')
+            }
+            handleNavigate(screenName)
+          }}
+          onBack={() => {
+            // Go back to the screen before sidebar was opened, or home if none
+            setScreen(screenBeforeSidebar || 'home')
+            setScreenBeforeSidebar(null)
+          }}
+          onStartTutorial={() => {
+            setScreenBeforeSidebar('helpSupport')
+            setScreen('onboardingTutorial')
+          }}
         />
       )
     }
@@ -1165,7 +1265,9 @@ function App() {
         <VoiceFeedbackScreen
           onNavigate={handleNavigate}
           onBack={() => {
-            handleNavigate('home')
+            // Go back to the screen before sidebar was opened, or home if none
+            setScreen(screenBeforeSidebar || 'home')
+            setScreenBeforeSidebar(null)
           }}
         />
       )

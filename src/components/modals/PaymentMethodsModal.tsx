@@ -21,7 +21,7 @@ export function PaymentMethodsModal({ selected, onSelect, onConfirm, onClose }: 
                 {options.map((option) => (
                     <button
                         key={option.id}
-                        className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 ${selected === option.id ? 'border-primary bg-primary/10' : 'border-zinc-200'
+                        className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 transition-all duration-200 hover-lift active:animate-button-press ${selected === option.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-zinc-200 hover:border-primary/40'
                             }`}
                         onClick={() => onSelect(option.id)}
                     >
@@ -37,10 +37,10 @@ export function PaymentMethodsModal({ selected, onSelect, onConfirm, onClose }: 
                 ))}
             </div>
             <div className="mt-6 flex gap-4">
-                <button className="flex-1 rounded-2xl border border-primary px-4 py-3 text-lg font-extrabold uppercase text-primary" onClick={onClose}>
+                <button className="flex-1 rounded-2xl border border-primary px-4 py-3 text-lg font-extrabold uppercase text-primary hover-lift active:animate-button-press transition-all duration-200" onClick={onClose}>
                     Cancel
                 </button>
-                <button className="flex-1 rounded-2xl bg-primary px-4 py-3 text-lg font-extrabold uppercase text-white" onClick={onConfirm}>
+                <button className="flex-1 rounded-2xl bg-primary px-4 py-3 text-lg font-extrabold uppercase text-white hover-lift active:animate-button-press transition-all duration-200 shadow-sm hover:shadow-md" onClick={onConfirm}>
                     Confirm
                 </button>
             </div>

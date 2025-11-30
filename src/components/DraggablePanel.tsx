@@ -158,24 +158,32 @@ export function DraggablePanel({
     return (
         <div
             ref={panelRef}
-            className="fixed left-0 right-0 bg-white rounded-t-[18px] transition-all duration-300 ease-out z-[400]"
+            className="fixed left-0 right-0 bg-white dark:bg-[rgb(var(--color-surface))] rounded-t-[28px] shadow-[0_-8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl border-t border-gray-100/50 dark:border-gray-700/50 z-[400]"
             style={{
                 height: getStyleHeight(),
                 bottom: hideBottomNav ? '0' : `${BOTTOM_NAV_HEIGHT}px`,
                 touchAction: 'none',
+                transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                willChange: isDragging ? 'height' : 'auto',
             }}
         >
-            {/* Drag Handle */}
+            {/* Top decorative gradient line - More subtle */}
+            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+            
+            {/* Drag Handle - Enhanced with better feedback */}
             <div
-                className="absolute top-3 left-1/2 -translate-x-1/2 w-16 h-1.5 bg-gray-300 rounded-full cursor-grab active:cursor-grabbing"
+                className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-1.5 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-600 dark:via-gray-500 dark:to-gray-600 rounded-full cursor-grab active:cursor-grabbing transition-all duration-200 hover:from-gray-300 hover:via-gray-400 hover:to-gray-300 dark:hover:from-gray-500 dark:hover:via-gray-400 dark:hover:to-gray-500 hover:w-24 hover:shadow-md active:scale-95"
                 onMouseDown={handleMouseDown}
                 onTouchStart={handleTouchStart}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
-            />
+            >
+                {/* Subtle shine effect - More refined */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/30 dark:via-white/8 to-transparent" />
+            </div>
 
             {/* Content */}
-            <div className="h-full overflow-y-auto pt-3 scrollbar-hide" style={{
+            <div className="h-full overflow-y-auto pt-6 scrollbar-hide" style={{
                 paddingBottom: hideBottomNav ? '24px' : `${BOTTOM_NAV_HEIGHT + 16}px`
             }}>
                 {children}

@@ -128,13 +128,13 @@ export function LoginScreen({ onLogin, onSwitchToSignup, onCallBykea }: LoginScr
                     Next
                 </button>
 
-                {/* Call Bykea Button */}
+                {/* Call AIR Button */}
                 <button
                     onClick={onCallBykea}
                     className="w-full rounded-full px-6 py-4 text-center font-semibold text-primary border-2 border-primary bg-white hover:bg-primary hover:text-white transition-all duration-200 active:scale-95 mb-4 flex items-center justify-center gap-2"
                 >
                     <AppIcon name="📞" className="text-xl" />
-                    Call Bykea
+                    Call AIR
                 </button>
 
                 {/* Numeric Keypad */}

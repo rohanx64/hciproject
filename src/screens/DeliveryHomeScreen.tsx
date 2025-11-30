@@ -37,6 +37,20 @@ export function DeliveryHomeScreen({
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<[number, number] | null>(null)
     const [selectedDropoffLocation, setSelectedDropoffLocation] = useState<[number, number] | null>(null)
     const mapRef = useRef<L.Map | null>(null)
+    const panelContentRef = useRef<HTMLDivElement>(null)
+    const isMapDraggingRef = useRef(false)
+    
+    // Horizontal scroll refs for location buttons
+    const favoritePlacesScrollRef = useRef<HTMLDivElement>(null)
+    const recentLocationsScrollRef = useRef<HTMLDivElement>(null)
+    const [isDraggingFavorites, setIsDraggingFavorites] = useState(false)
+    const [isDraggingRecent, setIsDraggingRecent] = useState(false)
+    const [startXFavorites, setStartXFavorites] = useState(0)
+    const [startXRecent, setStartXRecent] = useState(0)
+    const [scrollLeftFavorites, setScrollLeftFavorites] = useState(0)
+    const [scrollLeftRecent, setScrollLeftRecent] = useState(0)
+    const hasDraggedFavoritesRef = useRef(false)
+    const hasDraggedRecentRef = useRef(false)
 
     // Calculate button position in pixels based on panel height percentage
     // Use window.innerHeight to match DraggablePanel
@@ -47,6 +61,98 @@ export function DeliveryHomeScreen({
         window.addEventListener('resize', handleResize)
         return () => window.removeEventListener('resize', handleResize)
     }, [])
+
+    // Calculate optimal panel height based on content
+    useEffect(() => {
+        if (!panelContentRef.current || isMapDraggingRef.current) return
+        
+        const calculateOptimalHeight = () => {
+            // Skip calculation if map is being dragged
+            if (isMapDraggingRef.current) return
+            
+            const content = panelContentRef.current
+            if (!content) return
+            
+            const contentHeight = content.scrollHeight
+            const padding = 48
+            const totalNeededHeight = contentHeight + padding
+            
+            const bottomNavHeight = 110
+            const availableHeight = containerHeight - bottomNavHeight
+            const optimalPercent = Math.min(82, Math.max(30, (totalNeededHeight / availableHeight) * 100))
+            
+            if (Math.abs(panelHeight - optimalPercent) > 2) {
+                setPanelHeight(optimalPercent)
+                setPanelMinHeight(Math.max(PANEL_BASE_MIN_HEIGHT, optimalPercent * 0.7))
+            }
+        }
+        
+        const timeoutId = setTimeout(calculateOptimalHeight, 100)
+        const observer = new ResizeObserver(() => {
+            if (!isMapDraggingRef.current) {
+                calculateOptimalHeight()
+            }
+        })
+        
+        if (panelContentRef.current) {
+            observer.observe(panelContentRef.current)
+        }
+        
+        return () => {
+            clearTimeout(timeoutId)
+            observer.disconnect()
+        }
+    }, [containerHeight, panelHeight])
+
+    // Global mouse event handlers for favorite places scrolling
+    useEffect(() => {
+        const handleGlobalMouseMove = (e: MouseEvent) => {
+            if (!isDraggingFavorites || !favoritePlacesScrollRef.current) return
+            e.preventDefault()
+            hasDraggedFavoritesRef.current = true
+            const x = e.pageX - favoritePlacesScrollRef.current.offsetLeft
+            const walk = (x - startXFavorites) * 2
+            favoritePlacesScrollRef.current.scrollLeft = scrollLeftFavorites - walk
+        }
+
+        const handleGlobalMouseUp = () => {
+            setIsDraggingFavorites(false)
+        }
+
+        if (isDraggingFavorites) {
+            document.addEventListener('mousemove', handleGlobalMouseMove)
+            document.addEventListener('mouseup', handleGlobalMouseUp)
+            return () => {
+                document.removeEventListener('mousemove', handleGlobalMouseMove)
+                document.removeEventListener('mouseup', handleGlobalMouseUp)
+            }
+        }
+    }, [isDraggingFavorites, startXFavorites, scrollLeftFavorites])
+
+    // Global mouse event handlers for recent locations scrolling
+    useEffect(() => {
+        const handleGlobalMouseMove = (e: MouseEvent) => {
+            if (!isDraggingRecent || !recentLocationsScrollRef.current) return
+            e.preventDefault()
+            hasDraggedRecentRef.current = true
+            const x = e.pageX - recentLocationsScrollRef.current.offsetLeft
+            const walk = (x - startXRecent) * 2
+            recentLocationsScrollRef.current.scrollLeft = scrollLeftRecent - walk
+        }
+
+        const handleGlobalMouseUp = () => {
+            setIsDraggingRecent(false)
+        }
+
+        if (isDraggingRecent) {
+            document.addEventListener('mousemove', handleGlobalMouseMove)
+            document.addEventListener('mouseup', handleGlobalMouseUp)
+            return () => {
+                document.removeEventListener('mousemove', handleGlobalMouseMove)
+                document.removeEventListener('mouseup', handleGlobalMouseUp)
+            }
+        }
+    }, [isDraggingRecent, startXRecent, scrollLeftRecent])
 
     const bottomNavHeight = 110
     const availableHeight = containerHeight - bottomNavHeight
@@ -69,6 +175,7 @@ export function DeliveryHomeScreen({
     }
 
     const handleMapDragStart = () => {
+        isMapDraggingRef.current = true
         if (panelHeightBeforeDragRef.current === null) {
             panelHeightBeforeDragRef.current = panelHeight
         }
@@ -78,6 +185,7 @@ export function DeliveryHomeScreen({
 
     const handleMapDragEnd = () => {
         setTimeout(() => {
+            isMapDraggingRef.current = false
             const fallback = Math.max(panelHeightBeforeDragRef.current ?? 36, PANEL_BASE_MIN_HEIGHT)
             panelHeightBeforeDragRef.current = null
             setPanelMinHeight(PANEL_BASE_MIN_HEIGHT)
@@ -103,14 +211,21 @@ export function DeliveryHomeScreen({
                 {/* White gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-transparent to-transparent pointer-events-none" style={{ zIndex: 1 }} />
 
-                {/* Profile Avatar - Consistent across all screens */}
+                {/* Profile Avatar - Enhanced with better affordance */}
                 <button
-                    className="absolute left-[4.26%] top-[7.64%] size-[58px] overflow-hidden rounded-[30px] border-2 border-white shadow-lg z-20 hover:scale-105 active:scale-95 transition-all duration-200"
-                    aria-label="Profile"
+                    className="absolute left-[4.26%] top-[7.64%] size-[58px] overflow-hidden rounded-[30px] border-2 border-white shadow-lg z-20 hover:scale-105 hover-lift active:animate-button-press transition-all duration-200 group"
+                    aria-label="Open menu"
                     onClick={() => onOpenSidebar?.()}
+                    title="Tap to open menu"
                 >
-                    <div className="h-full w-full bg-gradient-to-br from-[#ff9500] to-[#e68600] flex items-center justify-center">
-                        <span className="text-2xl text-white font-bold">U</span>
+                    <div className="h-full w-full bg-gradient-to-br from-[#ff9500] to-[#e68600] flex items-center justify-center relative">
+                        <span className="text-2xl text-white font-bold">R</span>
+                        {/* Enhanced indicator for pullable area - More visible */}
+                        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-1 opacity-70 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110">
+                            <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
+                        </div>
                     </div>
                 </button>
 
@@ -161,12 +276,15 @@ export function DeliveryHomeScreen({
 
                 {/* Voice Button - Combined mic + Voice label, aligned with location button */}
                 <button
-                    style={{ bottom: `${buttonBottomPixels}px` }}
+                    style={{ 
+                        bottom: `${buttonBottomPixels}px`,
+                        transition: 'bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
                     onClick={onOpenVoiceActivation}
-                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary active:scale-95 transition-all duration-200 ease-out"
+                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary hover-lift active:animate-button-press transition-colors duration-200 ease-out"
                     aria-label="Voice input"
                 >
-                    <svg className="w-5 h-5 text-white animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-white animate-subtle-pulse" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2a3 3 0 013 3v6a3 3 0 01-6 0V5a3 3 0 013-3z" />
                         <path d="M19 10v1a7 7 0 01-14 0v-1a1 1 0 012 0v1a5 5 0 0010 0v-1a1 1 0 012 0z" />
                         <path d="M12 18.5a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 01-3 0v-3a1.5 1.5 0 011.5-1.5z" />
@@ -176,8 +294,11 @@ export function DeliveryHomeScreen({
 
                 {/* Location Button - Dynamically positioned above panel */}
                 <button
-                    style={{ bottom: `${buttonBottomPixels}px` }}
-                    className="fixed right-[5.26%] px-4 py-3 rounded-full bg-white/95 border-2 border-[#ff9500] text-[#ff9500] font-semibold shadow-lg flex items-center gap-2 z-[600] hover:bg-[#ff9500] hover:text-white hover:shadow-xl active:scale-95 transition-all duration-200 ease-out"
+                    style={{ 
+                        bottom: `${buttonBottomPixels}px`,
+                        transition: 'bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
+                    className="fixed right-[5.26%] px-4 py-3 rounded-full bg-white/95 border-2 border-[#ff9500] text-[#ff9500] font-semibold shadow-lg flex items-center gap-2 z-[600] hover:bg-[#ff9500] hover:text-white hover-lift active:animate-button-press transition-colors duration-200 ease-out"
                     aria-label="Use current location"
                     onClick={() => {
                         if (navigator.geolocation) {
@@ -248,16 +369,16 @@ export function DeliveryHomeScreen({
                 onHeightChange={setPanelHeight}
                 hideBottomNav={false}
             >
-                <div className="px-6 pb-2">
+                <div ref={panelContentRef} className="px-6 pb-2">
                     {/* Delivery Title - Top left */}
-                    <h1 className="font-display text-[32px] font-normal text-[#ff9500] text-left mb-3 mt-2">
+                    <h1 className="font-display text-[32px] font-extrabold text-[#ff9500] text-left mb-3 mt-2">
                         Delivery
                     </h1>
 
                     {/* Drop-off Input Card - With red pin icon (Figma style) */}
                     <button
                         onClick={onProceedToForm}
-                        className="w-full rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm mb-3 flex items-center gap-3 hover:bg-green-50 hover:border-[#ff9500] hover:shadow-md active:scale-[0.98] transition-all duration-200 group"
+                        className="w-full rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm mb-3 flex items-center gap-3 hover:bg-green-50 hover:border-[#ff9500] hover-lift active:animate-button-press transition-all duration-200 group"
                         style={dropoffCardStyle}
                     >
                         <div className="grid size-7 place-items-center flex-shrink-0">
@@ -277,55 +398,117 @@ export function DeliveryHomeScreen({
                         </div>
                     </button>
 
-                    {/* Suggested Location Tags */}
-                    <div className="flex flex-wrap gap-2 mb-3">
-                        {favoritePlaces.map((place, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => handleLocationClick(place)}
-                                className="min-h-[44px] px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 hover:border-[#32991d] hover:shadow-sm active:scale-95 transition-all duration-200 ease-out"
-                            >
-                                {place}
-                            </button>
-                        ))}
+                    {/* Suggested Location Tags - Horizontal Scrollable */}
+                    <div className="mb-3">
+                        <div 
+                            ref={favoritePlacesScrollRef}
+                            onMouseDown={(e) => {
+                                if (!favoritePlacesScrollRef.current) return
+                                setIsDraggingFavorites(true)
+                                hasDraggedFavoritesRef.current = false
+                                setStartXFavorites(e.pageX - favoritePlacesScrollRef.current.offsetLeft)
+                                setScrollLeftFavorites(favoritePlacesScrollRef.current.scrollLeft)
+                            }}
+                            onMouseMove={(e) => {
+                                if (!isDraggingFavorites || !favoritePlacesScrollRef.current) return
+                                e.preventDefault()
+                                hasDraggedFavoritesRef.current = true
+                                const x = e.pageX - favoritePlacesScrollRef.current.offsetLeft
+                                const walk = (x - startXFavorites) * 2
+                                favoritePlacesScrollRef.current.scrollLeft = scrollLeftFavorites - walk
+                            }}
+                            onMouseUp={() => setIsDraggingFavorites(false)}
+                            onMouseLeave={() => setIsDraggingFavorites(false)}
+                            className={`w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide scroll-smooth -mx-6 px-6 ${isDraggingFavorites ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                            style={{ 
+                                scrollbarWidth: 'none', 
+                                msOverflowStyle: 'none',
+                                WebkitOverflowScrolling: 'touch',
+                                touchAction: 'pan-x pinch-zoom',
+                                userSelect: 'none'
+                            }}
+                        >
+                            <div className="flex gap-2" style={{ width: 'max-content' }}>
+                                {favoritePlaces.map((place, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={(e) => {
+                                            if (hasDraggedFavoritesRef.current) {
+                                                e.preventDefault()
+                                                e.stopPropagation()
+                                                hasDraggedFavoritesRef.current = false
+                                                return
+                                            }
+                                            handleLocationClick(place)
+                                        }}
+                                        className="flex-shrink-0 min-h-[44px] px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 hover:border-[#32991d] hover-lift active:animate-button-press transition-all duration-200 ease-out"
+                                    >
+                                        {place}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Recent Locations List - Only show when panel is expanded (Figma style) */}
+                    {/* Recent Locations - Horizontal Scrollable Chips */}
                     {panelHeight > 50 && (
                         <div className="mb-3">
                             <p className="text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-3">RECENT LOCATIONS</p>
-                            <div className="space-y-0">
-                                {recentLocations.map((location, idx) => (
-                                    <div key={idx}>
+                            <div 
+                                ref={recentLocationsScrollRef}
+                                onMouseDown={(e) => {
+                                    if (!recentLocationsScrollRef.current) return
+                                    setIsDraggingRecent(true)
+                                    hasDraggedRecentRef.current = false
+                                    setStartXRecent(e.pageX - recentLocationsScrollRef.current.offsetLeft)
+                                    setScrollLeftRecent(recentLocationsScrollRef.current.scrollLeft)
+                                }}
+                                onMouseMove={(e) => {
+                                    if (!isDraggingRecent || !recentLocationsScrollRef.current) return
+                                    e.preventDefault()
+                                    hasDraggedRecentRef.current = true
+                                    const x = e.pageX - recentLocationsScrollRef.current.offsetLeft
+                                    const walk = (x - startXRecent) * 2
+                                    recentLocationsScrollRef.current.scrollLeft = scrollLeftRecent - walk
+                                }}
+                                onMouseUp={() => setIsDraggingRecent(false)}
+                                onMouseLeave={() => setIsDraggingRecent(false)}
+                                className={`w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide scroll-smooth -mx-6 px-6 ${isDraggingRecent ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                                style={{ 
+                                    scrollbarWidth: 'none', 
+                                    msOverflowStyle: 'none',
+                                    WebkitOverflowScrolling: 'touch',
+                                    touchAction: 'pan-x pinch-zoom',
+                                    userSelect: 'none'
+                                }}
+                            >
+                                <div className="flex gap-2" style={{ width: 'max-content' }}>
+                                    {recentLocations.map((location, idx) => (
                                         <button
-                                            onClick={() => handleLocationClick(location.label)}
-                                            className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-all duration-200 text-left min-h-[52px] group"
+                                            key={idx}
+                                            onClick={(e) => {
+                                                if (hasDraggedRecentRef.current) {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    hasDraggedRecentRef.current = false
+                                                    return
+                                                }
+                                                handleLocationClick(location.label)
+                                            }}
+                                            className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 hover-lift active:animate-button-press transition-all duration-200 ease-out"
                                         >
-                                            {/* Red location pin icon */}
-                                            <svg className="w-5 h-5 text-[#ff3b30] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-4 h-4 text-[#ff3b30] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                                             </svg>
-                                            <span className="flex-1 text-base font-normal text-text-dark">{location.label}</span>
-                                            {/* Clickable star icon */}
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    // Toggle favorite - in real app, this would update state
-                                                    console.log('Toggle favorite for:', location.label)
-                                                }}
-                                                className="flex-shrink-0 p-1 hover:scale-110 active:scale-95 transition-transform"
-                                                aria-label={location.favorite ? 'Remove from favorites' : 'Add to favorites'}
-                                            >
-                                                <svg className={`w-6 h-6 flex-shrink-0 transition-colors ${location.favorite ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} fill={location.favorite ? 'currentColor' : 'none'} viewBox="0 0 20 20">
+                                            <span>{location.label}</span>
+                                            {location.favorite && (
+                                                <svg className="w-4 h-4 text-yellow-400 fill-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                                 </svg>
-                                            </button>
+                                            )}
                                         </button>
-                                        {idx < recentLocations.length - 1 && (
-                                            <div className="h-[1px] bg-gray-200 mx-3"></div>
-                                        )}
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     )}

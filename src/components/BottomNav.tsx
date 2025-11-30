@@ -1,5 +1,6 @@
 import { navItems } from '../constants/data'
 import { AppIcon } from './AppIcon'
+import { useLanguage } from '../contexts/LanguageContext'
 
 interface BottomNavProps {
     active: string
@@ -7,9 +8,12 @@ interface BottomNavProps {
 }
 
 export function BottomNav({ active, onNavigate }: BottomNavProps) {
+    const { t } = useLanguage()
+    
     return (
-        <nav className="grid grid-cols-4 border-t border-gray-200 bg-white/95 backdrop-blur px-4 py-4 text-center text-xs font-semibold relative z-[1000]">
+        <nav className="grid grid-cols-4 border-t border-gray-200/80 bg-white/98 backdrop-blur-xl shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 py-3 text-center text-xs font-semibold relative z-[1000]">
             {navItems.map((item) => {
+                const translatedLabel = t(item.label)
                 const isActive = item.label === active
                 const isDelivery = item.label === 'Delivery'
                 
@@ -17,25 +21,37 @@ export function BottomNav({ active, onNavigate }: BottomNavProps) {
                     <button
                         key={item.label}
                         onClick={() => onNavigate?.(item.label)}
-                        className={`flex flex-col items-center gap-1.5 rounded-[11.7px] px-3 py-2 transition-all duration-200 ease-in-out ${
+                        className={`flex flex-col items-center gap-1.5 rounded-[14px] px-3 py-2.5 transition-all duration-300 ease-out relative group hover-lift ${
                             isActive && isDelivery
-                                ? 'bg-[rgba(255,149,0,0.15)] border-[0.585px] border-[#ff9500] text-[#ff9500] shadow-sm'
+                                ? 'bg-gradient-to-b from-[rgba(255,149,0,0.08)] to-[rgba(255,149,0,0.04)] border border-[#ff9500]/30 text-[#ff9500] shadow-[0_2px_6px_rgba(255,149,0,0.15)]'
                                 : isActive && item.label === 'Rentals'
-                                ? 'bg-[rgba(255,217,0,0.18)] border-[0.585px] border-[#ffd900] text-[#ffd900] shadow-sm'
+                                ? 'bg-gradient-to-b from-[rgba(255,217,0,0.1)] to-[rgba(255,217,0,0.05)] border border-[#ffd900]/30 text-[#ffd900] shadow-[0_2px_6px_rgba(255,217,0,0.15)]'
                                 : isActive && item.label === 'Shops'
-                                ? 'bg-[rgba(59,130,246,0.15)] border-[0.585px] border-[#3b82f6] text-[#3b82f6] shadow-sm'
+                                ? 'bg-gradient-to-b from-[rgba(59,130,246,0.08)] to-[rgba(59,130,246,0.04)] border border-[#3b82f6]/30 text-[#3b82f6] shadow-[0_2px_6px_rgba(59,130,246,0.15)]'
                                 : isActive
-                                ? 'bg-[#d5eecf] border-[0.585px] border-[rgba(50,153,29,0.64)] text-[#007311] shadow-sm'
-                                : 'text-[#7d7d7d] hover:bg-zinc-100 active:scale-95'
+                                ? 'bg-gradient-to-b from-[rgba(50,153,29,0.08)] to-[rgba(50,153,29,0.04)] border border-primary/30 text-primary shadow-[0_2px_6px_rgba(50,153,29,0.12)]'
+                                : 'text-[#7d7d7d] hover:bg-gray-50/80 active:animate-button-press'
                         }`}
                         >
-                            <span className="grid size-14 place-items-center rounded-2xl bg-transparent">
+                            <span className={`grid size-12 place-items-center rounded-xl transition-all duration-300 overflow-hidden ${
+                                isActive ? 'scale-110 shadow-sm' : 'group-hover:scale-105'
+                            }`}>
                                 <AppIcon
                                     name={item.icon}
-                                    className={`text-[32px] ${isActive ? '' : 'opacity-70'}`}
+                                    className={`text-[40px] transition-all duration-300 ${
+                                        isActive 
+                                            ? 'drop-shadow-sm' 
+                                            : 'opacity-60 group-hover:opacity-80'
+                                    }`}
                                 />
-                        </span>
-                        <span className="text-[11.5px] font-medium tracking-wide">{item.label}</span>
+                            </span>
+                            <span className={`text-[11px] font-semibold tracking-wide transition-all duration-300 ${
+                                isActive ? 'scale-105' : ''
+                            }`}>{translatedLabel}</span>
+                            {/* Active indicator dot */}
+                            {isActive && (
+                                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-current animate-pulse" />
+                            )}
                     </button>
                 )
             })}

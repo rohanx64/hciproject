@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { assets } from '../constants/assets'
 import { RideMap } from '../components/RideMap'
 import { DraggablePanel } from '../components/DraggablePanel'
@@ -35,6 +35,11 @@ export function SelectVehicleScreen({
     const [vehicle, setVehicle] = useState('Bike')
     const [showCancelDialog, setShowCancelDialog] = useState(false)
     const [isExpanded, setIsExpanded] = useState(false)
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+    const [isDragging, setIsDragging] = useState(false)
+    const [startX, setStartX] = useState(0)
+    const [scrollLeft, setScrollLeft] = useState(0)
+    const hasDraggedRef = useRef(false)
 
     // Vehicle data with estimated fares
     const vehicles = [
@@ -45,13 +50,9 @@ export function SelectVehicleScreen({
         { id: 'AC', icon: '🚕', label: 'AC', fare: 650 },
     ]
 
-    // Auto-open fare dialog when screen loads
+    // Announce fare when screen loads (but don't auto-open dialog)
     useEffect(() => {
-        const timer = setTimeout(() => {
-            onOpenFareDialog()
-            speakAction(`Your estimated fare is ${fare} rupees`)
-        }, 300)
-        return () => clearTimeout(timer)
+        speakAction(`Your estimated fare is ${fare} rupees`)
     }, [])
 
     // Detect when panel is expanded (height > 75%)
@@ -76,6 +77,57 @@ export function SelectVehicleScreen({
         onCancel()
         speakAction('Cancelled')
     }
+
+    // Mouse drag handlers for horizontal scrolling
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!scrollContainerRef.current) return
+        setIsDragging(true)
+        hasDraggedRef.current = false
+        setStartX(e.pageX - scrollContainerRef.current.offsetLeft)
+        setScrollLeft(scrollContainerRef.current.scrollLeft)
+    }
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!isDragging || !scrollContainerRef.current) return
+        e.preventDefault()
+        hasDraggedRef.current = true
+        const x = e.pageX - scrollContainerRef.current.offsetLeft
+        const walk = (x - startX) * 2 // Scroll speed multiplier
+        scrollContainerRef.current.scrollLeft = scrollLeft - walk
+    }
+
+    const handleMouseUp = () => {
+        setIsDragging(false)
+    }
+
+    const handleMouseLeave = () => {
+        setIsDragging(false)
+    }
+
+    // Global mouse event handlers for smooth dragging
+    useEffect(() => {
+        const handleGlobalMouseMove = (e: MouseEvent) => {
+            if (!isDragging || !scrollContainerRef.current) return
+            e.preventDefault()
+            hasDraggedRef.current = true
+            const x = e.pageX - scrollContainerRef.current.offsetLeft
+            const walk = (x - startX) * 2
+            scrollContainerRef.current.scrollLeft = scrollLeft - walk
+        }
+
+        const handleGlobalMouseUp = () => {
+            setIsDragging(false)
+        }
+
+        if (isDragging) {
+            document.addEventListener('mousemove', handleGlobalMouseMove)
+            document.addEventListener('mouseup', handleGlobalMouseUp)
+            return () => {
+                document.removeEventListener('mousemove', handleGlobalMouseMove)
+                document.removeEventListener('mouseup', handleGlobalMouseUp)
+            }
+        }
+    }, [isDragging, startX, scrollLeft])
 
 
     return (
@@ -152,32 +204,61 @@ export function SelectVehicleScreen({
 
                         {/* Horizontal view (collapsed) */}
                         {!isExpanded && (
-                            <div className="flex gap-3 justify-center overflow-x-auto pb-2 scrollbar-hide">
-                                {vehicles.map((v) => {
-                                    const active = vehicle === v.id
-                                    return (
-                                        <button
-                                            key={v.id}
-                                            onClick={() => handleVehicleSelect(v.id)}
-                                            className={`flex min-w-[70px] flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-all duration-200 active:scale-95 ${active
-                                                ? 'border-primary bg-primary/10 shadow-md scale-105'
-                                                : 'border-gray-200 bg-white hover:border-primary/40 hover:scale-102'
-                                                }`}
-                                        >
-                                            <div className={`grid size-14 place-items-center rounded-xl transition-all duration-200 ${active ? 'bg-primary/20 scale-110' : 'bg-gray-50'
-                                                }`}>
-                                                <AppIcon
-                                                    name={v.icon}
-                                                    className={`text-3xl transition-all duration-200 ${active ? 'text-primary scale-110' : 'text-gray-500'}`}
-                                                />
-                                            </div>
-                                            <span className={`text-xs font-semibold transition-colors duration-200 ${active ? 'text-primary' : 'text-gray-500'
-                                                }`}>
-                                                {v.label}
-                                            </span>
-                                        </button>
-                                    )
-                                })}
+                            <div 
+                                ref={scrollContainerRef}
+                                onMouseDown={handleMouseDown}
+                                onMouseMove={handleMouseMove}
+                                onMouseUp={handleMouseUp}
+                                onMouseLeave={handleMouseLeave}
+                                className={`w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide scroll-smooth -mx-6 px-6 ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                                style={{ 
+                                    scrollbarWidth: 'none', 
+                                    msOverflowStyle: 'none',
+                                    WebkitOverflowScrolling: 'touch',
+                                    touchAction: 'pan-x pinch-zoom',
+                                    userSelect: 'none'
+                                }}
+                            >
+                                <div className="flex gap-3" style={{ width: 'max-content' }}>
+                                    {vehicles.map((v) => {
+                                        const active = vehicle === v.id
+                                        return (
+                                            <button
+                                                key={v.id}
+                                                onClick={(e) => {
+                                                    // Prevent click if we were dragging
+                                                    if (hasDraggedRef.current) {
+                                                        e.preventDefault()
+                                                        e.stopPropagation()
+                                                        hasDraggedRef.current = false
+                                                        return
+                                                    }
+                                                    handleVehicleSelect(v.id)
+                                                }}
+                                                className={`flex w-[80px] flex-shrink-0 flex-col items-center gap-1.5 rounded-2xl border-2 p-3 transition-all duration-200 hover-lift ${!isDragging ? 'active:animate-button-press' : ''} ${active
+                                                    ? 'border-primary bg-primary/10 shadow-md scale-105'
+                                                    : 'border-gray-200 bg-white hover:border-primary/40'
+                                                    }`}
+                                            >
+                                                <div className={`grid size-14 place-items-center rounded-xl transition-all duration-200 ${active ? 'bg-primary/20 scale-110' : 'bg-gray-50'
+                                                    }`}>
+                                                    <AppIcon
+                                                        name={v.icon}
+                                                        className={`text-3xl transition-all duration-200 ${active ? 'text-primary scale-110' : 'text-gray-500'}`}
+                                                    />
+                                                </div>
+                                                <span className={`text-xs font-semibold transition-colors duration-200 ${active ? 'text-primary' : 'text-gray-500'
+                                                    }`}>
+                                                    {v.label}
+                                                </span>
+                                                <span className={`text-[10px] font-bold transition-colors duration-200 ${active ? 'text-primary' : 'text-gray-600'
+                                                    }`}>
+                                                    PKR {v.fare}
+                                                </span>
+                                            </button>
+                                        )
+                                    })}
+                                </div>
                             </div>
                         )}
 
@@ -190,7 +271,7 @@ export function SelectVehicleScreen({
                                         <button
                                             key={v.id}
                                             onClick={() => handleVehicleSelect(v.id)}
-                                            className={`w-full flex items-center gap-4 rounded-2xl border-2 p-4 transition-all duration-200 active:scale-98 ${active
+                                            className={`w-full flex items-center gap-4 rounded-2xl border-2 p-4 transition-all duration-200 hover-lift active:animate-button-press ${active
                                                 ? 'border-primary bg-primary/10 shadow-md'
                                                 : 'border-gray-200 bg-white hover:border-primary/40'
                                                 }`}
@@ -224,7 +305,7 @@ export function SelectVehicleScreen({
                         {/* Pull up hint when collapsed */}
                         {!isExpanded && (
                             <p className="text-center text-xs text-gray-400 mt-3">
-                                Pull up to see all vehicles with fares
+                                Pull up to see detailed vehicle information
                             </p>
                         )}
                     </div>
@@ -269,17 +350,17 @@ export function SelectVehicleScreen({
                         </div>
                     </button>
 
-                    {/* Action Buttons */}
+                    {/* Action Buttons - Enhanced with better feedback */}
                     <div className="flex gap-3">
                         <button
                             onClick={handleCancelClick}
-                            className="flex-1 rounded-[7px] border-[1.172px] border-[#ff4141] bg-[#ff544a] px-6 py-4 text-[19.931px] font-extrabold text-white transition-all duration-200 hover:bg-[#ff3d33] hover:shadow-lg hover:scale-102 active:scale-98 min-h-[52px]"
+                            className="flex-1 rounded-[7px] border-[1.172px] border-[#ff4141] bg-[#ff544a] px-6 py-4 text-[19.931px] font-extrabold text-white transition-all duration-200 hover:bg-[#ff3d33] hover:shadow-lg hover-lift active:animate-button-press min-h-[52px]"
                         >
                             CANCEL
                         </button>
                         <button
                             onClick={onConfirm}
-                            className="flex-1 rounded-[7px] bg-primary px-6 py-4 text-[19.931px] font-extrabold text-white shadow-[3.517px_3.517px_0px_0px_rgba(50,153,29,0.38)] transition-all duration-200 hover:bg-primary-dark hover:shadow-[4px_4px_0px_0px_rgba(50,153,29,0.38)] hover:scale-102 active:scale-98 min-h-[52px]"
+                            className="flex-1 rounded-[7px] bg-primary px-6 py-4 text-[19.931px] font-extrabold text-white shadow-[3.517px_3.517px_0px_0px_rgba(50,153,29,0.38)] transition-all duration-200 hover:bg-primary-dark hover:shadow-[4px_4px_0px_0px_rgba(50,153,29,0.38)] hover-lift active:animate-button-press min-h-[52px]"
                         >
                             CONFIRM
                         </button>

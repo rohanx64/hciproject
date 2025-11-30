@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { AppIcon } from './AppIcon'
+import { useTheme } from '../contexts/ThemeContext'
 
 // Fix for default marker icons in Leaflet
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
@@ -17,30 +18,30 @@ L.Icon.Default.mergeOptions({
     shadowUrl: markerShadow,
 })
 
-// Custom green marker icon for pickup location
+// Custom green marker icon for pickup location - Minimalist style
 const pickupIcon = new L.Icon({
     iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="46" viewBox="0 0 32 46">
-            <path fill="#6cc44a" stroke="#fff" stroke-width="2" d="M16 1c-7.732 0-14 6.268-14 14 0 10.5 14 26 14 26s14-15.5 14-26c0-7.732-6.268-14-14-14z"/>
-            <circle cx="16" cy="15" r="6" fill="#fff"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="#34C759" stroke="#fff" stroke-width="2"/>
+            <circle cx="12" cy="12" r="5" fill="#fff"/>
         </svg>
     `),
-    iconSize: [40, 58],
-    iconAnchor: [20, 58],
-    popupAnchor: [0, -58],
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12],
 })
 
-// Custom pink marker icon for dropoff location
+// Custom red marker icon for dropoff location - Minimalist style
 const dropoffIcon = new L.Icon({
     iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="46" viewBox="0 0 32 46">
-            <path fill="#f06292" stroke="#fff" stroke-width="2" d="M16 1c-7.732 0-14 6.268-14 14 0 10.5 14 26 14 26s14-15.5 14-26c0-7.732-6.268-14-14-14z"/>
-            <circle cx="16" cy="15" r="6" fill="#fff"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="#FF3B30" stroke="#fff" stroke-width="2"/>
+            <circle cx="12" cy="12" r="5" fill="#fff"/>
         </svg>
     `),
-    iconSize: [40, 58],
-    iconAnchor: [20, 58],
-    popupAnchor: [0, -58],
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -12],
 })
 
 interface RideMapProps {
@@ -57,32 +58,30 @@ interface RideMapProps {
     zoomLevel?: number
 }
 
-// Custom marker icon for selected pickup location (green)
+// Custom marker icon for selected pickup location (green) - Minimalist style
 const selectedPickupIcon = new L.Icon({
     iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="56" viewBox="0 0 40 56">
-            <path fill="#6cc44a" stroke="#fff" stroke-width="3" d="M20 2c-8.837 0-16 7.163-16 16 0 12 16 30 16 30s16-18 16-30c0-8.837-7.163-16-16-16z"/>
-            <circle cx="20" cy="18" r="8" fill="#fff"/>
-            <circle cx="20" cy="18" r="4" fill="#6cc44a"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+            <circle cx="16" cy="16" r="14" fill="#34C759" stroke="#fff" stroke-width="3"/>
+            <circle cx="16" cy="16" r="7" fill="#fff"/>
         </svg>
     `),
-    iconSize: [48, 68],
-    iconAnchor: [24, 68],
-    popupAnchor: [0, -68],
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16],
 })
 
-// Custom marker icon for selected dropoff location (red)
+// Custom marker icon for selected dropoff location (red) - Minimalist style
 const selectedDropoffIcon = new L.Icon({
     iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="56" viewBox="0 0 40 56">
-            <path fill="#ff3b30" stroke="#fff" stroke-width="3" d="M20 2c-8.837 0-16 7.163-16 16 0 12 16 30 16 30s16-18 16-30c0-8.837-7.163-16-16-16z"/>
-            <circle cx="20" cy="18" r="8" fill="#fff"/>
-            <circle cx="20" cy="18" r="4" fill="#ff3b30"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+            <circle cx="16" cy="16" r="14" fill="#FF3B30" stroke="#fff" stroke-width="3"/>
+            <circle cx="16" cy="16" r="7" fill="#fff"/>
         </svg>
     `),
-    iconSize: [48, 68],
-    iconAnchor: [24, 68],
-    popupAnchor: [0, -68],
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16],
 })
 
 export function RideMap({
@@ -96,12 +95,13 @@ export function RideMap({
     onDragEnd,
     mapRef: externalMapRef,
     showDefaultPickupMarker = false, // Hide default pickup marker by default
-    zoomLevel = 16,
+    zoomLevel = 20,
 }: RideMapProps) {
     const internalMapRef = useRef<L.Map | null>(null)
     const mapRef = externalMapRef || internalMapRef
     const interactionActiveRef = useRef(false)
     const [mapReady, setMapReady] = useState(false)
+    const { resolvedTheme } = useTheme()
 
     // Set up event listeners when map is ready and callbacks change
     useEffect(() => {
@@ -197,8 +197,12 @@ export function RideMap({
                 }}
             >
                 <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                    url={
+                        resolvedTheme === 'dark'
+                            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                            : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+                    }
                 />
 
                 {/* Pickup Marker - Only show if explicitly requested */}

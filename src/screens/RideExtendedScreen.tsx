@@ -32,7 +32,7 @@ export function RideExtendedScreen({ dropoffLabel, onEditDropoff, recentLocation
                     onClick={() => onNavigate?.('Settings')}
                 >
                     <div className="h-full w-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
-                        <span className="text-2xl text-white font-bold">U</span>
+                        <span className="text-2xl text-white font-bold">R</span>
                     </div>
                 </button>
 

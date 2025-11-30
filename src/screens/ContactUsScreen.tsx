@@ -75,7 +75,7 @@ export function ContactUsScreen({ onBack }: ContactUsScreenProps) {
                                 <AppIcon name="📧" className="text-2xl text-primary" />
                                 <div>
                                     <p className="text-sm text-gray-500">Email</p>
-                                    <p className="text-base text-text-dark">support@bykea.com</p>
+                                    <p className="text-base text-text-dark">support@air.com</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">

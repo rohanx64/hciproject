@@ -1,10 +1,12 @@
 import { useEffect } from 'react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 interface SplashScreenProps {
     onContinue: () => void
 }
 
 export function SplashScreen({ onContinue }: SplashScreenProps) {
+    const { t } = useLanguage()
     useEffect(() => {
         // Auto-advance after 2 seconds
         const timer = setTimeout(() => {
@@ -53,7 +55,7 @@ export function SplashScreen({ onContinue }: SplashScreenProps) {
 
                 {/* Tagline */}
                 <h1 className="text-3xl font-extrabold text-white text-center mb-8">
-                    Better Than Bykea
+                    {t('Your Ride, Your Way')}
                 </h1>
             </div>
 

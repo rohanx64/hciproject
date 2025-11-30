@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { assets } from '../constants/assets'
 import { AppIcon } from '../components/AppIcon'
+import { RideMap } from '../components/RideMap'
 
 interface SearchingRidesProps {
     dropoffLabel: string
@@ -29,8 +30,10 @@ export function SearchingRidesScreen({ dropoffLabel, onRidesFound }: SearchingRi
     return (
         <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px]">
             <section className="relative h-[560px] overflow-hidden">
-                <img src={assets.mapBase} alt="Map" className="absolute inset-0 h-full w-full object-cover" />
-                <img src={assets.mapOverlay} alt="" className="absolute inset-0 h-full w-full object-cover opacity-95" />
+                <RideMap
+                    pickupLocation={[24.8607, 67.0011]}
+                    className="h-full w-full"
+                />
 
                 {/* Animated pulse overlay */}
                 <div className="absolute inset-0 bg-primary/5 animate-pulse" />

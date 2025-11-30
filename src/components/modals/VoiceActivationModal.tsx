@@ -88,7 +88,7 @@ export function VoiceActivationModal({ onClose, onProceed }: VoiceActivationModa
 
                         <div className="mb-6">
                             <p className="text-base text-gray-700 mb-4">
-                                This feature helps users with physical disabilities or difficulty operating mobile phones to use Bykea through voice commands.
+                                This feature helps users with physical disabilities or difficulty operating mobile phones to use AIR through voice commands.
                             </p>
                             <div className="bg-green-50 rounded-xl p-4 border-2 border-primary/20">
                                 <p className="text-sm font-semibold text-primary mb-2">Default Script:</p>

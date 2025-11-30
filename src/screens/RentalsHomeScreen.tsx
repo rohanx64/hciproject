@@ -42,6 +42,15 @@ export function RentalsHomeScreen({
     const [paymentMethod] = useState('Cash')
     const [selectedPickupLocation, setSelectedPickupLocation] = useState<[number, number] | null>(null)
     const mapRef = useRef<L.Map | null>(null)
+    const panelContentRef = useRef<HTMLDivElement>(null)
+    const isMapDraggingRef = useRef(false)
+    
+    // Horizontal scroll refs for location buttons
+    const favoritePlacesScrollRef = useRef<HTMLDivElement>(null)
+    const [isDraggingFavorites, setIsDraggingFavorites] = useState(false)
+    const [startXFavorites, setStartXFavorites] = useState(0)
+    const [scrollLeftFavorites, setScrollLeftFavorites] = useState(0)
+    const hasDraggedFavoritesRef = useRef(false)
 
     // Calculate button position in pixels based on panel height percentage
     // Use window.innerHeight to match DraggablePanel
@@ -53,6 +62,48 @@ export function RentalsHomeScreen({
         return () => window.removeEventListener('resize', handleResize)
     }, [])
 
+    // Calculate optimal panel height based on content
+    useEffect(() => {
+        if (!panelContentRef.current || isMapDraggingRef.current) return
+        
+        const calculateOptimalHeight = () => {
+            // Skip calculation if map is being dragged
+            if (isMapDraggingRef.current) return
+            
+            const content = panelContentRef.current
+            if (!content) return
+            
+            const contentHeight = content.scrollHeight
+            const padding = 48
+            const totalNeededHeight = contentHeight + padding
+            
+            const bottomNavHeight = 110
+            const availableHeight = containerHeight - bottomNavHeight
+            const optimalPercent = Math.min(82, Math.max(30, (totalNeededHeight / availableHeight) * 100))
+            
+            if (Math.abs(panelHeight - optimalPercent) > 2) {
+                setPanelHeight(optimalPercent)
+                setPanelMinHeight(Math.max(PANEL_BASE_MIN_HEIGHT, optimalPercent * 0.7))
+            }
+        }
+        
+        const timeoutId = setTimeout(calculateOptimalHeight, 100)
+        const observer = new ResizeObserver(() => {
+            if (!isMapDraggingRef.current) {
+                calculateOptimalHeight()
+            }
+        })
+        
+        if (panelContentRef.current) {
+            observer.observe(panelContentRef.current)
+        }
+        
+        return () => {
+            clearTimeout(timeoutId)
+            observer.disconnect()
+        }
+    }, [containerHeight, panelHeight])
+
     const bottomNavHeight = 110
     const availableHeight = containerHeight - bottomNavHeight
     const panelHeightPixels = (panelHeight / 100) * availableHeight
@@ -63,6 +114,7 @@ export function RentalsHomeScreen({
     }
 
     const handleMapDragStart = () => {
+        isMapDraggingRef.current = true
         if (panelHeightBeforeDragRef.current === null) {
             panelHeightBeforeDragRef.current = panelHeight
         }
@@ -72,6 +124,7 @@ export function RentalsHomeScreen({
 
     const handleMapDragEnd = () => {
         setTimeout(() => {
+            isMapDraggingRef.current = false
             const fallback = Math.max(panelHeightBeforeDragRef.current ?? (showPickupSelection ? 36 : 68), PANEL_BASE_MIN_HEIGHT)
             panelHeightBeforeDragRef.current = null
             setPanelMinHeight(PANEL_BASE_MIN_HEIGHT)
@@ -131,14 +184,21 @@ export function RentalsHomeScreen({
                 {/* White gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-transparent to-transparent pointer-events-none z-10" />
 
-                {/* Profile Avatar - Consistent across all screens */}
+                {/* Profile Avatar - Enhanced with better affordance */}
                 <button
-                    className="absolute left-[4.26%] top-[7.64%] size-[58px] overflow-hidden rounded-[30px] border-2 border-white shadow-lg z-20 hover:scale-105 active:scale-95 transition-all duration-200"
-                    aria-label="Profile"
+                    className="absolute left-[4.26%] top-[7.64%] size-[58px] overflow-hidden rounded-[30px] border-2 border-white shadow-lg z-20 hover:scale-105 hover-lift active:animate-button-press transition-all duration-200 group"
+                    aria-label="Open menu"
                     onClick={() => onOpenSidebar?.()}
+                    title="Tap to open menu"
                 >
-                    <div className="h-full w-full bg-gradient-to-br from-[#ffd900] to-[#e6c400] flex items-center justify-center">
-                        <span className="text-2xl text-white font-bold">U</span>
+                    <div className="h-full w-full bg-gradient-to-br from-[#ffd900] to-[#e6c400] flex items-center justify-center relative">
+                        <span className="text-2xl text-white font-bold">R</span>
+                        {/* Enhanced indicator for pullable area - More visible */}
+                        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-1 opacity-70 group-hover:opacity-100 transition-all duration-200 group-hover:scale-110">
+                            <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
+                        </div>
                     </div>
                 </button>
 
@@ -189,12 +249,15 @@ export function RentalsHomeScreen({
 
                 {/* Voice Button - Combined mic + Voice label, aligned with location button */}
                 <button
-                    style={{ bottom: `${buttonBottomPixels}px` }}
+                    style={{ 
+                        bottom: `${buttonBottomPixels}px`,
+                        transition: 'bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
                     onClick={onOpenVoiceActivation}
-                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary active:scale-95 transition-all duration-200 ease-out"
+                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary hover-lift active:animate-button-press transition-colors duration-200 ease-out"
                     aria-label="Voice input"
                 >
-                    <svg className="w-5 h-5 text-white animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-white animate-subtle-pulse" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2a3 3 0 013 3v6a3 3 0 01-6 0V5a3 3 0 013-3z" />
                         <path d="M19 10v1a7 7 0 01-14 0v-1a1 1 0 012 0v1a5 5 0 0010 0v-1a1 1 0 012 0z" />
                         <path d="M12 18.5a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 01-3 0v-3a1.5 1.5 0 011.5-1.5z" />
@@ -204,8 +267,11 @@ export function RentalsHomeScreen({
 
                 {/* Location Button - Dynamically positioned above panel */}
                 <button
-                    style={{ bottom: `${buttonBottomPixels}px` }}
-                    className="fixed right-[5.26%] px-4 py-3 rounded-full bg-white/95 border-2 border-[#ffd900] text-[#a47f00] font-semibold shadow-lg flex items-center gap-2 z-[600] hover:bg-[#ffd900] hover:text-white hover:shadow-xl active:scale-95 transition-all duration-200 ease-out"
+                    style={{ 
+                        bottom: `${buttonBottomPixels}px`,
+                        transition: 'bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}
+                    className="fixed right-[5.26%] px-4 py-3 rounded-full bg-white/95 border-2 border-[#ffd900] text-[#a47f00] font-semibold shadow-lg flex items-center gap-2 z-[600] hover:bg-[#ffd900] hover:text-white hover-lift active:animate-button-press transition-colors duration-200 ease-out"
                     aria-label="Use current location"
                     onClick={() => {
                         if (navigator.geolocation) {
@@ -276,9 +342,9 @@ export function RentalsHomeScreen({
                 onHeightChange={setPanelHeight}
                 hideBottomNav={false}
             >
-                <div className="px-6 pb-2">
+                <div ref={panelContentRef} className="px-6 pb-2">
                     {/* Rentals Title - Top left */}
-                    <h1 className="font-display text-[32px] font-normal text-[#ffd900] text-left mb-3 mt-2">
+                    <h1 className="font-display text-[32px] font-extrabold text-[#ffd900] text-left mb-3 mt-2">
                         Rentals
                     </h1>
 
@@ -289,17 +355,54 @@ export function RentalsHomeScreen({
                                 SELECT PICKUP LOCATION
                             </p>
 
-                            {/* Suggested Location Tags */}
-                            <div className="flex flex-wrap gap-2">
-                                {favoritePlaces.map((place, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => handleLocationClick(place)}
-                                        className="min-h-[44px] px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 hover:border-[#ffd900] hover:shadow-sm active:scale-95 transition-all duration-200 ease-out"
-                                    >
-                                        {place}
-                                    </button>
-                                ))}
+                            {/* Suggested Location Tags - Horizontal Scrollable */}
+                            <div 
+                                ref={favoritePlacesScrollRef}
+                                onMouseDown={(e) => {
+                                    if (!favoritePlacesScrollRef.current) return
+                                    setIsDraggingFavorites(true)
+                                    hasDraggedFavoritesRef.current = false
+                                    setStartXFavorites(e.pageX - favoritePlacesScrollRef.current.offsetLeft)
+                                    setScrollLeftFavorites(favoritePlacesScrollRef.current.scrollLeft)
+                                }}
+                                onMouseMove={(e) => {
+                                    if (!isDraggingFavorites || !favoritePlacesScrollRef.current) return
+                                    e.preventDefault()
+                                    hasDraggedFavoritesRef.current = true
+                                    const x = e.pageX - favoritePlacesScrollRef.current.offsetLeft
+                                    const walk = (x - startXFavorites) * 2
+                                    favoritePlacesScrollRef.current.scrollLeft = scrollLeftFavorites - walk
+                                }}
+                                onMouseUp={() => setIsDraggingFavorites(false)}
+                                onMouseLeave={() => setIsDraggingFavorites(false)}
+                                className={`w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide scroll-smooth -mx-6 px-6 ${isDraggingFavorites ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                                style={{ 
+                                    scrollbarWidth: 'none', 
+                                    msOverflowStyle: 'none',
+                                    WebkitOverflowScrolling: 'touch',
+                                    touchAction: 'pan-x pinch-zoom',
+                                    userSelect: 'none'
+                                }}
+                            >
+                                <div className="flex gap-2" style={{ width: 'max-content' }}>
+                                    {favoritePlaces.map((place, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={(e) => {
+                                                if (hasDraggedFavoritesRef.current) {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    hasDraggedFavoritesRef.current = false
+                                                    return
+                                                }
+                                                handleLocationClick(place)
+                                            }}
+                                            className="flex-shrink-0 min-h-[44px] px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 hover:border-[#ffd900] hover-lift active:animate-button-press transition-all duration-200 ease-out"
+                                        >
+                                            {place}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </>
                     ) : (
@@ -426,13 +529,13 @@ export function RentalsHomeScreen({
                                         // Cancel - navigate back to previous screen
                                         onNavigate?.('Ride')
                                     }}
-                                    className="flex-1 rounded-[7px] border-[1.172px] border-[#ff4141] bg-[#ff544a] px-6 py-4 text-[19.931px] font-extrabold text-white transition-all duration-200 hover:bg-[#ff3d33] hover:shadow-lg hover:scale-102 active:scale-98 min-h-[52px]"
+                                    className="flex-1 rounded-[7px] border-[1.172px] border-[#ff4141] bg-[#ff544a] px-6 py-4 text-[19.931px] font-extrabold text-white transition-all duration-200 hover:bg-[#ff3d33] hover-lift active:animate-button-press min-h-[52px]"
                                 >
                                     CANCEL
                                 </button>
                                 <button
                                     onClick={() => onProceedToConfirm(selectedHours, selectedVehicle)}
-                                    className="flex-1 rounded-[7px] bg-[#32991d] px-6 py-4 text-[19.931px] font-extrabold text-white shadow-[3.517px_3.517px_0px_0px_rgba(50,153,29,0.38)] transition-all duration-200 hover:bg-[#2a7f16] hover:shadow-[4px_4px_0px_0px_rgba(50,153,29,0.38)] hover:scale-102 active:scale-98 min-h-[52px]"
+                                    className="flex-1 rounded-[7px] bg-[#32991d] px-6 py-4 text-[19.931px] font-extrabold text-white shadow-[3.517px_3.517px_0px_0px_rgba(50,153,29,0.38)] transition-all duration-200 hover:bg-[#2a7f16] hover:shadow-[4px_4px_0px_0px_rgba(50,153,29,0.38)] hover-lift active:animate-button-press min-h-[52px]"
                                 >
                                     CONFIRM
                                 </button>

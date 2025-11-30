@@ -73,7 +73,7 @@ export function DeliveryMapScreen({
                     aria-label="Profile"
                 >
                     <div className="h-full w-full bg-gradient-to-br from-[#ff9500] to-[#e68600] flex items-center justify-center">
-                        <span className="text-2xl text-white font-bold">U</span>
+                        <span className="text-2xl text-white font-bold">R</span>
                     </div>
                 </button>
 

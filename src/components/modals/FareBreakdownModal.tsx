@@ -17,8 +17,8 @@ export function FareBreakdownModal({ fare, items, onConfirm, onClose }: FareBrea
                     <span className="text-[#8d95a8]">PKR</span> {fare}
                 </p>
             </div>
-            <div className="mt-4 rounded-2xl bg-primary px-4 py-3 text-center text-white shadow-card">
-                <button className="text-lg font-extrabold uppercase tracking-widest" onClick={onConfirm}>
+            <div className="mt-4 rounded-2xl bg-primary px-4 py-3 text-center text-white shadow-card hover-lift active:animate-button-press transition-all duration-200">
+                <button className="text-lg font-extrabold uppercase tracking-widest w-full" onClick={onConfirm}>
                     Confirm
                 </button>
             </div>
@@ -36,7 +36,7 @@ export function FareBreakdownModal({ fare, items, onConfirm, onClose }: FareBrea
                     ))}
                 </div>
             </div>
-            <button className="mt-6 w-full text-sm text-[#7d7d7d] hover:text-text-dark transition-colors duration-200" onClick={onClose}>
+            <button className="mt-6 w-full text-sm text-[#7d7d7d] hover:text-text-dark hover-lift active:animate-button-press transition-all duration-200 px-2 py-1 rounded-lg" onClick={onClose}>
                 Close
             </button>
         </div>

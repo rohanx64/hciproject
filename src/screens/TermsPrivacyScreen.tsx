@@ -27,7 +27,7 @@ export function TermsPrivacyScreen({ onBack }: TermsPrivacyScreenProps) {
                     <section>
                         <h2 className="text-lg font-bold mb-3">Terms of Service</h2>
                         <p className="text-base leading-relaxed text-gray-700 mb-4">
-                            Welcome to Bykea. By using our services, you agree to be bound by these Terms of Service.
+                            Welcome to AIR. By using our services, you agree to be bound by these Terms of Service.
                             Please read them carefully.
                         </p>
                         <p className="text-base leading-relaxed text-gray-700 mb-4">
@@ -62,7 +62,7 @@ export function TermsPrivacyScreen({ onBack }: TermsPrivacyScreenProps) {
                         <h2 className="text-lg font-bold mb-3">Contact Us</h2>
                         <p className="text-base leading-relaxed text-gray-700">
                             If you have any questions about these Terms or our Privacy Policy, please contact us
-                            through the app or at support@bykea.com
+                            through the app or at support@air.com
                         </p>
                     </section>
                 </div>
