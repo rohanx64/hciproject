@@ -399,9 +399,9 @@ function App() {
               setScreenBeforeSidebar(null)
             } else {
               // Complete onboarding normally
-              setIsAuthenticated(true)
-              localStorage.setItem('isAuthenticated', 'true')
-              setScreen('home')
+            setIsAuthenticated(true)
+            localStorage.setItem('isAuthenticated', 'true')
+            setScreen('home')
             }
           }}
         />

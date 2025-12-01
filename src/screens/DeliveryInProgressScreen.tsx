@@ -66,17 +66,18 @@ export function DeliveryInProgressScreen({
                             <div className="size-3 rounded-full bg-white animate-pulse"></div>
                         </div>
                     </div>
-                    <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-lg font-bold text-text-dark">{riderName}</h3>
-                            <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <AppIcon key={i} name="★" className="text-yellow-400 text-sm" />
-                                ))}
+                        <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                                <h3 className="text-lg font-bold text-text-dark">{riderName}</h3>
+                                <div className="flex items-center gap-1">
+                                    {[...Array(5)].map((_, i) => (
+                                        <AppIcon key={i} name="★" className="text-yellow-400 text-sm" />
+                                    ))}
+                                </div>
                             </div>
+                            <p className="text-sm text-gray-500">Delivery in progress</p>
+                            <p className="text-xs text-gray-400 mt-0.5">Expected time to arrive: 10–15 minutes</p>
                         </div>
-                        <p className="text-sm text-gray-500">Delivery in progress</p>
-                    </div>
                     <div className="flex gap-2">
                         <button
                             onClick={onChatRider}

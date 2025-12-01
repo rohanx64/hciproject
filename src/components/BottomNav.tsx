@@ -44,7 +44,7 @@ export function BottomNav({ active, onNavigate }: BottomNavProps) {
                                             : 'opacity-60 group-hover:opacity-80'
                                     }`}
                                 />
-                            </span>
+                        </span>
                             <span className={`text-[11px] font-semibold tracking-wide transition-all duration-300 ${
                                 isActive ? 'scale-105' : ''
                             }`}>{translatedLabel}</span>

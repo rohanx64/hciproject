@@ -7,6 +7,39 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""/>
+    <!-- Microsoft Clarity for session replay & heatmaps -->
+    <script type="text/javascript">
+      (function (c, l, a, r, i, t, y) {
+        c[a] =
+          c[a] ||
+          function () {
+            (c[a].q = c[a].q || []).push(arguments)
+          }
+        t = l.createElement(r)
+        t.async = 1
+        t.src = 'https://www.clarity.ms/tag/' + i
+        y = l.getElementsByTagName(r)[0]
+        y.parentNode.insertBefore(t, y)
+      })(window, document, 'clarity', 'script', 'uep3yjhaai')
+    </script>
+    <!-- Smartlook for advanced session replay & heatmaps -->
+    <script type="text/javascript">
+      window.smartlook ||
+        (function (d) {
+          var o = (smartlook = function () {
+              o.api.push(arguments)
+            }),
+            h = d.getElementsByTagName('head')[0]
+          var c = d.createElement('script')
+          o.api = new Array()
+          c.async = true
+          c.type = 'text/javascript'
+          c.charset = 'utf-8'
+          c.src = 'https://web-sdk.smartlook.com/recorder.js'
+          h.appendChild(c)
+        })(document)
+      smartlook('init', 'f7d7aef1e0e93d4ee8431f7eabe3187eac838a00', { region: 'eu' })
+    </script>
     <title>hciproject</title>
   </head>
   <body>

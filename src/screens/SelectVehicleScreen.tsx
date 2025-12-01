@@ -52,7 +52,7 @@ export function SelectVehicleScreen({
 
     // Announce fare when screen loads (but don't auto-open dialog)
     useEffect(() => {
-        speakAction(`Your estimated fare is ${fare} rupees`)
+            speakAction(`Your estimated fare is ${fare} rupees`)
     }, [])
 
     // Detect when panel is expanded (height > 75%)
@@ -220,11 +220,11 @@ export function SelectVehicleScreen({
                                 }}
                             >
                                 <div className="flex gap-3" style={{ width: 'max-content' }}>
-                                    {vehicles.map((v) => {
-                                        const active = vehicle === v.id
-                                        return (
-                                            <button
-                                                key={v.id}
+                                {vehicles.map((v) => {
+                                    const active = vehicle === v.id
+                                    return (
+                                        <button
+                                            key={v.id}
                                                 onClick={(e) => {
                                                     // Prevent click if we were dragging
                                                     if (hasDraggedRef.current) {
@@ -236,28 +236,28 @@ export function SelectVehicleScreen({
                                                     handleVehicleSelect(v.id)
                                                 }}
                                                 className={`flex w-[80px] flex-shrink-0 flex-col items-center gap-1.5 rounded-2xl border-2 p-3 transition-all duration-200 hover-lift ${!isDragging ? 'active:animate-button-press' : ''} ${active
-                                                    ? 'border-primary bg-primary/10 shadow-md scale-105'
+                                                ? 'border-primary bg-primary/10 shadow-md scale-105'
                                                     : 'border-gray-200 bg-white hover:border-primary/40'
-                                                    }`}
-                                            >
-                                                <div className={`grid size-14 place-items-center rounded-xl transition-all duration-200 ${active ? 'bg-primary/20 scale-110' : 'bg-gray-50'
-                                                    }`}>
-                                                    <AppIcon
-                                                        name={v.icon}
-                                                        className={`text-3xl transition-all duration-200 ${active ? 'text-primary scale-110' : 'text-gray-500'}`}
-                                                    />
-                                                </div>
-                                                <span className={`text-xs font-semibold transition-colors duration-200 ${active ? 'text-primary' : 'text-gray-500'
-                                                    }`}>
-                                                    {v.label}
-                                                </span>
+                                                }`}
+                                        >
+                                            <div className={`grid size-14 place-items-center rounded-xl transition-all duration-200 ${active ? 'bg-primary/20 scale-110' : 'bg-gray-50'
+                                                }`}>
+                                                <AppIcon
+                                                    name={v.icon}
+                                                    className={`text-3xl transition-all duration-200 ${active ? 'text-primary scale-110' : 'text-gray-500'}`}
+                                                />
+                                            </div>
+                                            <span className={`text-xs font-semibold transition-colors duration-200 ${active ? 'text-primary' : 'text-gray-500'
+                                                }`}>
+                                                {v.label}
+                                            </span>
                                                 <span className={`text-[10px] font-bold transition-colors duration-200 ${active ? 'text-primary' : 'text-gray-600'
                                                     }`}>
                                                     PKR {v.fare}
                                                 </span>
-                                            </button>
-                                        )
-                                    })}
+                                        </button>
+                                    )
+                                })}
                                 </div>
                             </div>
                         )}

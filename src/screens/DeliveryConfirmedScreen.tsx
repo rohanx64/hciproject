@@ -82,6 +82,7 @@ export function DeliveryConfirmedScreen({
                             </div>
                         </div>
                         <p className="text-sm text-gray-500">{vehicleType}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">Expected arrival: 5–7 minutes</p>
                     </div>
                     <div className="flex gap-2">
                         <button

@@ -85,6 +85,7 @@ export function DeliveryPickupSelectScreen({ onCancel, onApply, currentLocation 
                         pickupLocation={selectedCoords || [24.8607, 67.0011]}
                         onMapClick={handleMapClick}
                         className="h-full w-full"
+                        showSelectionMarkers={false}
                     />
 
                     {/* Pin for selected location - always centered visually */}

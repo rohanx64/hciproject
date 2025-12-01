@@ -93,7 +93,7 @@ export function FareDialog({ fare, onChangeFare, onConfirm, onViewBreakdown, rec
                             title="Click to edit fare"
                         >
                             {fare}
-                        </span>
+                </span>
                     )}
                 </div>
                 <button

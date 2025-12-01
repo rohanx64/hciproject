@@ -179,6 +179,7 @@ export function RentalsHomeScreen({
                     onDragEnd={handleMapDragEnd}
                     className="h-full w-full"
                     mapRef={mapRef}
+                    showSelectionMarkers={false}
                 />
 
                 {/* White gradient overlay */}
@@ -316,22 +317,7 @@ export function RentalsHomeScreen({
                 </button>
 
                 {/* Location Selection Indicator - Consistent pin style */}
-                {selectedPickupLocation && (
-                    <div className="absolute left-1/2 top-[33.5%] -translate-x-1/2 z-20 pointer-events-none">
-                        <div className="relative">
-                            {/* Pin shadow */}
-                            <div className="absolute inset-0 translate-y-1 bg-black/20 blur-sm rounded-full" />
-                            {/* Pin body - Yellow for rentals */}
-                            <div className="relative size-[269px] rounded-full bg-[#ffd900]/20 flex items-center justify-center">
-                                <div className="size-[67px] rounded-full bg-[#ffd900] flex items-center justify-center shadow-lg">
-                                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                {selectedPickupLocation && null}
             </section>
 
             {/* Draggable Bottom Panel - Standardized initial, expands when pickup selected */}
@@ -385,9 +371,9 @@ export function RentalsHomeScreen({
                                 }}
                             >
                                 <div className="flex gap-2" style={{ width: 'max-content' }}>
-                                    {favoritePlaces.map((place, idx) => (
-                                        <button
-                                            key={idx}
+                                {favoritePlaces.map((place, idx) => (
+                                    <button
+                                        key={idx}
                                             onClick={(e) => {
                                                 if (hasDraggedFavoritesRef.current) {
                                                     e.preventDefault()
@@ -398,10 +384,10 @@ export function RentalsHomeScreen({
                                                 handleLocationClick(place)
                                             }}
                                             className="flex-shrink-0 min-h-[44px] px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 hover:border-[#ffd900] hover-lift active:animate-button-press transition-all duration-200 ease-out"
-                                        >
-                                            {place}
-                                        </button>
-                                    ))}
+                                    >
+                                        {place}
+                                    </button>
+                                ))}
                                 </div>
                             </div>
                         </>

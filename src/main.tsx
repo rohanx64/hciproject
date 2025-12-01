@@ -12,13 +12,13 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <LanguageProvider>
       <AnalyticsProvider>
-        <VoiceFeedbackProvider>
-          <ThemeProvider>
-            <TextSizeProvider>
-              <App />
-            </TextSizeProvider>
-          </ThemeProvider>
-        </VoiceFeedbackProvider>
+    <VoiceFeedbackProvider>
+      <ThemeProvider>
+        <TextSizeProvider>
+          <App />
+        </TextSizeProvider>
+      </ThemeProvider>
+    </VoiceFeedbackProvider>
       </AnalyticsProvider>
     </LanguageProvider>
   </StrictMode>,

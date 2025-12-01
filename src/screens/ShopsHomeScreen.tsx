@@ -111,6 +111,7 @@ export function ShopsHomeScreen({
                     onDragEnd={handleMapDragEnd}
                     className="h-full w-full"
                     mapRef={mapRef}
+                    showSelectionMarkers={false}
                 />
 
                 {/* White gradient overlay */}
@@ -239,23 +240,8 @@ export function ShopsHomeScreen({
                     </div>
                 </button>
 
-                {/* Location Selection Indicator - Consistent pin style */}
-                {selectedLocation && (
-                    <div className="absolute left-1/2 top-[33.5%] -translate-x-1/2 z-20 pointer-events-none">
-                        <div className="relative">
-                            {/* Pin shadow */}
-                            <div className="absolute inset-0 translate-y-1 bg-black/20 blur-sm rounded-full" />
-                            {/* Pin body - Blue for shops */}
-                            <div className="relative size-[269px] rounded-full bg-[#3b82f6]/20 flex items-center justify-center">
-                                <div className="size-[67px] rounded-full bg-[#3b82f6] flex items-center justify-center shadow-lg">
-                                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                {/* Location Selection Indicator removed for cleaner map visuals */}
+                {selectedLocation && null}
             </section>
 
             {/* Draggable Bottom Panel - Standardized initial, expands when category selected */}

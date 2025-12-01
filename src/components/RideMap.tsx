@@ -56,6 +56,7 @@ interface RideMapProps {
     mapRef?: React.MutableRefObject<L.Map | null> // Ref to expose map instance
     showDefaultPickupMarker?: boolean // Option to hide default pickup marker
     zoomLevel?: number
+    showSelectionMarkers?: boolean // Show markers for user selections (pickup/dropoff)
 }
 
 // Custom marker icon for selected pickup location (green) - Minimalist style
@@ -96,6 +97,7 @@ export function RideMap({
     mapRef: externalMapRef,
     showDefaultPickupMarker = false, // Hide default pickup marker by default
     zoomLevel = 20,
+    showSelectionMarkers = true,
 }: RideMapProps) {
     const internalMapRef = useRef<L.Map | null>(null)
     const mapRef = externalMapRef || internalMapRef
@@ -236,7 +238,7 @@ export function RideMap({
                 )}
 
                 {/* Selected Pickup Location Marker */}
-                {selectedPickupLocation && (
+                {showSelectionMarkers && selectedPickupLocation && (
                     <Marker position={selectedPickupLocation} icon={selectedPickupIcon}>
                         <Popup className="custom-popup">
                             <div className="text-center">
@@ -250,7 +252,7 @@ export function RideMap({
                 )}
 
                 {/* Selected Dropoff Location Marker */}
-                {selectedDropoffLocation && (
+                {showSelectionMarkers && selectedDropoffLocation && (
                     <Marker position={selectedDropoffLocation} icon={selectedDropoffIcon}>
                         <Popup className="custom-popup">
                             <div className="text-center">

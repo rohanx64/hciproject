@@ -73,7 +73,10 @@ export function SearchingRidesScreen({ dropoffLabel, onRidesFound }: SearchingRi
             <section className="bg-white px-6 pb-8 pt-6">
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <p className="text-2xl font-display font-semibold text-text-dark">Finding your ride</p>
+                        <div>
+                            <p className="text-2xl font-display font-semibold text-text-dark">Finding your ride</p>
+                            <p className="text-xs text-gray-500 mt-1">Expected time: 30–60 seconds</p>
+                        </div>
                         <div className="flex gap-1">
                             <span className="size-2 rounded-full bg-primary animate-bounce" />
                             <span className="size-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.2s' }} />
