@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
+import { collection, query, orderBy, limit, getDocs, deleteDoc, doc } from 'firebase/firestore'
 import { db } from '../../firebase.config'
 import type { Session, ScreenFlowEntry, AnalyticsEvent } from '../../contexts/AnalyticsContext'
 import type { Screen } from '../../types'
@@ -67,6 +67,7 @@ export function AnalyticsDashboard() {
   const [sessions, setSessions] = useState<SessionListItem[]>([])
   const [selectedSession, setSelectedSession] = useState<SessionListItem | null>(null)
   const [selectedScreen, setSelectedScreen] = useState<ScreenFlowEntry | null>(null)
+  // Local toggle for showing per-session click heatmap overlay inside Replay tab
   const [heatmapMode, setHeatmapMode] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [stats, setStats] = useState({
@@ -87,7 +88,40 @@ export function AnalyticsDashboard() {
     avgClicksPerSession: 0,
     avgScreensPerSession: 0,
   })
+  const [showAllSessions, setShowAllSessions] = useState(false)
   const replayContainerRef = useRef<HTMLDivElement>(null)
+
+  const visibleSessions = showAllSessions ? sessions : sessions.slice(0, 20)
+
+  const handleDeleteSession = async (sessionId: string) => {
+    try {
+      await deleteDoc(doc(db, 'sessions', sessionId))
+      setSessions((prev) => prev.filter((s) => s.id !== sessionId))
+      if (selectedSession?.id === sessionId) {
+        setSelectedSession(null)
+        setSelectedScreen(null)
+      }
+    } catch (error) {
+      console.error('Failed to delete session:', error)
+    }
+  }
+
+  const handleDeleteAllSessions = async () => {
+    if (sessions.length === 0) return
+    const confirmDelete = window.confirm(
+      `Delete all ${sessions.length} session logs from analytics? This cannot be undone.`
+    )
+    if (!confirmDelete) return
+
+    try {
+      await Promise.all(sessions.map((s) => deleteDoc(doc(db, 'sessions', s.id))))
+      setSessions([])
+      setSelectedSession(null)
+      setSelectedScreen(null)
+    } catch (error) {
+      console.error('Failed to delete all sessions:', error)
+    }
+  }
 
   // Fetch sessions from Firestore
   useEffect(() => {
@@ -296,14 +330,16 @@ export function AnalyticsDashboard() {
     return `${days}d ago`
   }
 
-  // Get all clicks for heatmap from ALL sessions and ALL users for a specific screen
+  // Get all mouse-move points for heatmap from ALL sessions and ALL users for a specific screen
+  // This lets us visualize continuous cursor activity, not just discrete clicks.
   const getHeatmapClicks = (screenName?: string): Array<{ x: number; y: number; intensity: number }> => {
     const targetScreen = screenName || selectedScreen?.screenName
     if (!targetScreen) return []
 
-    const clickMap = new Map<string, { x: number; y: number; count: number }>()
+    const moveMap = new Map<string, { x: number; y: number; count: number }>()
 
-    // Aggregate clicks from ALL sessions for this screen
+    // Aggregate mouse moves from ALL sessions for this screen.
+    // Coordinates are stored normalized [0,1] from AnalyticsContext.
     sessions.forEach((session) => {
       // Find all screens with the same name across all sessions
       const matchingScreens = session.screenFlow.filter(
@@ -314,24 +350,34 @@ export function AnalyticsDashboard() {
         // Ensure events is an array
         const events = Array.isArray(screen.events) ? screen.events : []
         events
-          .filter((e) => e && e.type === 'click' && typeof e.x === 'number' && typeof e.y === 'number')
-          .forEach((click) => {
-            // Use smaller grid for more precise heatmap (8px grid for smoother visualization)
-            const gridX = Math.round(click.x / 8) * 8
-            const gridY = Math.round(click.y / 8) * 8
+          .filter(
+            (e) =>
+              e &&
+              e.type === 'move' &&
+              typeof e.x === 'number' &&
+              typeof e.y === 'number' &&
+              e.x >= 0 &&
+              e.x <= 1 &&
+              e.y >= 0 &&
+              e.y <= 1
+          )
+          .forEach((move) => {
+            // Bucket normalized space into a 50x50 grid for smoother visualization
+            const gridX = Math.round(move.x * 50) / 50
+            const gridY = Math.round(move.y * 50) / 50
             const key = `${gridX},${gridY}`
 
-            const existing = clickMap.get(key)
+            const existing = moveMap.get(key)
             if (existing) {
               existing.count++
             } else {
-              clickMap.set(key, { x: gridX, y: gridY, count: 1 })
+              moveMap.set(key, { x: gridX, y: gridY, count: 1 })
             }
           })
       })
     })
 
-    return Array.from(clickMap.values()).map((item) => ({
+    return Array.from(moveMap.values()).map((item) => ({
       x: item.x,
       y: item.y,
       intensity: item.count,
@@ -355,8 +401,28 @@ export function AnalyticsDashboard() {
 
     // Ensure events is an array
     const events = Array.isArray(selectedScreen.events) ? selectedScreen.events : []
-    const clicks = events.filter((e) => e && e.type === 'click' && typeof e.x === 'number' && typeof e.y === 'number')
-    const moves = events.filter((e) => e && e.type === 'move' && typeof e.x === 'number' && typeof e.y === 'number')
+    const clicks = events.filter(
+      (e) =>
+        e &&
+        e.type === 'click' &&
+        typeof e.x === 'number' &&
+        typeof e.y === 'number' &&
+        e.x >= 0 &&
+        e.x <= 1 &&
+        e.y >= 0 &&
+        e.y <= 1
+    )
+    const moves = events.filter(
+      (e) =>
+        e &&
+        e.type === 'move' &&
+        typeof e.x === 'number' &&
+        typeof e.y === 'number' &&
+        e.x >= 0 &&
+        e.x <= 1 &&
+        e.y >= 0 &&
+        e.y <= 1
+    )
     const heatmapClicks = heatmapMode ? getHeatmapClicks() : []
 
     return (
@@ -366,9 +432,14 @@ export function AnalyticsDashboard() {
       >
         {/* Mouse path */}
         {!heatmapMode && moves.length > 0 && (
-          <svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible' }}>
+          <svg
+            className="absolute inset-0 w-full h-full"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            style={{ overflow: 'visible' }}
+          >
             <path
-              d={`M ${moves.map((m) => `${m.x},${m.y}`).join(' L ')}`}
+              d={`M ${moves.map((m) => `${m.x * 100},${m.y * 100}`).join(' L ')}`}
               fill="none"
               stroke="rgba(255, 193, 7, 0.3)"
               strokeWidth="2"
@@ -383,8 +454,8 @@ export function AnalyticsDashboard() {
               key={idx}
               className="absolute w-4 h-4 rounded-full bg-red-500 border-2 border-white shadow-lg animate-pulse"
               style={{
-                left: `${click.x}px`,
-                top: `${click.y}px`,
+                left: `${click.x * 100}%`,
+                top: `${click.y * 100}%`,
                 transform: 'translate(-50%, -50%)',
               }}
             />
@@ -469,16 +540,63 @@ export function AnalyticsDashboard() {
       case 'selectVehicle':
         return <SelectVehicleScreen onCancel={noop} onConfirm={noop} dropoffLabel="Where to?" onOpenFareDialog={noop} onOpenPaymentModal={noop} fare={900} paymentMethod="cash" pickupLocation="My current location" onOpenPickupSelect={noop} onOpenDropoffSelect={noop} />
       case 'deliveryHome':
-        return <DeliveryHomeScreen onNavigate={noop} onProceedToForm={noop} onSelectLocation={noop} pickupLocation={undefined} onOpenPickupSelect={noop} onOpenSidebar={noop} onOpenVoiceActivation={noop} />
+        return (
+          <DeliveryHomeScreen
+            onNavigate={noop}
+            onProceedToForm={noop}
+            onSelectLocation={noop}
+            selectedType="bike"
+            onSelectType={noop}
+            pickupLocation="My current location"
+            onChangePickup={noop}
+            onOpenPickupSelect={noop}
+            onOpenSidebar={noop}
+            onOpenVoiceActivation={noop}
+          />
+        )
       case 'rentalsHome':
-        return <RentalsHomeScreen onNavigate={noop} onProceedToConfirm={noop} pickupLocation={undefined} onChangePickup={noop} onOpenFareDialog={noop} onOpenPaymentModal={noop} onOpenSidebar={noop} onOpenVoiceActivation={noop} />
+        return (
+          <RentalsHomeScreen
+            onNavigate={noop}
+            onProceedToConfirm={noop}
+            pickupLocation="My current location"
+            onChangePickup={noop}
+            onOpenFareDialog={noop}
+            onOpenPaymentModal={noop}
+            onOpenSidebar={noop}
+            onOpenVoiceActivation={noop}
+          />
+        )
       case 'shopsHome':
-        return <ShopsHomeScreen onNavigate={noop} onSelectLocation={noop} onOpenSidebar={noop} onOpenVoiceActivation={noop} />
+        return (
+          <ShopsHomeScreen
+            onNavigate={noop}
+            onSelectShop={noop}
+            location="My current location"
+            onOpenLocationSelect={noop}
+            onOpenSidebar={noop}
+            onOpenVoiceActivation={noop}
+          />
+        )
       case 'deliveryPickupSelect':
       case 'ridePickupSelect':
         return <DeliveryPickupSelectScreen onCancel={noop} onApply={noop} currentLocation="My current location" />
       case 'deliveryForm':
-        return <DeliveryFormScreen onCancel={noop} onConfirm={noop} pickupLocation="Pickup" dropoffLocation="Dropoff" />
+        return (
+          <DeliveryFormScreen
+            pickupLocation="Pickup"
+            deliveryLocation="Dropoff"
+            parcelDetails=""
+            paymentOption="half-pay"
+            onChangePickup={noop}
+            onChangeDelivery={noop}
+            onChangeParcel={noop}
+            onChangePayment={noop}
+            onCancel={noop}
+            onApply={noop}
+            onOpenMap={noop}
+          />
+        )
       case 'searchingRides':
         return <SearchingRidesScreen dropoffLabel="Where to?" onRidesFound={noop} />
       default:
@@ -496,7 +614,7 @@ export function AnalyticsDashboard() {
   // Heatmap View Component - Full screen heatmap visualization
   const HeatmapView = ({ screenName }: { screenName: string }) => {
     const heatmapClicks = getHeatmapClicks(screenName)
-    const totalClicks = heatmapClicks.reduce((sum, c) => sum + c.intensity, 0)
+    const totalPoints = heatmapClicks.reduce((sum, c) => sum + c.intensity, 0)
     const maxIntensity = heatmapClicks.length > 0 ? Math.max(...heatmapClicks.map((c) => c.intensity), 1) : 1
 
     // Find a session with this screen to render the base screen
@@ -523,7 +641,7 @@ export function AnalyticsDashboard() {
           {heatmapClicks.length === 0 ? (
             <div className="absolute inset-0 flex items-center justify-center bg-black/10 rounded-lg">
               <div className="bg-white/90 px-4 py-2 rounded-lg shadow-lg">
-                <p className="text-sm text-gray-600">No click data available for this screen</p>
+                <p className="text-sm text-gray-600">No movement data available for this screen</p>
                 <p className="text-xs text-gray-500 mt-1">
                   Clicks will appear here once users interact with this screen
                 </p>
@@ -534,7 +652,7 @@ export function AnalyticsDashboard() {
               <HeatmapCanvas clicks={heatmapClicks} />
               {/* Heatmap Legend */}
               <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-4 shadow-lg z-50 pointer-events-auto">
-                <div className="text-sm font-semibold text-gray-700 mb-2">Click Intensity</div>
+                <div className="text-sm font-semibold text-gray-700 mb-2">Cursor Activity Intensity</div>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex-1 h-4 rounded-full bg-gradient-to-r from-blue-500 via-green-500 via-yellow-500 to-red-500"></div>
                 </div>
@@ -543,8 +661,8 @@ export function AnalyticsDashboard() {
                   <span>High</span>
                 </div>
                 <div className="text-xs text-gray-500 border-t border-gray-200 pt-2 mt-2">
-                  <div className="font-semibold">{totalClicks} total clicks</div>
-                  <div>Max intensity: {maxIntensity} clicks</div>
+                  <div className="font-semibold">{totalPoints} movement samples</div>
+                  <div>Max intensity: {maxIntensity} samples in one area</div>
                   <div>Screen: {screenName}</div>
                 </div>
               </div>
@@ -577,13 +695,16 @@ export function AnalyticsDashboard() {
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // Create gradient for each click point
+      // Create gradient for each point.
+      // Incoming x/y are normalized [0,1], convert to canvas coordinates here.
       clicks.forEach((click) => {
+        const px = click.x * canvas.width
+        const py = click.y * canvas.height
         const normalizedIntensity = click.intensity / maxIntensity
         const radius = Math.max(30, Math.min(100, 30 + normalizedIntensity * 70))
         
         // Create radial gradient: hot colors (red/orange) for high intensity
-        const gradient = ctx.createRadialGradient(click.x, click.y, 0, click.x, click.y, radius)
+        const gradient = ctx.createRadialGradient(px, py, 0, px, py, radius)
         
         // Color based on intensity: blue -> green -> yellow -> orange -> red
         const intensityRatio = normalizedIntensity
@@ -618,7 +739,7 @@ export function AnalyticsDashboard() {
 
         ctx.fillStyle = gradient
         ctx.beginPath()
-        ctx.arc(click.x, click.y, radius, 0, Math.PI * 2)
+        ctx.arc(px, py, radius, 0, Math.PI * 2)
         ctx.fill()
       })
 
@@ -1137,10 +1258,33 @@ export function AnalyticsDashboard() {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar - Session List */}
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+      <div className="w-72 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-4 border-b border-gray-200">
           <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">User Behavior Tracker</p>
+        </div>
+
+        {/* Session controls */}
+        <div className="px-4 py-2 border-b border-gray-200 flex items-center justify-between text-xs text-gray-600">
+          <span className="truncate">
+            {showAllSessions
+              ? `Showing all ${sessions.length} sessions`
+              : `Showing latest ${Math.min(20, sessions.length)} of ${sessions.length}`}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowAllSessions((prev) => !prev)}
+              className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-100"
+            >
+              {showAllSessions ? 'Show Recent' : 'Show All'}
+            </button>
+            <button
+              onClick={handleDeleteAllSessions}
+              className="px-2 py-1 rounded border border-red-300 text-red-600 hover:bg-red-50"
+            >
+              Clear All
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
@@ -1150,7 +1294,7 @@ export function AnalyticsDashboard() {
             <div className="p-4 text-center text-gray-500">No sessions found</div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {sessions.map((session) => (
+              {visibleSessions.map((session) => (
                 <button
                   key={session.id}
                   onClick={() => {
@@ -1161,19 +1305,30 @@ export function AnalyticsDashboard() {
                     selectedSession?.id === session.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium text-gray-900">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-900 truncate">
                         {session.userId.substring(0, 12)}...
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
                         {formatTimeAgo(session.startTime)}
                       </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {session.screenFlow.length} screens
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-400 uppercase">{session.device}</div>
-                  </div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    {session.screenFlow.length} screens
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="text-xs text-gray-400 uppercase">{session.device}</div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteSession(session.id)
+                        }}
+                        className="text-[11px] text-red-500 hover:text-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </button>
               ))}
@@ -1184,11 +1339,11 @@ export function AnalyticsDashboard() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
-        {/* Controls Bar - Mobile-shaped container */}
+        {/* Controls Bar - Tabs + Global KPIs */}
         <div className="bg-white border-b border-gray-200">
-          <div className="mx-auto w-[440px] max-w-full p-4">
+          <div className="mx-auto w-[960px] max-w-full p-4">
             {/* Tab Navigation */}
-            <div className="flex gap-2 mb-4 border-b border-gray-200">
+            <div className="flex gap-3 mb-4 border-b border-gray-200">
               <button
                 onClick={() => setActiveTab('replay')}
                 className={`px-4 py-2 font-medium transition-colors border-b-2 ${
@@ -1209,6 +1364,48 @@ export function AnalyticsDashboard() {
               >
                 Analytics Suite
               </button>
+              <button
+                onClick={() => setActiveTab('heatmap')}
+                className={`px-4 py-2 font-medium transition-colors border-b-2 ${
+                  activeTab === 'heatmap'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Heatmap
+              </button>
+            </div>
+
+            {/* Global KPI strip - always visible, no scrolling */}
+            <div className="grid grid-cols-4 gap-4 mb-2">
+              <div className="bg-gradient-to-br from-sky-50 to-sky-100 p-4 rounded-lg shadow-sm">
+                <div className="text-xs font-medium text-sky-700 uppercase tracking-wide">
+                  Total Sessions
+                </div>
+                <div className="mt-1 text-2xl font-bold text-sky-900">{stats.totalSessions}</div>
+              </div>
+              <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 rounded-lg shadow-sm">
+                <div className="text-xs font-medium text-emerald-700 uppercase tracking-wide">
+                  Avg Time to Book
+                </div>
+                <div className="mt-1 text-2xl font-bold text-emerald-900">
+                  {Math.round(stats.averageTimeToBook / 1000)}s
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-lg shadow-sm">
+                <div className="text-xs font-medium text-amber-700 uppercase tracking-wide">
+                  Most Confusing Screen
+                </div>
+                <div className="mt-1 text-base font-semibold text-amber-900 truncate">
+                  {stats.mostConfusingScreen || 'N/A'}
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-fuchsia-50 to-fuchsia-100 p-4 rounded-lg shadow-sm">
+                <div className="text-xs font-medium text-fuchsia-700 uppercase tracking-wide">
+                  Total Clicks
+                </div>
+                <div className="mt-1 text-2xl font-bold text-fuchsia-900">{stats.totalClicks}</div>
+              </div>
             </div>
 
             {activeTab === 'replay' && (
@@ -1264,9 +1461,9 @@ export function AnalyticsDashboard() {
           {activeTab === 'heatmap' ? (
             <div className="mx-auto w-[440px] max-w-full">
               <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Click Heatmap</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Mouse Movement Heatmap</h2>
                 <p className="text-sm text-gray-600 mb-4">
-                  Visualize where all users click most frequently across all sessions
+                  Visualize where users move their mouse the most on each screen, aggregated across all sessions.
                 </p>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1285,9 +1482,28 @@ export function AnalyticsDashboard() {
                   </select>
                 </div>
               </div>
-              
-              <div className="relative bg-white rounded-lg shadow-lg overflow-hidden" style={{ height: '844px' }}>
-                <HeatmapView screenName={selectedHeatmapScreen} />
+
+              <div
+                className="relative mx-auto w-[440px] max-w-full h-[844px] overflow-hidden rounded-[40px] bg-white shadow-2xl"
+                style={{
+                  isolation: 'isolate',
+                }}
+              >
+                {/* Constrain fixed elements to this container, same as Session Replay */}
+                <style>{`
+                  #heatmap-container [class*="fixed"] {
+                    position: absolute !important;
+                  }
+                  #heatmap-container nav[class*="fixed"] {
+                    position: absolute !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    width: 100% !important;
+                  }
+                `}</style>
+                <div id="heatmap-container" className="relative w-full h-full">
+                  <HeatmapView screenName={selectedHeatmapScreen} />
+                </div>
               </div>
             </div>
           ) : activeTab === 'replay' ? (
@@ -1476,33 +1692,6 @@ export function AnalyticsDashboard() {
           )}
         </div>
 
-        {/* Stats Panel - Mobile-shaped container */}
-        <div className="bg-white border-t border-gray-200">
-          <div className="mx-auto w-[440px] max-w-full p-4">
-            <div className="grid grid-cols-4 gap-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="text-sm text-gray-500">Total Sessions</div>
-                <div className="text-2xl font-bold text-gray-900">{stats.totalSessions}</div>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="text-sm text-gray-500">Avg Time to Book</div>
-                <div className="text-2xl font-bold text-gray-900">
-                  {Math.round(stats.averageTimeToBook / 1000)}s
-                </div>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="text-sm text-gray-500">Most Confusing Screen</div>
-                <div className="text-2xl font-bold text-gray-900 truncate">
-                  {stats.mostConfusingScreen || 'N/A'}
-                </div>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="text-sm text-gray-500">Total Clicks</div>
-                <div className="text-2xl font-bold text-gray-900">{stats.totalClicks}</div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )

@@ -184,10 +184,15 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
     const target = e.target as HTMLElement
     const targetText = target.innerText || target.getAttribute('aria-label') || target.tagName
 
+    // Normalize coordinates to [0,1] relative to viewport so they can be replayed
+    // inside the fixed phone frame on the dashboard.
+    const normX = window.innerWidth > 0 ? e.clientX / window.innerWidth : 0
+    const normY = window.innerHeight > 0 ? e.clientY / window.innerHeight : 0
+
     const event: AnalyticsEvent = {
       type: 'click',
-      x: e.clientX,
-      y: e.clientY,
+      x: Math.max(0, Math.min(1, normX)),
+      y: Math.max(0, Math.min(1, normY)),
       target: targetText.substring(0, 100), // Limit length
       timestamp: Date.now(),
     }
@@ -199,10 +204,13 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
   const trackMouseMove = throttle((e: MouseEvent) => {
     if (!isTracking) return
 
+    const normX = window.innerWidth > 0 ? e.clientX / window.innerWidth : 0
+    const normY = window.innerHeight > 0 ? e.clientY / window.innerHeight : 0
+
     const event: AnalyticsEvent = {
       type: 'move',
-      x: e.clientX,
-      y: e.clientY,
+      x: Math.max(0, Math.min(1, normX)),
+      y: Math.max(0, Math.min(1, normY)),
       timestamp: Date.now(),
     }
 

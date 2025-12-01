@@ -65,7 +65,7 @@ export function HomeRideScreen({
     useEffect(() => {
         if (!panelContentRef.current || isMapDraggingRef.current) return
         
-        let timeoutId: NodeJS.Timeout | null = null
+        let timeoutId: ReturnType<typeof setTimeout> | null = null
         
         const calculateOptimalHeight = () => {
             // Skip calculation if map is being dragged

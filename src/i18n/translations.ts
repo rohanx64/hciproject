@@ -94,7 +94,7 @@ export const translations = {
     'Delivery Completed': 'ڈیلیوری مکمل',
     
     // Rentals
-    'SELECT PICKUP LOCATION': 'پک اپ مقام منتخب کریں',
+    // 'SELECT PICKUP LOCATION': 'پک اپ مقام منتخب کریں',
     'Select Hours': 'گھنٹے منتخب کریں',
     'Select Vehicle': 'گاڑی منتخب کریں',
     'Rentals Confirm': 'رینٹلز کی تصدیق',
@@ -133,12 +133,12 @@ export const translations = {
     'Available 24/7 for your convenience': 'آپ کی سہولت کے لیے 24/7 دستیاب',
     
     // Help & Support
-    'Help & Support': 'مدد اور معاونت',
+    // 'Help & Support': 'مدد اور معاونت',
     'Frequently Asked Questions': 'اکثر پوچھے گئے سوالات',
     'Contact Support': 'سپورٹ سے رابطہ کریں',
     
     // Voice Feedback
-    'Voice Feedback': 'آواز کی آراء',
+    // 'Voice Feedback': 'آواز کی آراء',
     'Record your feedback': 'اپنی آراء ریکارڈ کریں',
     
     // Messages
@@ -200,13 +200,13 @@ export const translations = {
     'OK': 'ٹھیک ہے',
     
     // Tutorial
-    'Skip': 'چھوڑ دیں',
-    'Get Started': 'شروع کریں',
+    // 'Skip': 'چھوڑ دیں',
+    // 'Get Started': 'شروع کریں',
     'Go Through Tutorial': 'ٹیوٹوریل دیکھیں',
     'Chat with AIR Representative': 'AIR نمائندے سے بات کریں',
     'Available 24/7': '24/7 دستیاب',
     'Quick Help': 'فوری مدد',
-    'Frequently Asked Questions': 'اکثر پوچھے گئے سوالات',
+    // 'Frequently Asked Questions': 'اکثر پوچھے گئے سوالات',
     'How do I book a ride?': 'میں سواری کیسے بک کروں؟',
     'Can I pay with cash?': 'کیا میں نقد ادائیگی کر سکتا ہوں؟',
     'How do I track my delivery?': 'میں اپنی ڈیلیوری کیسے ٹریک کروں؟',
