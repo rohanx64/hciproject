@@ -100,7 +100,7 @@ export function ShopsHomeScreen({
     }
 
     return (
-        <div className="w-full h-full flex flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl relative">
+        <div className="w-full h-full flex flex-col overflow-hidden rounded-[20px] bg-white shadow-2xl relative">
             {/* Map Section - Full height, panel overlays */}
             <section className="absolute inset-0 overflow-hidden">
                 <RideMap
@@ -158,7 +158,7 @@ export function ShopsHomeScreen({
                                 mapRef.current.zoomIn()
                             }
                         }}
-                        className="size-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
+                        className="size-10 rounded-lg bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
                         aria-label="Zoom in"
                     >
                         <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,7 +171,7 @@ export function ShopsHomeScreen({
                                 mapRef.current.zoomOut()
                             }
                         }}
-                        className="size-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
+                        className="size-10 rounded-lg bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
                         aria-label="Zoom out"
                     >
                         <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,7 +184,7 @@ export function ShopsHomeScreen({
                 <button
                     style={{ bottom: `${buttonBottomPixels}px` }}
                     onClick={onOpenVoiceActivation}
-                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary active:scale-95 transition-all duration-200 ease-out"
+                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary active:scale-95 transition-all duration-200 ease-out"
                     aria-label="Voice input"
                 >
                     <svg className="w-5 h-5 text-white animate-subtle-pulse" fill="currentColor" viewBox="0 0 24 24">
@@ -198,7 +198,7 @@ export function ShopsHomeScreen({
                 {/* Location Button - Dynamically positioned above panel */}
                 <button
                     style={{ bottom: `${buttonBottomPixels}px` }}
-                    className="fixed right-[5.26%] px-4 py-3 rounded-full bg-white/95 border-2 border-[#3b82f6] text-[#1d4ed8] font-semibold shadow-lg flex items-center gap-2 z-[600] hover:bg-[#3b82f6] hover:text-white hover:shadow-xl active:scale-95 transition-all duration-200 ease-out"
+                    className="fixed right-[5.26%] px-4 py-3 rounded-full bg-white/95 border-2 border-[#3b82f6] text-[#1d4ed8] font-semibold flex items-center gap-2 z-[600] hover:bg-[#3b82f6] hover:text-white hover:shadow-xl active:scale-95 transition-all duration-200 ease-out"
                     aria-label="Use current location"
                     onClick={() => {
                         if (navigator.geolocation) {
@@ -221,7 +221,7 @@ export function ShopsHomeScreen({
                     onClick={onOpenLocationSelect}
                     className="absolute left-1/2 top-[25.7%] -translate-x-1/2 w-[254px] min-h-[60px] z-20 active:scale-95 transition-transform duration-200"
                 >
-                    <div className="rounded-3xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-3 shadow-lg flex items-center gap-3 hover:shadow-xl transition-all duration-200">
+                    <div className="rounded-xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-3 shadow-[4px_4px_0px_rgba(50,153,29,0.5)] flex items-center gap-3 hover:shadow-[5px_5px_0px_rgba(50,153,29,0.5)] transition-all duration-200">
                         <div className="grid size-7 place-items-center flex-shrink-0">
                             {/* Green target/crosshair icon for location */}
                             <svg className="w-5 h-5 text-[#6cc44a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -240,6 +240,15 @@ export function ShopsHomeScreen({
                     </div>
                 </button>
 
+                {/* Connecting Line from Location to Map Pin - Blue for Shops */}
+                <div
+                    className="absolute left-1/2 -translate-x-1/2 w-[3px] bg-[#3b82f6] z-15 pointer-events-none"
+                    style={{
+                        top: 'calc(25.7% + 60px)',
+                        height: 'calc(50% - 25.7% - 60px - 50px)'
+                    }}
+                />
+
                 {/* Location Selection Indicator removed for cleaner map visuals */}
                 {selectedLocation && null}
             </section>
@@ -254,13 +263,13 @@ export function ShopsHomeScreen({
             >
                 <div className="px-6 pb-2">
                     {/* Shops Title - Top left */}
-                    <h1 className="font-display text-[32px] font-extrabold text-[#3b82f6] text-left mb-3 mt-2">
+                    <h1 className="text-[32px] font-extrabold text-[#3b82f6] text-left mb-3 mt-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
                         Shops
                     </h1>
 
                     {/* Search Bar */}
                     <div className="mb-3">
-                        <div className="flex items-center gap-3 rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm focus-within:border-[#3b82f6] focus-within:shadow-md transition-all duration-200">
+                        <div className="flex items-center gap-3 rounded-lg border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm focus-within:border-[#3b82f6] focus-within:shadow-md transition-all duration-200">
                             <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -290,7 +299,7 @@ export function ShopsHomeScreen({
                                             }`}
                                     >
                                         <div
-                                            className={`size-16 rounded-2xl flex items-center justify-center transition-all duration-200 shadow-sm ${isActive
+                                            className={`size-16 rounded-lg flex items-center justify-center transition-all duration-200 shadow-sm ${isActive
                                                 ? 'shadow-lg border-2 ring-2 ring-offset-2'
                                                 : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow-md'
                                                 }`}
@@ -299,8 +308,8 @@ export function ShopsHomeScreen({
                                                 borderColor: isActive ? category.color : undefined,
                                                 '--tw-ring-color': isActive ? `${category.color}40` : undefined,
                                             } as React.CSSProperties}
-                                            >
-                                                <AppIcon name={category.icon} className="text-2xl text-text-dark" />
+                                        >
+                                            <AppIcon name={category.icon} className="text-2xl text-text-dark" />
                                         </div>
                                         <span
                                             className={`text-xs font-semibold transition-colors duration-200 ${isActive ? 'text-text-dark font-bold' : 'text-gray-600'
@@ -324,10 +333,10 @@ export function ShopsHomeScreen({
                                         <button
                                             key={shop.id}
                                             onClick={() => onSelectShop(shop.id)}
-                                            className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 border-[#c8f0c0] bg-white hover:border-[#3b82f6] hover:shadow-lg hover:bg-blue-50/30 transition-all duration-200 active:scale-[0.98] text-left group"
+                                            className="w-full flex items-center gap-4 p-4 rounded-lg border-2 border-[#c8f0c0] bg-white hover:border-[#3b82f6] hover:shadow-lg hover:bg-blue-50/30 transition-all duration-200 active:scale-[0.98] text-left group"
                                         >
                                             <div
-                                                className="size-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 shadow-sm transition-all duration-200 group-hover:scale-110"
+                                                className="size-14 rounded-md flex items-center justify-center text-2xl flex-shrink-0 shadow-sm transition-all duration-200 group-hover:scale-110"
                                                 style={{
                                                     backgroundColor: category ? `${category.color}20` : '#f3f4f6',
                                                 }}

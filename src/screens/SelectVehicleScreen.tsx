@@ -52,7 +52,7 @@ export function SelectVehicleScreen({
 
     // Announce fare when screen loads (but don't auto-open dialog)
     useEffect(() => {
-            speakAction(`Your estimated fare is ${fare} rupees`)
+        speakAction(`Your estimated fare is ${fare} rupees`)
     }, [])
 
     // Detect when panel is expanded (height > 75%)
@@ -145,7 +145,7 @@ export function SelectVehicleScreen({
 
                 {/* Back Button */}
                 <button
-                    className="absolute left-[6.13%] top-[6.38%] size-[52px] rounded-full border-2 border-white bg-white shadow-lg flex items-center justify-center z-20 hover:bg-gray-50 active:scale-90 transition-all duration-200"
+                    className="absolute left-[6.13%] top-[6.38%] size-[52px] rounded-lg border-2 border-white bg-white shadow-lg flex items-center justify-center z-20 hover:bg-gray-50 active:scale-90 transition-all duration-200"
                     aria-label="Back"
                     onClick={handleCancelClick}
                 >
@@ -159,9 +159,9 @@ export function SelectVehicleScreen({
                     onClick={onOpenPickupSelect}
                     className="absolute left-[calc(6.13%+52px+16px)] right-4 top-[6.38%] z-20 text-left hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200"
                 >
-                    <div className="rounded-3xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-2 shadow-lg flex items-center gap-3 hover:border-primary hover:shadow-xl transition-all duration-200">
+                    <div className="rounded-xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-2 shadow-lg flex items-center gap-3 hover:border-primary hover:shadow-xl transition-all duration-200">
                         <div className="grid size-7 place-items-center">
-                            <div className="size-5 rounded-full border-2 border-primary bg-primary"></div>
+                            <div className="size-5 rounded-lg border-2 border-primary bg-primary"></div>
                         </div>
                         <div className="flex-1 text-left">
                             <p className="text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-1">PICKUP</p>
@@ -175,9 +175,9 @@ export function SelectVehicleScreen({
                     onClick={onOpenDropoffSelect}
                     className="absolute left-[calc(6.13%+52px+16px)] right-4 top-[calc(6.38%+52px+8px)] z-20 text-left hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200"
                 >
-                    <div className="rounded-3xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-2 shadow-lg flex items-center gap-3 hover:border-primary hover:shadow-xl transition-all duration-200">
+                    <div className="rounded-xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-2 shadow-lg flex items-center gap-3 hover:border-primary hover:shadow-xl transition-all duration-200">
                         <div className="grid size-7 place-items-center">
-                            <div className="size-5 rounded-full border-2 border-[#ff3b30] bg-[#ff3b30]"></div>
+                            <div className="size-5 rounded-lg border-2 border-[#ff3b30] bg-[#ff3b30]"></div>
                         </div>
                         <div className="flex-1 text-left">
                             <p className="text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-1">DROP-OFF</p>
@@ -189,30 +189,30 @@ export function SelectVehicleScreen({
 
             {/* Draggable Bottom Panel */}
             <DraggablePanel
-                initialHeight={58}
-                minHeight={55}
+                initialHeight={45}
+                minHeight={40}
                 maxHeight={85}
                 onHeightChange={setPanelHeight}
                 hideBottomNav={true}
             >
                 <div className="px-6 pb-6">
                     {/* SELECT VEHICLE Section */}
-                    <div className="mb-6 mt-6">
-                        <p className="text-center text-[19.931px] font-light text-[#919191] mb-4">
+                    <div className="mb-3 mt-3">
+                        <p className="text-center text-sm font-light text-[#919191] mb-3">
                             SELECT VEHICLE
                         </p>
 
                         {/* Horizontal view (collapsed) */}
                         {!isExpanded && (
-                            <div 
+                            <div
                                 ref={scrollContainerRef}
                                 onMouseDown={handleMouseDown}
                                 onMouseMove={handleMouseMove}
                                 onMouseUp={handleMouseUp}
                                 onMouseLeave={handleMouseLeave}
                                 className={`w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide scroll-smooth -mx-6 px-6 ${isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
-                                style={{ 
-                                    scrollbarWidth: 'none', 
+                                style={{
+                                    scrollbarWidth: 'none',
                                     msOverflowStyle: 'none',
                                     WebkitOverflowScrolling: 'touch',
                                     touchAction: 'pan-x pinch-zoom',
@@ -220,11 +220,11 @@ export function SelectVehicleScreen({
                                 }}
                             >
                                 <div className="flex gap-3" style={{ width: 'max-content' }}>
-                                {vehicles.map((v) => {
-                                    const active = vehicle === v.id
-                                    return (
-                                        <button
-                                            key={v.id}
+                                    {vehicles.map((v) => {
+                                        const active = vehicle === v.id
+                                        return (
+                                            <button
+                                                key={v.id}
                                                 onClick={(e) => {
                                                     // Prevent click if we were dragging
                                                     if (hasDraggedRef.current) {
@@ -235,29 +235,29 @@ export function SelectVehicleScreen({
                                                     }
                                                     handleVehicleSelect(v.id)
                                                 }}
-                                                className={`flex w-[80px] flex-shrink-0 flex-col items-center gap-1.5 rounded-2xl border-2 p-3 transition-all duration-200 hover-lift ${!isDragging ? 'active:animate-button-press' : ''} ${active
-                                                ? 'border-primary bg-primary/10 shadow-md scale-105'
+                                                className={`flex w-[85px] flex-shrink-0 flex-col items-center gap-1 rounded-lg border-2 p-2 shadow-[3px_3px_0px_rgba(50,153,29,0.5)] transition-all duration-200 hover-lift ${!isDragging ? 'active:animate-button-press' : ''} ${active
+                                                    ? 'border-primary bg-primary/10 scale-105'
                                                     : 'border-gray-200 bg-white hover:border-primary/40'
-                                                }`}
-                                        >
-                                            <div className={`grid size-14 place-items-center rounded-xl transition-all duration-200 ${active ? 'bg-primary/20 scale-110' : 'bg-gray-50'
-                                                }`}>
-                                                <AppIcon
-                                                    name={v.icon}
-                                                    className={`text-3xl transition-all duration-200 ${active ? 'text-primary scale-110' : 'text-gray-500'}`}
-                                                />
-                                            </div>
-                                            <span className={`text-xs font-semibold transition-colors duration-200 ${active ? 'text-primary' : 'text-gray-500'
-                                                }`}>
-                                                {v.label}
-                                            </span>
+                                                    }`}
+                                            >
+                                                <div className={`grid size-11 place-items-center rounded-md transition-all duration-200 ${active ? 'bg-primary/20 scale-110' : 'bg-gray-50'
+                                                    }`}>
+                                                    <AppIcon
+                                                        name={v.icon}
+                                                        className={`text-3xl transition-all duration-200 ${active ? 'text-primary scale-110' : 'text-gray-500'}`}
+                                                    />
+                                                </div>
+                                                <span className={`text-xs font-semibold transition-colors duration-200 ${active ? 'text-primary' : 'text-gray-500'
+                                                    }`}>
+                                                    {v.label}
+                                                </span>
                                                 <span className={`text-[10px] font-bold transition-colors duration-200 ${active ? 'text-primary' : 'text-gray-600'
                                                     }`}>
                                                     PKR {v.fare}
                                                 </span>
-                                        </button>
-                                    )
-                                })}
+                                            </button>
+                                        )
+                                    })}
                                 </div>
                             </div>
                         )}
@@ -271,12 +271,12 @@ export function SelectVehicleScreen({
                                         <button
                                             key={v.id}
                                             onClick={() => handleVehicleSelect(v.id)}
-                                            className={`w-full flex items-center gap-4 rounded-2xl border-2 p-4 transition-all duration-200 hover-lift active:animate-button-press ${active
-                                                ? 'border-primary bg-primary/10 shadow-md'
+                                            className={`w-full flex items-center gap-4 rounded-lg border-2 p-4 shadow-[3px_3px_0px_rgba(50,153,29,0.5)] transition-all duration-200 hover-lift active:animate-button-press ${active
+                                                ? 'border-primary bg-primary/10'
                                                 : 'border-gray-200 bg-white hover:border-primary/40'
                                                 }`}
                                         >
-                                            <div className={`grid size-16 place-items-center rounded-xl transition-all duration-200 ${active ? 'bg-primary/20' : 'bg-gray-50'
+                                            <div className={`grid size-16 place-items-center rounded-md transition-all duration-200 ${active ? 'bg-primary/20' : 'bg-gray-50'
                                                 }`}>
                                                 <AppIcon name={v.icon} className="text-3xl text-primary" />
                                             </div>
@@ -304,51 +304,58 @@ export function SelectVehicleScreen({
 
                         {/* Pull up hint when collapsed */}
                         {!isExpanded && (
-                            <p className="text-center text-xs text-gray-400 mt-3">
+                            <p className="text-center text-xs text-gray-400 mt-2 mb-2">
                                 Pull up to see detailed vehicle information
                             </p>
                         )}
                     </div>
 
-                    {/* YOUR FARE Card - Clickable */}
-                    <button
-                        onClick={onOpenFareDialog}
-                        className="w-full mb-4 rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-4 shadow-sm hover:border-primary hover:shadow-md transition-all duration-200 active:scale-98"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="grid size-10 place-items-center rounded-full bg-primary/10">
-                                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
+                    {/* Fare and Payment - Side by Side */}
+                    <div className="flex gap-3 mb-6">
+                        {/* YOUR FARE Card - Clickable */}
+                        <button
+                            onClick={onOpenFareDialog}
+                            className="flex-[1.5] rounded-lg border-2 border-[#c8f0c0] bg-white p-3 shadow-[3px_3px_0px_rgba(50,153,29,0.5)] hover:border-primary hover:shadow-[4px_4px_0px_rgba(50,153,29,0.5)] transition-all duration-200 active:scale-98 group min-h-[80px]"
+                        >
+                            <div className="flex items-center gap-3 h-full">
+                                {/* Large icon on left */}
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex items-center justify-center bg-primary/10 rounded-lg p-2">
+                                        <svg className="w-7 h-7 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
+                                    </div>
+                                    <p className="text-[9px] font-semibold uppercase tracking-wider text-[#919191]">YOUR FARE</p>
+                                </div>
+                                {/* Right side with value */}
+                                <div className="flex-1 flex items-start justify-start">
+                                    <p className="text-3xl font-black text-text-dark underline decoration-2 underline-offset-4 decoration-primary -mt-2">{fare} Rs.</p>
+                                </div>
                             </div>
-                            <div className="flex-1 text-left">
-                                <p className="text-xs font-semibold uppercase tracking-wider text-[#919191] mb-1">YOUR FARE</p>
-                                <p className="text-xl font-extrabold text-text-dark">{fare} Rs.</p>
-                            </div>
-                            <img src={assets.chevronIcon} alt="" className="h-5 w-5 opacity-50" />
-                        </div>
-                    </button>
+                        </button>
 
-                    {/* PAYMENT METHOD Card - Clickable */}
-                    <button
-                        onClick={onOpenPaymentModal}
-                        className="w-full mb-6 rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-4 shadow-sm hover:border-primary hover:shadow-md transition-all duration-200 active:scale-98"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="grid size-10 place-items-center rounded-full bg-primary/10">
-                                <span className="text-2xl">
-                                    <AppIcon name={paymentMethod === 'cash' ? '💵' : '💳'} className="text-2xl text-primary" />
-                                </span>
+                        {/* PAYMENT METHOD Card - Clickable */}
+                        <button
+                            onClick={onOpenPaymentModal}
+                            className="flex-1 rounded-lg border-2 border-[#c8f0c0] bg-white p-3 shadow-[3px_3px_0px_rgba(50,153,29,0.5)] hover:border-primary hover:shadow-[4px_4px_0px_rgba(50,153,29,0.5)] transition-all duration-200 active:scale-98 group min-h-[80px]"
+                        >
+                            <div className="flex items-center gap-3 h-full">
+                                {/* Large icon on left */}
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex items-center justify-center bg-primary/10 rounded-lg p-2">
+                                        <AppIcon name={paymentMethod === 'cash' ? '💵' : '💳'} className="text-3xl text-primary flex-shrink-0" />
+                                    </div>
+                                    <p className="text-[9px] font-semibold uppercase tracking-wider text-[#919191]">PAYMENT</p>
+                                </div>
+                                {/* Right side with value */}
+                                <div className="flex-1 flex items-start justify-start">
+                                    <p className="text-2xl font-black text-text-dark -mt-2">
+                                        {paymentMethod === 'cash' ? 'Cash' : 'Digital'}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="flex-1 text-left">
-                                <p className="text-xs font-semibold uppercase tracking-wider text-[#919191] mb-1">PAYMENT METHOD</p>
-                                <p className="text-base font-semibold text-text-dark">
-                                    {paymentMethod === 'cash' ? 'Cash' : 'Digital'}
-                                </p>
-                            </div>
-                            <img src={assets.chevronIcon} alt="" className="h-5 w-5 opacity-50" />
-                        </div>
-                    </button>
+                        </button>
+                    </div>
 
                     {/* Action Buttons - Enhanced with better feedback */}
                     <div className="flex gap-3">
@@ -371,19 +378,19 @@ export function SelectVehicleScreen({
             {/* Cancel Confirmation Dialog */}
             {showCancelDialog && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
-                    <div className="w-[360px] rounded-[28px] border border-primary bg-white px-6 py-8 text-center text-text-dark shadow-2xl mx-4">
+                    <div className="w-[360px] rounded-[14px] border border-primary bg-white px-6 py-8 text-center text-text-dark shadow-2xl mx-4">
                         <p className="text-xl font-medium">
                             Cancelling will <span className="font-extrabold">remove all details you have added</span>, are you sure?
                         </p>
                         <div className="mt-6 flex gap-4">
                             <button
-                                className="flex-1 rounded-2xl bg-[#ff544a] px-4 py-3 text-base font-extrabold uppercase tracking-wide text-white shadow-[3px_3px_0_rgba(245,45,86,0.3)] transition hover:brightness-95 active:scale-95"
+                                className="flex-1 rounded-lg bg-[#ff544a] px-4 py-3 text-base font-extrabold uppercase tracking-wide text-white shadow-[3px_3px_0_rgba(245,45,86,0.3)] transition hover:brightness-95 active:scale-95"
                                 onClick={handleConfirmCancel}
                             >
                                 Yes, Cancel
                             </button>
                             <button
-                                className="flex-1 rounded-2xl bg-primary px-4 py-3 text-base font-extrabold uppercase tracking-wide text-white shadow-[3px_3px_0_rgba(50,153,29,0.33)] transition hover:bg-primary-dark active:scale-95"
+                                className="flex-1 rounded-lg bg-primary px-4 py-3 text-base font-extrabold uppercase tracking-wide text-white shadow-[3px_3px_0_rgba(50,153,29,0.33)] transition hover:bg-primary-dark active:scale-95"
                                 onClick={() => setShowCancelDialog(false)}
                             >
                                 No

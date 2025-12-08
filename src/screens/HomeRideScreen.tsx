@@ -38,7 +38,7 @@ export function HomeRideScreen({
     const panelHeightBeforeDragRef = useRef<number | null>(null)
     const panelContentRef = useRef<HTMLDivElement>(null)
     const isMapDraggingRef = useRef(false)
-    
+
     // Horizontal scroll refs for location buttons
     const favoritePlacesScrollRef = useRef<HTMLDivElement>(null)
     const recentLocationsScrollRef = useRef<HTMLDivElement>(null)
@@ -64,53 +64,53 @@ export function HomeRideScreen({
     // Calculate optimal panel height based on content
     useEffect(() => {
         if (!panelContentRef.current || isMapDraggingRef.current) return
-        
+
         let timeoutId: ReturnType<typeof setTimeout> | null = null
-        
+
         const calculateOptimalHeight = () => {
             // Skip calculation if map is being dragged
             if (isMapDraggingRef.current) return
-            
+
             const content = panelContentRef.current
             if (!content) return
-            
+
             // Measure content height (scrollHeight gives full content height)
             const contentHeight = content.scrollHeight
             const padding = 48 // Top padding (pt-6 = 24px) + bottom padding (pb-2 = 8px) + some buffer
             const totalNeededHeight = contentHeight + padding
-            
+
             // Calculate as percentage of available height
             const bottomNavHeight = 110
             const availableHeight = containerHeight - bottomNavHeight
             const optimalPercent = Math.min(82, Math.max(30, (totalNeededHeight / availableHeight) * 100))
-            
+
             // Only update if significantly different to avoid constant re-renders
             if (Math.abs(panelHeight - optimalPercent) > 2) {
                 setPanelHeight(optimalPercent)
                 setPanelMinHeight(Math.max(PANEL_BASE_MIN_HEIGHT, optimalPercent * 0.7))
             }
         }
-        
+
         // Debounce the calculation to prevent janky transitions
         const debouncedCalculate = () => {
             if (timeoutId) clearTimeout(timeoutId)
             timeoutId = setTimeout(calculateOptimalHeight, 150)
         }
-        
+
         // Calculate after a short delay to ensure content is rendered
         debouncedCalculate()
-        
+
         // Also recalculate when panel height changes (content might expand) - debounced
         const observer = new ResizeObserver(() => {
             if (!isMapDraggingRef.current) {
                 debouncedCalculate()
             }
         })
-        
+
         if (panelContentRef.current) {
             observer.observe(panelContentRef.current)
         }
-        
+
         return () => {
             if (timeoutId) clearTimeout(timeoutId)
             observer.disconnect()
@@ -208,7 +208,7 @@ export function HomeRideScreen({
     }
 
     return (
-        <div className="w-full h-full flex flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl relative">
+        <div className="w-full h-full flex flex-col overflow-hidden rounded-[20px] bg-white shadow-2xl relative">
             {/* Map Section - Full height, panel overlays */}
             <section className="absolute inset-0 overflow-hidden">
                 <RideMap
@@ -245,9 +245,9 @@ export function HomeRideScreen({
                 {/* Quick Book Button - Green button at top */}
                 <button
                     onClick={onOpenQuickBook}
-                    className="absolute left-1/2 top-[14%] -translate-x-1/2 w-[255px] min-h-[56px] z-20 active:scale-95 transition-transform duration-200 ease-out"
+                    className="absolute left-1/2 top-[17%] -translate-x-1/2 w-[255px] min-h-[56px] z-20 active:scale-95 transition-transform duration-200 ease-out"
                 >
-                    <div className="rounded-3xl bg-primary px-6 py-3.5 shadow-lg flex items-center justify-between hover:shadow-xl transition-all duration-200">
+                    <div className="rounded-xl bg-primary px-6 py-3.5 shadow-lg flex items-center justify-between hover:shadow-xl transition-all duration-200">
                         <span className="text-[25.688px] font-extrabold text-white uppercase">QUICK BOOK</span>
                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
@@ -260,9 +260,9 @@ export function HomeRideScreen({
                     onClick={() => {
                         onOpenPickupSelect?.()
                     }}
-                    className="absolute left-1/2 top-[25.7%] -translate-x-1/2 w-[254px] min-h-[60px] z-20 active:scale-95 transition-transform duration-200 ease-out"
+                    className="absolute left-1/2 top-[26%] -translate-x-1/2 w-[254px] min-h-[60px] z-20 active:scale-95 transition-transform duration-200 ease-out"
                 >
-                    <div className="rounded-3xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-3 shadow-lg flex items-center gap-3 hover:shadow-xl transition-all duration-200">
+                    <div className="rounded-xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-3 shadow-[4px_4px_0px_rgba(50,153,29,0.5)] flex items-center gap-3 hover:shadow-[5px_5px_0px_rgba(50,153,29,0.5)] transition-all duration-200">
                         <div className="grid size-7 place-items-center flex-shrink-0">
                             {/* Green target/crosshair icon for pickup */}
                             <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,6 +281,15 @@ export function HomeRideScreen({
                     </div>
                 </button>
 
+                {/* Connecting Line from Pickup to Map Pin */}
+                <div
+                    className="absolute left-1/2 -translate-x-1/2 w-[3px] bg-primary z-15 pointer-events-none"
+                    style={{
+                        top: 'calc(26% + 60px)',
+                        height: 'calc(50% - 26% - 60px - 50px)'
+                    }}
+                />
+
                 {/* Zoom Controls */}
                 <div className="absolute right-[5.26%] top-[20%] z-30 flex flex-col gap-2">
                     <button
@@ -289,7 +298,7 @@ export function HomeRideScreen({
                                 mapRef.current.zoomIn()
                             }
                         }}
-                        className="size-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
+                        className="size-10 rounded-lg bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
                         aria-label="Zoom in"
                     >
                         <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,7 +311,7 @@ export function HomeRideScreen({
                                 mapRef.current.zoomOut()
                             }
                         }}
-                        className="size-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
+                        className="size-10 rounded-lg bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
                         aria-label="Zoom out"
                     >
                         <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,12 +340,12 @@ export function HomeRideScreen({
 
                 {/* Voice Button - Combined mic + Voice label, aligned with location button */}
                 <button
-                    style={{ 
+                    style={{
                         bottom: `${buttonBottomPixels}px`,
                         transition: 'bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
                     onClick={onOpenVoiceActivation}
-                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary hover-lift active:animate-button-press transition-colors duration-200 ease-out"
+                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary hover-lift active:animate-button-press transition-colors duration-200 ease-out"
                     aria-label="Voice input"
                 >
                     <svg className="w-5 h-5 text-white animate-subtle-pulse" fill="currentColor" viewBox="0 0 24 24">
@@ -349,11 +358,11 @@ export function HomeRideScreen({
 
                 {/* Location Button - Dynamically positioned above panel */}
                 <button
-                    style={{ 
+                    style={{
                         bottom: `${buttonBottomPixels}px`,
                         transition: 'bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
-                    className="fixed right-[5.26%] px-4 py-3 rounded-full bg-white/95 border-2 border-primary text-primary font-semibold shadow-lg flex items-center gap-2 z-[600] hover:bg-primary hover:text-white hover-lift active:animate-button-press transition-colors duration-200 ease-out"
+                    className="fixed right-[5.26%] px-4 py-3 rounded-full bg-white/95 border-2 border-primary text-primary font-semibold flex items-center gap-2 z-[600] hover:bg-primary hover:text-white hover-lift active:animate-button-press transition-colors duration-200 ease-out"
                     aria-label="Use current location"
                     onClick={() => {
                         if (navigator.geolocation) {
@@ -382,14 +391,14 @@ export function HomeRideScreen({
             >
                 <div ref={panelContentRef} className="px-6 pb-2">
                     {/* Ride Title - Top left */}
-                    <h1 className="font-display text-[32px] font-extrabold text-primary text-left mb-3 mt-2">
+                    <h1 className="text-[32px] font-extrabold text-primary text-left mb-3 mt-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
                         {t('Ride')}
                     </h1>
 
                     {/* Drop-off Input Card - With red pin icon (Figma style) */}
                     <button
                         onClick={onOpenDropoff}
-                        className="w-full rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm mb-3 flex items-center gap-3 hover:bg-green-50 hover:border-primary hover-lift active:animate-button-press transition-all duration-200 ease-out group"
+                        className="w-full rounded-lg border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-[4px_4px_0px_rgba(50,153,29,0.5)] mb-3 flex items-center gap-3 hover:bg-green-50 hover:border-primary hover-lift active:animate-button-press transition-all duration-200 ease-out group"
                         style={dropoffCardStyle}
                     >
                         <div className="grid size-7 place-items-center flex-shrink-0">
@@ -410,8 +419,8 @@ export function HomeRideScreen({
                     </button>
 
                     {/* Suggested Location Tags - Horizontal Scrollable */}
-                    <div className="mb-3">
-                        <div 
+                    <div className="mb-3 mt-4">
+                        <div
                             ref={favoritePlacesScrollRef}
                             onMouseDown={(e) => {
                                 if (!favoritePlacesScrollRef.current) return
@@ -431,8 +440,8 @@ export function HomeRideScreen({
                             onMouseUp={() => setIsDraggingFavorites(false)}
                             onMouseLeave={() => setIsDraggingFavorites(false)}
                             className={`w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide scroll-smooth -mx-6 px-6 ${isDraggingFavorites ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
-                            style={{ 
-                                scrollbarWidth: 'none', 
+                            style={{
+                                scrollbarWidth: 'none',
                                 msOverflowStyle: 'none',
                                 WebkitOverflowScrolling: 'touch',
                                 touchAction: 'pan-x pinch-zoom',
@@ -452,7 +461,7 @@ export function HomeRideScreen({
                                             }
                                             handleLocationClick()
                                         }}
-                                        className="flex-shrink-0 min-h-[44px] px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 hover-lift active:animate-button-press transition-all duration-200 ease-out"
+                                        className="flex-shrink-0 min-h-[36px] px-3 py-1.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-xs font-normal text-text-dark hover:bg-green-50 hover-lift active:animate-button-press transition-all duration-200 ease-out"
                                     >
                                         {t(place)}
                                     </button>
@@ -465,7 +474,7 @@ export function HomeRideScreen({
                     {panelHeight > 50 && (
                         <div className="mb-3">
                             <p className="text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-3">{t('Recent locations').toUpperCase()}</p>
-                            <div 
+                            <div
                                 ref={recentLocationsScrollRef}
                                 onMouseDown={(e) => {
                                     if (!recentLocationsScrollRef.current) return
@@ -485,8 +494,8 @@ export function HomeRideScreen({
                                 onMouseUp={() => setIsDraggingRecent(false)}
                                 onMouseLeave={() => setIsDraggingRecent(false)}
                                 className={`w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide scroll-smooth -mx-6 px-6 ${isDraggingRecent ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
-                                style={{ 
-                                    scrollbarWidth: 'none', 
+                                style={{
+                                    scrollbarWidth: 'none',
                                     msOverflowStyle: 'none',
                                     WebkitOverflowScrolling: 'touch',
                                     touchAction: 'pan-x pinch-zoom',
@@ -506,7 +515,7 @@ export function HomeRideScreen({
                                                 }
                                                 handleLocationClick()
                                             }}
-                                            className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 hover-lift active:animate-button-press transition-all duration-200 ease-out"
+                                            className="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-xs font-normal text-text-dark hover:bg-green-50 hover-lift active:animate-button-press transition-all duration-200 ease-out"
                                         >
                                             <svg className="w-4 h-4 text-[#ff3b30] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />

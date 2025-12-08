@@ -107,7 +107,7 @@ export function QuickBookModal({
 
     return (
         <Overlay>
-            <div className="w-[400px] max-h-[85vh] rounded-[24px] border-2 border-primary/20 bg-white p-6 text-text-dark shadow-2xl overflow-hidden relative z-[3000]">
+            <div className="w-[400px] max-h-[85vh] rounded-[12px] border-2 border-primary/20 bg-white p-6 text-text-dark shadow-2xl overflow-hidden relative z-[3000]">
                 {/* Header */}
                 <h2 className="mb-4 font-display text-2xl font-bold uppercase tracking-wide text-primary">
                     Quick Book
@@ -138,7 +138,7 @@ export function QuickBookModal({
 
                 {/* Add/Edit Form */}
                 {showAddForm && (
-                    <div className="mb-4 rounded-2xl border-2 border-primary/30 bg-green-50 p-4 space-y-3">
+                    <div className="mb-4 rounded-lg border-2 border-primary/30 bg-green-50 p-4 space-y-3">
                         <div className="flex items-center justify-between mb-2">
                             <h3 className="text-sm font-bold text-primary">
                                 {editingId ? 'Edit Route' : 'Add New Route'}
@@ -170,7 +170,7 @@ export function QuickBookModal({
                             </label>
                             <button
                                 onClick={() => handleLocationClick('pickup')}
-                                className="w-full px-3 py-2 rounded-lg border-2 border-gray-300 bg-white text-sm text-left hover:border-primary transition-colors flex items-center justify-between"
+                                className="w-full px-3 py-2 rounded-md border-2 border-gray-300 bg-white text-sm text-left hover:border-primary transition-colors flex items-center justify-between"
                             >
                                 <span className={newRoute.pickupAddress === 'Select pickup location' ? 'text-gray-400' : 'text-text-dark'}>
                                     {newRoute.pickupAddress}
@@ -188,7 +188,7 @@ export function QuickBookModal({
                             </label>
                             <button
                                 onClick={() => handleLocationClick('dropoff')}
-                                className="w-full px-3 py-2 rounded-lg border-2 border-gray-300 bg-white text-sm text-left hover:border-primary transition-colors flex items-center justify-between"
+                                className="w-full px-3 py-2 rounded-md border-2 border-gray-300 bg-white text-sm text-left hover:border-primary transition-colors flex items-center justify-between"
                             >
                                 <span className={newRoute.dropoffAddress === 'Select drop-off location' ? 'text-gray-400' : 'text-text-dark'}>
                                     {newRoute.dropoffAddress}
@@ -209,7 +209,7 @@ export function QuickBookModal({
                                 value={newRoute.price}
                                 onChange={(e) => setNewRoute({ ...newRoute, price: e.target.value })}
                                 placeholder="e.g., RS. 120"
-                                className="w-full px-3 py-2 rounded-lg border-2 border-gray-300 text-sm focus:outline-none focus:border-primary"
+                                className="w-full px-3 py-2 rounded-md border-2 border-gray-300 text-sm focus:outline-none focus:border-primary"
                             />
                         </div>
 
@@ -226,13 +226,13 @@ export function QuickBookModal({
                                     })
                                     setEditingId(undefined)
                                 }}
-                                className="flex-1 py-2 rounded-lg border border-gray-300 bg-white text-sm font-semibold text-text-dark hover:bg-gray-50"
+                                className="flex-1 py-2 rounded-md border border-gray-300 bg-white text-sm font-semibold text-text-dark hover:bg-gray-50"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleSaveRoute}
-                                className="flex-1 py-2 rounded-lg bg-primary text-sm font-semibold text-white hover:bg-primary-dark"
+                                className="flex-1 py-2 rounded-md bg-primary text-sm font-semibold text-white hover:bg-primary-dark"
                             >
                                 {editingId ? 'Update' : 'Add'}
                             </button>
@@ -243,15 +243,15 @@ export function QuickBookModal({
                 {/* Route cards */}
                 <div className="mb-6 space-y-3 max-h-[400px] overflow-y-auto">
                     {routes.map((route) => (
-                        <div key={route.id} className="rounded-2xl border-2 border-primary bg-white p-4 shadow-md">
+                        <div key={route.id} className="rounded-lg border-2 border-primary bg-white p-4 shadow-md">
                             <div className="flex gap-3">
                                 {/* Location icons */}
                                 <div className="flex flex-col items-center gap-1 pt-1">
-                                    <div className="grid size-5 place-items-center rounded-full bg-yellow-400 text-white">
+                                    <div className="grid size-5 place-items-center rounded-lg bg-yellow-400 text-white">
                                         <AppIcon name="📍" className="text-xs" />
                                     </div>
                                     <div className="h-6 w-0.5 bg-zinc-300" />
-                                    <div className="grid size-5 place-items-center rounded-full bg-pink-500 text-white">
+                                    <div className="grid size-5 place-items-center rounded-lg bg-pink-500 text-white">
                                         <AppIcon name="📍" className="text-xs" />
                                     </div>
                                 </div>
@@ -274,7 +274,7 @@ export function QuickBookModal({
 
                                 {/* Price and vehicle */}
                                 <div className="flex flex-col items-end justify-between">
-                                    <div className="rounded-lg bg-primary/10 p-2">
+                                    <div className="rounded-md bg-primary/10 p-2">
                                         <img src={assets.motoIcon} alt="" className="h-8 w-8" />
                                     </div>
                                     <p className="text-lg font-bold text-primary">{route.price}</p>
@@ -285,19 +285,19 @@ export function QuickBookModal({
                             <div className="mt-3 flex items-center gap-2">
                                 <button
                                     onClick={() => handleDeleteRoute(route.id)}
-                                    className="grid size-10 place-items-center rounded-lg bg-[#ff6b6b] text-white transition hover:bg-[#ff5555]"
+                                    className="grid size-10 place-items-center rounded-md bg-[#ff6b6b] text-white transition hover:bg-[#ff5555]"
                                 >
                                     <AppIcon name="🗑️" className="text-lg" />
                                 </button>
                                 <button
                                     onClick={() => handleEditRoute(route)}
-                                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-text-dark transition hover:bg-zinc-50"
+                                    className="flex flex-1 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-text-dark transition hover:bg-zinc-50"
                                 >
                                     <AppIcon name="✏️" className="text-base" />
                                     Edit
                                 </button>
                                 <button
-                                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
+                                    className="flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white transition hover:bg-primary-dark"
                                     onClick={() => onConfirm(route)}
                                 >
                                     <AppIcon name="✓" className="text-lg" />

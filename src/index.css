@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=M+PLUS+Rounded+1c:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=M+PLUS+Rounded+1c:wght@500;700&family=Poppins:wght@700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -127,6 +127,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -143,9 +144,11 @@
     transform: scale(0) rotate(45deg);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.2) rotate(45deg);
   }
+
   100% {
     transform: scale(1) rotate(45deg);
     opacity: 1;
@@ -153,9 +156,12 @@
 }
 
 @keyframes success-bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.05);
   }
@@ -165,19 +171,24 @@
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(0.96);
   }
+
   100% {
     transform: scale(1);
   }
 }
 
 @keyframes subtle-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.8;
     transform: scale(1.02);
@@ -189,6 +200,7 @@
     transform: translateY(0);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
+
   100% {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -303,15 +315,15 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-  
+
   .scale-102 {
     transform: scale(1.02);
   }
-  
+
   .scale-98 {
     transform: scale(0.98);
   }
@@ -324,13 +336,14 @@
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
   }
-  
+
   /* HCI Principles: Ensure minimum touch targets */
-  button, a[role="button"] {
+  button,
+  a[role="button"] {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   /* Smooth scrolling */
   * {
     scroll-behavior: smooth;

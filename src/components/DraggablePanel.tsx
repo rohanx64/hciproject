@@ -158,7 +158,7 @@ export function DraggablePanel({
     return (
         <div
             ref={panelRef}
-            className="fixed left-0 right-0 bg-white dark:bg-[rgb(var(--color-surface))] rounded-t-[28px] shadow-[0_-8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl border-t border-gray-100/50 dark:border-gray-700/50 z-[400]"
+            className="fixed left-0 right-0 bg-white dark:bg-[rgb(var(--color-surface))] rounded-t-[28px] backdrop-blur-xl border-t border-gray-100/50 dark:border-gray-700/50 z-[400]"
             style={{
                 height: getStyleHeight(),
                 bottom: hideBottomNav ? '0' : `${BOTTOM_NAV_HEIGHT}px`,
@@ -169,7 +169,7 @@ export function DraggablePanel({
         >
             {/* Top decorative gradient line - More subtle */}
             <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-            
+
             {/* Drag Handle - Enhanced with better feedback */}
             <div
                 className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-1.5 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-600 dark:via-gray-500 dark:to-gray-600 rounded-full cursor-grab active:cursor-grabbing transition-all duration-200 hover:from-gray-300 hover:via-gray-400 hover:to-gray-300 dark:hover:from-gray-500 dark:hover:via-gray-400 dark:hover:to-gray-500 hover:w-24 hover:shadow-md active:scale-95"

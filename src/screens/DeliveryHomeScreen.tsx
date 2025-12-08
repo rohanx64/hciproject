@@ -39,7 +39,7 @@ export function DeliveryHomeScreen({
     const mapRef = useRef<L.Map | null>(null)
     const panelContentRef = useRef<HTMLDivElement>(null)
     const isMapDraggingRef = useRef(false)
-    
+
     // Horizontal scroll refs for location buttons
     const favoritePlacesScrollRef = useRef<HTMLDivElement>(null)
     const recentLocationsScrollRef = useRef<HTMLDivElement>(null)
@@ -65,39 +65,39 @@ export function DeliveryHomeScreen({
     // Calculate optimal panel height based on content
     useEffect(() => {
         if (!panelContentRef.current || isMapDraggingRef.current) return
-        
+
         const calculateOptimalHeight = () => {
             // Skip calculation if map is being dragged
             if (isMapDraggingRef.current) return
-            
+
             const content = panelContentRef.current
             if (!content) return
-            
+
             const contentHeight = content.scrollHeight
             const padding = 48
             const totalNeededHeight = contentHeight + padding
-            
+
             const bottomNavHeight = 110
             const availableHeight = containerHeight - bottomNavHeight
             const optimalPercent = Math.min(82, Math.max(30, (totalNeededHeight / availableHeight) * 100))
-            
+
             if (Math.abs(panelHeight - optimalPercent) > 2) {
                 setPanelHeight(optimalPercent)
                 setPanelMinHeight(Math.max(PANEL_BASE_MIN_HEIGHT, optimalPercent * 0.7))
             }
         }
-        
+
         const timeoutId = setTimeout(calculateOptimalHeight, 100)
         const observer = new ResizeObserver(() => {
             if (!isMapDraggingRef.current) {
                 calculateOptimalHeight()
             }
         })
-        
+
         if (panelContentRef.current) {
             observer.observe(panelContentRef.current)
         }
-        
+
         return () => {
             clearTimeout(timeoutId)
             observer.disconnect()
@@ -194,7 +194,7 @@ export function DeliveryHomeScreen({
     }
 
     return (
-        <div className="w-full h-full flex flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl relative">
+        <div className="w-full h-full flex flex-col overflow-hidden rounded-[20px] bg-white shadow-2xl relative">
             {/* Map Section - Full height, panel overlays */}
             <section className="absolute inset-0 overflow-hidden" style={{ zIndex: 0 }}>
                 <RideMap
@@ -253,7 +253,7 @@ export function DeliveryHomeScreen({
                                 mapRef.current.zoomIn()
                             }
                         }}
-                        className="size-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
+                        className="size-10 rounded-lg bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
                         aria-label="Zoom in"
                     >
                         <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -266,7 +266,7 @@ export function DeliveryHomeScreen({
                                 mapRef.current.zoomOut()
                             }
                         }}
-                        className="size-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
+                        className="size-10 rounded-lg bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all duration-200"
                         aria-label="Zoom out"
                     >
                         <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,12 +277,12 @@ export function DeliveryHomeScreen({
 
                 {/* Voice Button - Combined mic + Voice label, aligned with location button */}
                 <button
-                    style={{ 
+                    style={{
                         bottom: `${buttonBottomPixels}px`,
                         transition: 'bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
                     onClick={onOpenVoiceActivation}
-                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm shadow-lg border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary hover-lift active:animate-button-press transition-colors duration-200 ease-out"
+                    className="fixed left-[5.68%] px-4 py-3 rounded-full bg-primary/95 backdrop-blur-sm border-2 border-white flex items-center gap-2 z-[600] hover:bg-primary active:scale-95 transition-all duration-200 ease-out"
                     aria-label="Voice input"
                 >
                     <svg className="w-5 h-5 text-white animate-subtle-pulse" fill="currentColor" viewBox="0 0 24 24">
@@ -295,11 +295,11 @@ export function DeliveryHomeScreen({
 
                 {/* Location Button - Dynamically positioned above panel */}
                 <button
-                    style={{ 
+                    style={{
                         bottom: `${buttonBottomPixels}px`,
                         transition: 'bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
-                    className="fixed right-[5.26%] px-4 py-3 rounded-full bg-white/95 border-2 border-[#ff9500] text-[#ff9500] font-semibold shadow-lg flex items-center gap-2 z-[600] hover:bg-[#ff9500] hover:text-white hover-lift active:animate-button-press transition-colors duration-200 ease-out"
+                    className="fixed right-[5.26%] px-4 py-3 rounded-full bg-white/95 border-2 border-[#32991d] text-[#2a7f16] font-semibold flex items-center gap-2 z-[600] hover:bg-[#32991d] hover:text-white hover:shadow-xl active:scale-95 transition-all duration-200 ease-out"
                     aria-label="Use current location"
                     onClick={() => {
                         if (navigator.geolocation) {
@@ -324,7 +324,7 @@ export function DeliveryHomeScreen({
                     }}
                     className="absolute left-1/2 top-[25.7%] -translate-x-1/2 w-[254px] min-h-[60px] z-20 active:scale-95 transition-transform duration-200"
                 >
-                    <div className="rounded-3xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-3 shadow-lg flex items-center gap-3 hover:shadow-xl transition-all duration-200">
+                    <div className="rounded-xl border-2 border-[#c8f0c0] bg-white/95 px-4 py-3 shadow-[4px_4px_0px_rgba(50,153,29,0.5)] flex items-center gap-3 hover:shadow-[5px_5px_0px_rgba(50,153,29,0.5)] transition-all duration-200">
                         <div className="grid size-7 place-items-center flex-shrink-0">
                             {/* Green target/crosshair icon for pickup */}
                             <svg className="w-5 h-5 text-[#6cc44a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -342,6 +342,15 @@ export function DeliveryHomeScreen({
                         </svg>
                     </div>
                 </button>
+
+                {/* Connecting Line from Pickup to Map Pin - Orange for Delivery */}
+                <div
+                    className="absolute left-1/2 -translate-x-1/2 w-[3px] bg-[#ff9500] z-15 pointer-events-none"
+                    style={{
+                        top: 'calc(25.7% + 60px)',
+                        height: 'calc(50% - 25.7% - 60px - 50px)'
+                    }}
+                />
             </section>
 
             {/* Draggable Bottom Panel */}
@@ -354,14 +363,14 @@ export function DeliveryHomeScreen({
             >
                 <div ref={panelContentRef} className="px-6 pb-2">
                     {/* Delivery Title - Top left */}
-                    <h1 className="font-display text-[32px] font-extrabold text-[#ff9500] text-left mb-3 mt-2">
+                    <h1 className="text-[32px] font-extrabold text-[#ff9500] text-left mb-3 mt-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
                         Delivery
                     </h1>
 
                     {/* Drop-off Input Card - With red pin icon (Figma style) */}
                     <button
                         onClick={onProceedToForm}
-                        className="w-full rounded-2xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm mb-3 flex items-center gap-3 hover:bg-green-50 hover:border-[#ff9500] hover-lift active:animate-button-press transition-all duration-200 group"
+                        className="w-full rounded-lg border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-[4px_4px_0px_rgba(50,153,29,0.5)] mb-3 flex items-center gap-3 hover:bg-green-50 hover:border-[#ff9500] hover-lift active:animate-button-press transition-all duration-200 group"
                         style={dropoffCardStyle}
                     >
                         <div className="grid size-7 place-items-center flex-shrink-0">
@@ -382,8 +391,8 @@ export function DeliveryHomeScreen({
                     </button>
 
                     {/* Suggested Location Tags - Horizontal Scrollable */}
-                    <div className="mb-3">
-                        <div 
+                    <div className="mb-3 mt-4">
+                        <div
                             ref={favoritePlacesScrollRef}
                             onMouseDown={(e) => {
                                 if (!favoritePlacesScrollRef.current) return
@@ -403,8 +412,8 @@ export function DeliveryHomeScreen({
                             onMouseUp={() => setIsDraggingFavorites(false)}
                             onMouseLeave={() => setIsDraggingFavorites(false)}
                             className={`w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide scroll-smooth -mx-6 px-6 ${isDraggingFavorites ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
-                            style={{ 
-                                scrollbarWidth: 'none', 
+                            style={{
+                                scrollbarWidth: 'none',
                                 msOverflowStyle: 'none',
                                 WebkitOverflowScrolling: 'touch',
                                 touchAction: 'pan-x pinch-zoom',
@@ -412,9 +421,9 @@ export function DeliveryHomeScreen({
                             }}
                         >
                             <div className="flex gap-2" style={{ width: 'max-content' }}>
-                        {favoritePlaces.map((place, idx) => (
-                            <button
-                                key={idx}
+                                {favoritePlaces.map((place, idx) => (
+                                    <button
+                                        key={idx}
                                         onClick={(e) => {
                                             if (hasDraggedFavoritesRef.current) {
                                                 e.preventDefault()
@@ -424,11 +433,11 @@ export function DeliveryHomeScreen({
                                             }
                                             handleLocationClick(place)
                                         }}
-                                        className="flex-shrink-0 min-h-[44px] px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 hover:border-[#32991d] hover-lift active:animate-button-press transition-all duration-200 ease-out"
-                            >
-                                {place}
-                            </button>
-                        ))}
+                                        className="flex-shrink-0 min-h-[36px] px-3 py-1.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-xs font-normal text-text-dark hover:bg-green-50 hover:border-[#32991d] hover-lift active:animate-button-press transition-all duration-200 ease-out"
+                                    >
+                                        {place}
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -437,7 +446,7 @@ export function DeliveryHomeScreen({
                     {panelHeight > 50 && (
                         <div className="mb-3">
                             <p className="text-xs font-extrabold uppercase tracking-wider text-[#c8c7cc] mb-3">RECENT LOCATIONS</p>
-                            <div 
+                            <div
                                 ref={recentLocationsScrollRef}
                                 onMouseDown={(e) => {
                                     if (!recentLocationsScrollRef.current) return
@@ -457,8 +466,8 @@ export function DeliveryHomeScreen({
                                 onMouseUp={() => setIsDraggingRecent(false)}
                                 onMouseLeave={() => setIsDraggingRecent(false)}
                                 className={`w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-hide scroll-smooth -mx-6 px-6 ${isDraggingRecent ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
-                                style={{ 
-                                    scrollbarWidth: 'none', 
+                                style={{
+                                    scrollbarWidth: 'none',
                                     msOverflowStyle: 'none',
                                     WebkitOverflowScrolling: 'touch',
                                     touchAction: 'pan-x pinch-zoom',
@@ -466,7 +475,7 @@ export function DeliveryHomeScreen({
                                 }}
                             >
                                 <div className="flex gap-2" style={{ width: 'max-content' }}>
-                                {recentLocations.map((location, idx) => (
+                                    {recentLocations.map((location, idx) => (
                                         <button
                                             key={idx}
                                             onClick={(e) => {
@@ -478,7 +487,7 @@ export function DeliveryHomeScreen({
                                                 }
                                                 handleLocationClick(location.label)
                                             }}
-                                            className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 hover-lift active:animate-button-press transition-all duration-200 ease-out"
+                                            className="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-xs font-normal text-text-dark hover:bg-green-50 hover-lift active:animate-button-press transition-all duration-200 ease-out"
                                         >
                                             <svg className="w-4 h-4 text-[#ff3b30] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
@@ -490,7 +499,7 @@ export function DeliveryHomeScreen({
                                                 </svg>
                                             )}
                                         </button>
-                                ))}
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -502,6 +511,6 @@ export function DeliveryHomeScreen({
             <div className="fixed bottom-0 left-0 right-0 z-[1000] bg-white max-w-full">
                 <BottomNav active="Delivery" onNavigate={onNavigate} />
             </div>
-        </div>
+        </div >
     )
 }

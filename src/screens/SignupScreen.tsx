@@ -53,7 +53,7 @@ export function SignupScreen({ onSignup, onSwitchToLogin, onCallBykea }: SignupS
             </div>
 
             {/* White Card Container */}
-            <div className="relative z-20 mt-48 flex-1 bg-white rounded-t-[40px] px-6 pt-8 pb-4 flex flex-col">
+            <div className="relative z-20 mt-48 flex-1 bg-white rounded-t-[40px] px-6 pt-8 pb-6 flex flex-col overflow-y-auto">
                 {/* Tabs */}
                 <div className="flex items-center gap-6 mb-6">
                     <button className="text-base font-bold text-text-dark relative">
@@ -116,11 +116,10 @@ export function SignupScreen({ onSignup, onSwitchToLogin, onCallBykea }: SignupS
                 <button
                     onClick={handleNext}
                     disabled={phoneNumber.length !== 10}
-                    className={`w-full rounded-full px-6 py-4 text-center font-semibold text-white transition-all duration-200 mb-4 ${
-                        phoneNumber.length === 10
-                            ? 'bg-primary hover:bg-primary-dark active:scale-95 shadow-lg'
-                            : 'bg-gray-300 cursor-not-allowed'
-                    }`}
+                    className={`w-full rounded-full px-6 py-4 text-center font-semibold text-white transition-all duration-200 mb-4 ${phoneNumber.length === 10
+                        ? 'bg-primary hover:bg-primary-dark active:scale-95 shadow-lg'
+                        : 'bg-gray-300 cursor-not-allowed'
+                        }`}
                 >
                     Next
                 </button>
@@ -136,41 +135,33 @@ export function SignupScreen({ onSignup, onSwitchToLogin, onCallBykea }: SignupS
 
                 {/* Numeric Keypad */}
                 {showKeypad && (
-                    <div className="mt-auto grid grid-cols-3 gap-3 pb-4">
+                    <div className="mt-auto grid grid-cols-3 gap-2 pb-4">
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                             <button
                                 key={num}
                                 onClick={() => handleNumberClick(num.toString())}
-                                className="aspect-square rounded-xl bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all flex flex-col items-center justify-center"
+                                className="h-12 rounded-lg bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center"
                             >
-                                <span className="text-2xl font-semibold text-text-dark">{num}</span>
-                                {num === 2 && <span className="text-xs text-gray-500">ABC</span>}
-                                {num === 3 && <span className="text-xs text-gray-500">DEF</span>}
-                                {num === 4 && <span className="text-xs text-gray-500">GHI</span>}
-                                {num === 5 && <span className="text-xs text-gray-500">JKL</span>}
-                                {num === 6 && <span className="text-xs text-gray-500">MNO</span>}
-                                {num === 7 && <span className="text-xs text-gray-500">PQRS</span>}
-                                {num === 8 && <span className="text-xs text-gray-500">TUV</span>}
-                                {num === 9 && <span className="text-xs text-gray-500">WXYZ</span>}
+                                <span className="text-xl font-semibold text-text-dark">{num}</span>
                             </button>
                         ))}
                         <button
                             onClick={() => handleNumberClick('*')}
-                            className="aspect-square rounded-xl bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center"
+                            className="h-12 rounded-lg bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center"
                         >
-                            <span className="text-2xl font-semibold text-text-dark">*</span>
+                            <span className="text-xl font-semibold text-text-dark">*</span>
                         </button>
                         <button
                             onClick={() => handleNumberClick('0')}
-                            className="aspect-square rounded-xl bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center"
+                            className="h-12 rounded-lg bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center"
                         >
-                            <span className="text-2xl font-semibold text-text-dark">0</span>
+                            <span className="text-xl font-semibold text-text-dark">0</span>
                         </button>
                         <button
                             onClick={handleBackspace}
-                            className="aspect-square rounded-xl bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center"
+                            className="h-12 rounded-lg bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all flex items-center justify-center"
                         >
-                            <svg className="w-6 h-6 text-text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" />
                             </svg>
                         </button>

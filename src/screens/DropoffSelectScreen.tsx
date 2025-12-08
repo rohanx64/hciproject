@@ -11,7 +11,7 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
     const [value, setValue] = useState('')
     const [selectedLocation, setSelectedLocation] = useState<[number, number] | null>(null)
     const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
-    
+
     // Horizontal scroll refs for location buttons
     const favoritePlacesScrollRef = useRef<HTMLDivElement>(null)
     const recentLocationsScrollRef = useRef<HTMLDivElement>(null)
@@ -104,11 +104,11 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
     }, [isDraggingRecent, startXRecent, scrollLeftRecent])
 
     return (
-        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:scale-90 h-[844px]">
+        <div className="mx-auto flex w-[440px] max-w-full flex-col overflow-hidden rounded-[20px] bg-white shadow-2xl md:scale-90 h-[844px]">
             {/* Header with Search Input and Map/List toggle (matched to pickup selector) */}
             <section className="bg-white px-6 py-4 border-b border-gray-200 z-10">
                 <div className="flex items-center gap-3 mb-3">
-                    <div className="size-12 rounded-full bg-[#ff3b30]/20 flex items-center justify-center flex-shrink-0">
+                    <div className="size-12 rounded-lg bg-[#ff3b30]/20 flex items-center justify-center flex-shrink-0">
                         <svg className="w-7 h-7 text-[#ff3b30]" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                         </svg>
@@ -121,7 +121,7 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                         {viewMode === 'map' ? 'List View' : 'Map View'}
                     </button>
                 </div>
-                <div className="flex items-center gap-3 rounded-3xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm">
+                <div className="flex items-center gap-3 rounded-xl border-2 border-[#c8f0c0] bg-white px-4 py-3 shadow-sm">
                     <div className="grid size-7 place-items-center flex-shrink-0">
                         <svg className="w-5 h-5 text-[#ff3b30]" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
@@ -152,7 +152,7 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                         {/* Use Current Location */}
                         <button
                             onClick={handleUseCurrentLocation}
-                            className="w-full flex items-center gap-3 p-3 mb-4 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition text-left min-h-[52px]"
+                            className="w-full flex items-center gap-3 p-3 mb-4 rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition text-left min-h-[52px]"
                         >
                             <svg className="w-6 h-6 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -169,7 +169,7 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                                     <button
                                         key={idx}
                                         onClick={() => handleLocationSelect(place)}
-                                        className="px-4 py-2 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-sm font-normal text-text-dark hover:bg-green-50 active:scale-95 transition-all duration-200"
+                                        className="px-3 py-1.5 rounded-[17.5px] border border-[rgba(50,153,29,0.64)] bg-white text-xs font-normal text-text-dark hover:bg-green-50 active:scale-95 transition-all duration-200"
                                     >
                                         {place}
                                     </button>
@@ -185,11 +185,11 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                                     <div key={idx}>
                                         <button
                                             onClick={() => handleLocationSelect(location.label)}
-                                            className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition text-left group"
+                                            className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-md transition text-left group"
                                         >
                                             {/* Red location pin icon */}
                                             <svg className="w-5 h-5 text-[#ff3b30] flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                                             </svg>
                                             <span className="flex-1 text-base font-normal text-text-dark">{location.label}</span>
                                             {/* Clickable star icon */}
@@ -232,7 +232,7 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                                 {/* Pin shadow */}
                                 <div className="absolute inset-0 translate-y-1 bg-black/20 blur-sm rounded-full" />
                                 {/* Pin body - Red for drop-off */}
-                                <div className="relative size-14 rounded-full bg-[#ff3b30] border-4 border-white shadow-lg flex items-center justify-center">
+                                <div className="relative size-14 rounded-lg bg-[#ff3b30] border-4 border-white shadow-lg flex items-center justify-center">
                                     <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                                     </svg>
@@ -264,13 +264,13 @@ export function DropoffSelectScreen({ onCancel, onApply }: DropoffSelectProps) {
                 <div className="flex gap-4">
                     <button
                         onClick={onCancel}
-                        className="flex-1 rounded-3xl border-2 border-gray-300 bg-white px-6 py-4 text-base font-bold text-gray-700 transition hover:bg-gray-50 active:scale-95 min-h-[52px]"
+                        className="flex-1 rounded-xl border-2 border-gray-300 bg-white px-6 py-4 text-base font-bold text-gray-700 transition hover:bg-gray-50 active:scale-95 min-h-[52px]"
                     >
                         CANCEL
                     </button>
                     <button
                         onClick={() => onApply(value || 'Custom Drop-off')}
-                        className="flex-1 rounded-3xl bg-primary px-6 py-4 text-base font-bold text-white transition hover:bg-primary-dark shadow-lg active:scale-95 min-h-[52px]"
+                        className="flex-1 rounded-xl bg-primary px-6 py-4 text-base font-bold text-white transition hover:bg-primary-dark shadow-lg active:scale-95 min-h-[52px]"
                     >
                         APPLY
                     </button>
